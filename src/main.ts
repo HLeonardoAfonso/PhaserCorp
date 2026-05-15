@@ -8,6 +8,14 @@ const config: Phaser.Types.Core.GameConfig = {
   backgroundColor: '#1a1a2e',
   scene: [GameScene],
   parent: 'app',
+  physics: {
+    default: 'arcade',
+    arcade: {
+      gravity: { y: 0, x: 0 },
+      debug: false,
+    },
+  }
+
 };
 
 new Phaser.Game(config);
