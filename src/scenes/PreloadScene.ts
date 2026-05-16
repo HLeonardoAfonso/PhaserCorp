@@ -11,8 +11,4 @@ export class PreloadScene extends Phaser.Scene {
   public create(): void {
     this.scene.start('GAME_SCENE');
   }
-
-  #createAnimations(): void {
-    this.anims.createFromAseprite('PLAYER');
-  }
 }
