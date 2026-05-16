@@ -3,11 +3,17 @@ import { GameScene } from './scenes/GameScene';
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
-  width: 800,
-  height: 600,
-  backgroundColor: '#1a1a2e',
+  pixelArt: true,
+  roundPixels: true,
+  scale: {
+    parent: 'game-container',
+    width: 1000,
+    height: 800,
+    autoCenter: Phaser.Scale.CENTER_BOTH,
+    mode: Phaser.Scale.HEIGHT_CONTROLS_WIDTH,
+  },
+  backgroundColor: '#47ABA9',
   scene: [GameScene],
-  parent: 'app',
   physics: {
     default: 'arcade',
     arcade: {
