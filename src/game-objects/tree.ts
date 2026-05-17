@@ -2,7 +2,7 @@ import { Interactibles, type InteractiblesConfig } from "./interactibles";
 
 export class Tree extends Interactibles {
     constructor(config: InteractiblesConfig) {
-        super(config);
+        super(config, 100);
         this.playIdleAnimation();
         this.setOrigin(0.51, 0.83);
         this.setBodySize(30, 30);
@@ -18,5 +18,14 @@ export class Tree extends Interactibles {
         this.once('animationcomplete-TREE_CHOP', () => {
             this.playIdleAnimation();
         })
+    }
+
+    update(): void {
+        if (this.isDead) {
+            this.stop();
+            this.setFrame(8);
+            Interactibles.clearHovered();
+            this.disableInteractive();
+        }
     }
 }

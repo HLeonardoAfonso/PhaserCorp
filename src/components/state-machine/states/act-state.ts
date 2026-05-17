@@ -4,6 +4,9 @@ import type { StateMachine } from "../state-machine";
 import { IdleState } from "./idle-state";
 import type { ControlsComponent } from "../../game-object/controls-component";
 import type { Player } from "../../../game-objects/player";
+import { Tree } from "../../../game-objects/tree";
+import { Interactibles } from "../../../game-objects/interactibles";
+import { MoveState } from "./move-state";
 
 export class ActState extends State {
     declare protected gameObject: Phaser.Physics.Arcade.Sprite;
@@ -22,31 +25,37 @@ export class ActState extends State {
     }
 
     onEnter(_previousState: State | null): void {
-        const interactible = (this.gameObject as Player).nearInteractible;
+        const selected = Interactibles.currentSelected;
+
         this.gameObject.setVelocity(0, 0);
-        this.gameObject.play({ key: this.#animKey, repeat: 0 }, true);
-        
-        const onFrame = (_anim: Phaser.Animations.Animation, frame: Phaser.Animations.AnimationFrame) => {
-            if (frame.index === 3) { // frame do impacto do machado
-                interactible?.playInteractAnimation();
-                this.gameObject.off('animationupdate', onFrame);
+        this.gameObject.play({ key: this.#animKey, repeat: -1 }, true);
+
+        if (selected && !selected.isDead && selected instanceof Tree){
+            const tree = selected as Tree;
+            const onFrame = (_anim: Phaser.Animations.Animation, frame: Phaser.Animations.AnimationFrame) => {
+                if (frame.index === 3) { // frame do impacto do machado
+                    tree.playInteractAnimation();
+                    tree.takeDamage(25);
+                    tree.update();
+                    this.gameObject.off('animationupdate', onFrame);
+                }
             }
+            this.gameObject.on('animationupdate', onFrame);
         }
-
-        this.gameObject.on('animationupdate', onFrame);
-
-        this.gameObject.once(`animationcomplete-${this.#animKey}`, () => {
-            this.stateMachine.setState(
-                new IdleState(
-                    this.gameObject as Phaser.Physics.Arcade.Sprite,
-                    this.stateMachine,
-                    this.#controlsComponent,
-                ),
-            );
-        });
     }
 
     onUpdate(): void {
-        // Do nothing, waiting for animation to complete
+        const controls = this.#controlsComponent.controls;
+        const isMoving = controls.isLeftDown || controls.isRightDown || controls.isUpDown || controls.isDownDown;
+        const tree = Interactibles.currentSelected as Tree;
+        if (isMoving || tree.isDead) {
+            this.gameObject.off('animationupdate');
+            Interactibles.clearSelected();
+            this.stateMachine.setState(
+            isMoving
+                ? new MoveState(this.gameObject, this.stateMachine, this.#controlsComponent)
+                : new IdleState(this.gameObject, this.stateMachine, this.#controlsComponent),
+            );
+        }
     }
 }

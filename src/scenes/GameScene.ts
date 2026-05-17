@@ -2,6 +2,8 @@ import Phaser from 'phaser';
 import { Player } from '../game-objects/player';
 import { KeyboardComponent } from '../components/input/keyboard-component';
 import { Tree } from '../game-objects/tree';
+import { Interactibles } from '../game-objects/interactibles';
+import { Cursors } from '../common/cursor';
 
 export class GameScene extends Phaser.Scene {
 
@@ -37,6 +39,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   public create(): void {
+    this.input.setDefaultCursor(Cursors.DEFAULT);
 
     if (!this.input.keyboard) {
       console.warn('Phaser keyboard plugin not setup');
@@ -83,7 +86,6 @@ export class GameScene extends Phaser.Scene {
       repeat: 0,
     });
 
-
     this.#controls = new KeyboardComponent(this.input.keyboard);
     this.#player = new Player({
       scene: this,
@@ -104,14 +106,25 @@ export class GameScene extends Phaser.Scene {
   }
 
   update() {
-    this.#player.nearInteractible = null;
     this.physics.overlap(
       this.#player.getInteractZone(),
       this.#trees,
-      (_, tree) => { //funcao lambda (zone, tree) (callback)
-        this.#player.nearInteractible = tree as Tree; //cast (tree gameObject para Tree class)
+      (_, obj) => { //funcao lambda (zone, tree:GameObject) (callback)
+        const tree = obj as Tree //cast (tree gameObject para Tree class) 
+        if (!tree.isDead){
+          this.#player.addNearInteractibles(tree)
+        } 
       }
     );
+
+    const hovered = Interactibles.currentHovered;
+    if (hovered && !hovered.isDead) {
+      const reachable = this.#player.nearInteractibles.has(hovered);
+      this.input.setDefaultCursor(reachable ? Cursors.CLICKABLE : Cursors.UNREACHABLE);
+    } else {
+      this.input.setDefaultCursor(Cursors.DEFAULT);
+    }
+
     this.#player.update();
   }
 }

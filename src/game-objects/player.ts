@@ -17,8 +17,8 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     #controlsComponent: ControlsComponent;
     #stateMachine: StateMachine;
     #interactZone: Phaser.GameObjects.Zone;
-    #nearInteractible: Interactibles | null = null;
-
+    #nearInteractibles: Set<Interactibles> = new Set();
+    
     constructor(config: PlayerConfig) {
         const { scene, position, assetKey, frame } = config;
         const { x, y } = position;
@@ -46,12 +46,18 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     return this.#interactZone;
     }
 
-    get nearInteractible() { return this.#nearInteractible; }
-    set nearInteractible(val: Interactibles | null) { this.#nearInteractible = val; }
+    get nearInteractibles() { return this.#nearInteractibles; }
 
+    clearNearInteractibles(): void { this.#nearInteractibles.clear(); }
+
+    addNearInteractibles(interactibles: Interactibles): void {
+        this.#nearInteractibles.add(interactibles);
+    }
     update(): void {
         this.#stateMachine.update();
         this.setDepth(this.y);
         this.#interactZone.setPosition(this.x, this.y);
+        this.clearNearInteractibles()
+    
     }
 }
