@@ -1,8 +1,9 @@
 import Phaser from 'phaser';
 import { Player } from '../game-objects/player';
 import { KeyboardComponent } from '../components/input/keyboard-component';
-import MAP_DATA, { WATER_TILES } from '../levels/level1';
 import { Tree } from '../game-objects/tree';
+import { createAnimations } from '../construction/animations';
+import MAP_DATA, { WATER_TILES } from '../construction/level';
 
 export class GameScene extends Phaser.Scene {
 
@@ -19,59 +20,7 @@ export class GameScene extends Phaser.Scene {
     const MAP_WIDTH = 44 * 64;
     const MAP_HEIGHT = 26 * 64;
 
-    if (!this.input.keyboard) {
-      console.warn('Phaser keyboard plugin not setup');
-      return;
-    }
-
-    this.anims.create({
-      key: 'IDLE',
-      frames: this.anims.generateFrameNumbers('PLAYER_IDLE', { start: 0, end: 7 }),
-      frameRate: 8,
-      repeat: -1,
-    });
-
-    this.anims.create({
-      key: 'MOVE',
-      frames: this.anims.generateFrameNumbers('PLAYER_MOVE', { start: 0, end: 5 }),
-      frameRate: 8,
-      repeat: -1,
-    });
-
-    this.anims.create({
-      key: 'ACT_PICKAXE',
-      frames: this.anims.generateFrameNumbers('PLAYER_PICKAXE', { start: 0, end: 5 }),
-      frameRate: 8,
-      repeat: -1,
-    });
-    this.anims.create({
-      key: 'ACT_AXE',
-      frames: this.anims.generateFrameNumbers('PLAYER_AXE', { start: 0, end: 5 }),
-      frameRate: 8,
-      repeat: -1,
-    });
-    
-    this.anims.create({
-      key: 'TREE_IDLE',
-      frames: this.anims.generateFrameNumbers('TREE', { start: 0, end: 3 }),
-      frameRate: 8,
-      repeat: -1,
-    });
-    this.anims.create({
-      key: 'TREE_CHOP',
-      frames: this.anims.generateFrameNumbers('TREE', { start: 4, end: 5 }),
-      frameRate: 8,
-      repeat: 0,
-    });
-
-
-    // ── Water animation ──
-    this.anims.create({
-      key: 'WATER_FOAM_ANIM',
-      frames: this.anims.generateFrameNumbers('WATER_FOAM', { start: 0, end: 16 }),
-      frameRate: 8,
-      repeat: -1,
-    });
+    createAnimations(this);
 
     // ── Build tilemap ──
     const map = this.make.tilemap({
@@ -106,6 +55,10 @@ export class GameScene extends Phaser.Scene {
       }
     }
 
+    if (!this.input.keyboard) {
+      console.warn('Phaser keyboard plugin not setup');
+      return;
+    }
     this.#controls = new KeyboardComponent(this.input.keyboard);
 
     this.physics.world.setBounds(0, 0, MAP_WIDTH, MAP_HEIGHT);
