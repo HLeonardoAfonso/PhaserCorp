@@ -4,6 +4,7 @@ import { MoveState } from "./move-state";
 import { ActState } from "./act-state";
 import type { StateMachine } from "../state-machine";
 import type { ControlsComponent } from "../../game-object/controls-component";
+import type { Player } from "../../../game-objects/player";
 
 export class IdleState extends State {
     declare protected gameObject: Phaser.Physics.Arcade.Sprite;
@@ -32,6 +33,7 @@ export class IdleState extends State {
                     this.gameObject as Phaser.Physics.Arcade.Sprite,
                     this.stateMachine,
                     this.#controlsComponent,
+                    (this.gameObject as Player).nearInteractible ? "ACT_AXE" : "ACT_PICKAXE",
                 ),
             );
             return;
