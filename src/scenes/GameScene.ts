@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { Player } from '../game-objects/player';
 import { KeyboardComponent } from '../components/input/keyboard-component';
+import MAP_DATA, { WATER_TILES } from '../levels/level1';
 
 export class GameScene extends Phaser.Scene {
 
@@ -9,21 +10,6 @@ export class GameScene extends Phaser.Scene {
 
   constructor() {
     super({ key: 'GAME_SCENE' });
-  }
-
-  preload() {
-    this.load.spritesheet('PLAYER_IDLE', 'assets/pawn/Pawn_Idle.png', {
-      frameWidth: 192,
-      frameHeight: 192,
-    });
-    this.load.spritesheet('PLAYER_MOVE', 'assets/pawn/Pawn_Run.png', {
-      frameWidth: 192,
-      frameHeight: 192,
-    });
-    this.load.spritesheet('PLAYER_ACT', 'assets/pawn/Pawn_Interact Pickaxe.png', {
-      frameWidth: 192,
-      frameHeight: 192,
-    });
   }
 
   public create(): void {
@@ -54,6 +40,47 @@ export class GameScene extends Phaser.Scene {
       repeat: -1,
     });
 
+    // ── Water animation ──
+    this.anims.create({
+      key: 'WATER_FOAM_ANIM',
+      frames: this.anims.generateFrameNumbers('WATER_FOAM', { start: 0, end: 16 }),
+      frameRate: 8,
+      repeat: -1,
+    });
+
+    // ── Build tilemap ──
+    const map = this.make.tilemap({
+      data: MAP_DATA,
+      tileWidth: 64,
+      tileHeight: 64,
+    });
+    const tileset = map.addTilesetImage('tileset', 'TILESET_COLOR1', 64, 64, 0, 0);
+    if (!tileset) {
+      console.warn('Failed to add tileset image');
+      return;
+    }
+    const groundLayer = map.createLayer(0, tileset, 0, 0);
+    if (groundLayer) {
+      groundLayer.setDepth(1);
+    }
+
+    // ── Animated water foam behind water tiles ──
+    const waterSet = new Set(WATER_TILES);
+    for (let row = 0; row < MAP_DATA.length; row++) {
+      for (let col = 0; col < MAP_DATA[row].length; col++) {
+        if (waterSet.has(MAP_DATA[row][col])) {
+          const foam = this.add.sprite(
+            col * 64 + 32, 
+            row * 64 + 32,
+            'WATER_FOAM',
+            0
+          );
+          foam.setDepth(0);
+          foam.play('WATER_FOAM_ANIM');
+        }
+      }
+    }
+
     this.#controls = new KeyboardComponent(this.input.keyboard);
     this.#player = new Player({
       scene: this,
@@ -62,6 +89,7 @@ export class GameScene extends Phaser.Scene {
       frame: 0,
       controls: this.#controls,
     });
+    this.#player.setDepth(2);
   }
 
   update() {
