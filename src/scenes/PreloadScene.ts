@@ -13,15 +13,23 @@ export class PreloadScene extends Phaser.Scene {
       frameWidth: 192,
       frameHeight: 192,
     });
-    this.load.spritesheet('PLAYER_ACT', 'assets/pawn/Pawn_Interact Pickaxe.png', {
-      frameWidth: 192,
-      frameHeight: 192,
-    });
     this.load.spritesheet('TILESET_COLOR1', 'assets/tileset/Tilemap_color1.png', {
       frameWidth: 64,
       frameHeight: 64,
     });
     this.load.spritesheet('WATER_FOAM', 'assets/tileset/Water Foam.png', {
+      frameWidth: 192,
+      frameHeight: 192,
+    });
+    this.load.spritesheet('TREE', 'assets/tree/Tree.png', {
+      frameWidth: 192,
+      frameHeight: 192,
+    })
+    this.load.spritesheet('PLAYER_PICKAXE', 'assets/pawn/Pawn_Interact Pickaxe.png', {
+      frameWidth: 192,
+      frameHeight: 192,
+    });
+    this.load.spritesheet('PLAYER_AXE', 'assets/pawn/Pawn_Interact Axe.png', {
       frameWidth: 192,
       frameHeight: 192,
     });
