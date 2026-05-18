@@ -6,6 +6,10 @@ export class PreloadScene extends Phaser.Scene {
   }
 
   public preload(): void {
+    this.load.image('SEL_TL', 'assets/cursors/select_tl.png');
+    this.load.image('SEL_TR', 'assets/cursors/select_tr.png');
+    this.load.image('SEL_BL', 'assets/cursors/select_bl.png');
+    this.load.image('SEL_BR', 'assets/cursors/select_br.png');
     this.load.spritesheet('PLAYER_IDLE', 'assets/pawn/Pawn_Idle.png', {
       frameWidth: 192,
       frameHeight: 192,

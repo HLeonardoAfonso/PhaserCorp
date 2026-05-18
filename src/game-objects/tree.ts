@@ -1,6 +1,7 @@
 import { Interactibles, type InteractiblesConfig } from "./interactibles";
 
 export class Tree extends Interactibles {
+    #opaqueZone: Phaser.GameObjects.Zone;
     constructor(config: InteractiblesConfig) {
         super(config, 100);
         this.playIdleAnimation();
@@ -9,8 +10,14 @@ export class Tree extends Interactibles {
         this.setDepth(config.position.y);
 
         this.removeInteractive();
-        this.setInteractive(new Phaser.Geom.Rectangle(66, 0, 64, 175), Phaser.Geom.Rectangle.Contains);
+        const rect = new Phaser.Geom.Rectangle(66, 0, 64, 175);
+        this.hitRect = rect;
+        this.setInteractive(rect, Phaser.Geom.Rectangle.Contains);
+        this.#opaqueZone = this.scene.add.zone(this.x, this.y/1.7, 64, 175);
+        this.scene.physics.add.existing(this.#opaqueZone);
     }
+
+    get opaqueZone() { return this.#opaqueZone; }
 
     playIdleAnimation(): void {
         this.play('TREE_IDLE');
@@ -32,6 +39,8 @@ export class Tree extends Interactibles {
             this.setFrame(8);
             Interactibles.clearHovered();
             this.removeInteractive();
+            this.#opaqueZone.destroy();
+            this.setAlpha(1);
             // Se a arvore poder se regenerar, é melhor disable do que o remove
             //this.disableInteractive();
         }

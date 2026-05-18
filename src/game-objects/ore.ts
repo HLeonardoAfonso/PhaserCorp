@@ -8,7 +8,9 @@ export class Ore extends Interactibles {
         this.setDepth(config.position.y);
 
         this.removeInteractive();
-        this.setInteractive(new Phaser.Geom.Rectangle(40, 40, 45, 45), Phaser.Geom.Rectangle.Contains);
+        const rect = new Phaser.Geom.Rectangle(40, 40, 45, 45);
+        this.hitRect = rect;
+        this.setInteractive(rect, Phaser.Geom.Rectangle.Contains);
     }
 
     playIdleAnimation(): void {
