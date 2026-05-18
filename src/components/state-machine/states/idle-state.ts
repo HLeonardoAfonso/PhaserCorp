@@ -4,6 +4,10 @@ import { MoveState } from "./move-state";
 import { ActState } from "./act-state";
 import type { StateMachine } from "../state-machine";
 import type { ControlsComponent } from "../../game-object/controls-component";
+import type { Player } from "../../../game-objects/player";
+import { Tree } from "../../../game-objects/tree";
+import { Interactibles } from "../../../game-objects/interactibles";
+import { Ore } from "../../../game-objects/ore";
 
 export class IdleState extends State {
     declare protected gameObject: Phaser.Physics.Arcade.Sprite;
@@ -25,16 +29,30 @@ export class IdleState extends State {
 
     onUpdate(): void {
         const controls = this.#controlsComponent.controls;
+        const selected = Interactibles.currentSelected;
 
-        if (controls.isActionKeyJustDown) {
+        if ((selected instanceof Tree) && (this.gameObject as Player).nearInteractibles.has(selected)){
             this.stateMachine.setState(
                 new ActState(
                     this.gameObject as Phaser.Physics.Arcade.Sprite,
                     this.stateMachine,
                     this.#controlsComponent,
+                    "ACT_AXE",
                 ),
             );
-            return;
+            return
+        }
+
+        if ((selected instanceof Ore) && (this.gameObject as Player).nearInteractibles.has(selected)){
+            this.stateMachine.setState(
+                new ActState(
+                    this.gameObject as Phaser.Physics.Arcade.Sprite,
+                    this.stateMachine,
+                    this.#controlsComponent,
+                    "ACT_PICKAXE",
+                ),
+            );
+            return
         }
 
         const isMoving = controls.isLeftDown || controls.isRightDown || controls.isUpDown || controls.isDownDown;
