@@ -95,13 +95,9 @@ export class GameScene extends Phaser.Scene {
       controls: this.#controls,
     });
     this.#trees = this.physics.add.staticGroup();
-    this.#trees.add(
-      new Tree({
-      scene: this,
-      position: { x: 100, y: 100 },
-      assetKey: 'TREE',
-    })
-    );
+    const tree = new Tree({ scene: this, position: { x: 100, y: 180 }, assetKey: 'TREE' });
+    this.input.enableDebug(tree);
+    this.#trees.add(tree);
     this.physics.add.collider(this.#player, this.#trees);
   }
 

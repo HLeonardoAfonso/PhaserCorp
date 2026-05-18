@@ -7,6 +7,9 @@ export class Tree extends Interactibles {
         this.setOrigin(0.51, 0.83);
         this.setBodySize(30, 30);
         this.setDepth(config.position.y);
+
+        this.removeInteractive();
+        this.setInteractive(new Phaser.Geom.Rectangle(66, 0, 64, 175), Phaser.Geom.Rectangle.Contains);
     }
 
     playIdleAnimation(): void {
@@ -16,7 +19,10 @@ export class Tree extends Interactibles {
     playInteractAnimation(): void {
         this.play('TREE_CHOP');
         this.once('animationcomplete-TREE_CHOP', () => {
-            this.playIdleAnimation();
+            this.update();
+            if(!this.isDead){
+                this.playIdleAnimation();
+            }
         })
     }
 
@@ -25,7 +31,9 @@ export class Tree extends Interactibles {
             this.stop();
             this.setFrame(8);
             Interactibles.clearHovered();
-            this.disableInteractive();
+            this.removeInteractive();
+            // Se a arvore poder se regenerar, é melhor disable do que o remove
+            //this.disableInteractive();
         }
     }
 }

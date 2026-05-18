@@ -3,7 +3,6 @@ import { State } from "../state";
 import type { StateMachine } from "../state-machine";
 import { IdleState } from "./idle-state";
 import type { ControlsComponent } from "../../game-object/controls-component";
-import type { Player } from "../../../game-objects/player";
 import { Tree } from "../../../game-objects/tree";
 import { Interactibles } from "../../../game-objects/interactibles";
 import { MoveState } from "./move-state";
@@ -36,8 +35,6 @@ export class ActState extends State {
                 if (frame.index === 3) { // frame do impacto do machado
                     tree.playInteractAnimation();
                     tree.takeDamage(25);
-                    tree.update();
-                    this.gameObject.off('animationupdate', onFrame);
                 }
             }
             this.gameObject.on('animationupdate', onFrame);
