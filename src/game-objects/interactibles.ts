@@ -47,5 +47,4 @@ export abstract class Interactibles extends Phaser.Physics.Arcade.Sprite {
     }
 
     abstract playIdleAnimation(): void;
-    abstract playInteractAnimation(): void;
 }

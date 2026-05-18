@@ -6,6 +6,7 @@ import type { ControlsComponent } from "../../game-object/controls-component";
 import { Tree } from "../../../game-objects/tree";
 import { Interactibles } from "../../../game-objects/interactibles";
 import { MoveState } from "./move-state";
+import { Ore } from "../../../game-objects/ore";
 
 export class ActState extends State {
     declare protected gameObject: Phaser.Physics.Arcade.Sprite;
@@ -29,12 +30,17 @@ export class ActState extends State {
         this.gameObject.setVelocity(0, 0);
         this.gameObject.play({ key: this.#animKey, repeat: -1 }, true);
 
-        if (selected && !selected.isDead && selected instanceof Tree){
-            const tree = selected as Tree;
+        if (selected && !selected.isDead){
             const onFrame = (_anim: Phaser.Animations.Animation, frame: Phaser.Animations.AnimationFrame) => {
                 if (frame.index === 3) { // frame do impacto do machado
-                    tree.playInteractAnimation();
-                    tree.takeDamage(25);
+                    selected.takeDamage(25);
+                    if(selected instanceof Tree){
+                        (selected as Tree).playInteractAnimation();
+                        
+                    }
+                    if(selected instanceof Ore){
+                        (selected as Ore).update();
+                    }
                 }
             }
             this.gameObject.on('animationupdate', onFrame);
@@ -44,8 +50,8 @@ export class ActState extends State {
     onUpdate(): void {
         const controls = this.#controlsComponent.controls;
         const isMoving = controls.isLeftDown || controls.isRightDown || controls.isUpDown || controls.isDownDown;
-        const tree = Interactibles.currentSelected as Tree;
-        if (isMoving || tree.isDead) {
+        const selected = Interactibles.currentSelected;
+        if (isMoving || !selected || selected.isDead) {
             this.gameObject.off('animationupdate');
             Interactibles.clearSelected();
             this.stateMachine.setState(

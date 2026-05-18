@@ -1,3 +1,4 @@
+import Phaser from 'phaser';
 export class PreloadScene extends Phaser.Scene {
 
   constructor() {
@@ -32,6 +33,10 @@ export class PreloadScene extends Phaser.Scene {
     this.load.spritesheet('PLAYER_AXE', 'assets/pawn/Pawn_Interact Axe.png', {
       frameWidth: 192,
       frameHeight: 192,
+    });
+    this.load.spritesheet('ORE', 'assets/gold/Gold Stone 3_Highlight.png', {
+      frameWidth: 128,
+      frameHeight: 128,
     });
   }
 

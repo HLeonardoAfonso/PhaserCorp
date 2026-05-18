@@ -48,4 +48,11 @@ export function createAnimations(scene: Phaser.Scene): void {
     frameRate: 8,
     repeat: -1,
   });
+
+  scene.anims.create({
+    key: 'ORE_IDLE',
+    frames: scene.anims.generateFrameNumbers('ORE', { start: 0, end: 5 }),
+    frameRate: 8,
+    repeat: -1,
+  });
 }
