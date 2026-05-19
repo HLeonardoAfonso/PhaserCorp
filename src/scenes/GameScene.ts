@@ -5,7 +5,7 @@ import { Tree } from '../game-objects/tree';
 import { Interactibles } from '../game-objects/interactibles';
 import { Cursors } from '../common/cursor';
 import { createAnimations } from '../construction/animations';
-import MAP_DATA, { WATER_TILES } from '../construction/level';
+import { createWorld, WORLD, WATER_TILES } from '../construction/level';
 import { Ore } from '../game-objects/ore';
 
 export class GameScene extends Phaser.Scene {
@@ -21,10 +21,11 @@ export class GameScene extends Phaser.Scene {
   public create(): void {
     this.input.setDefaultCursor(Cursors.DEFAULT);
 
-    const MAP_WIDTH = 44 * 64;
-    const MAP_HEIGHT = 26 * 64;
+    const MAP_WIDTH = 2 * 16 * 64;
+    const MAP_HEIGHT = 1 * 16 * 64;
 
     createAnimations(this);
+    const MAP_DATA = createWorld(WORLD);
 
     //Build tilemap
     const map = this.make.tilemap({
