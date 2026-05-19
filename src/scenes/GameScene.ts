@@ -13,6 +13,8 @@ export class GameScene extends Phaser.Scene {
   #player!: Player;
   #interactibles!: Phaser.Physics.Arcade.StaticGroup
   #controls!: KeyboardComponent
+  #selectionCorners!: { tl: Phaser.GameObjects.Image, tr: Phaser.GameObjects.Image, bl: Phaser.GameObjects.Image, br: Phaser.GameObjects.Image };
+  #wasPointerDown = false;
 
   constructor() {
     super({ key: 'GAME_SCENE' });
@@ -20,6 +22,12 @@ export class GameScene extends Phaser.Scene {
 
   public create(): void {
     this.input.setDefaultCursor(Cursors.DEFAULT);
+    this.#selectionCorners = {
+      tl: this.add.image(0, 0, 'SEL_TL').setOrigin(0.5, 0.5).setDepth(999).setVisible(false),
+      tr: this.add.image(0, 0, 'SEL_TR').setOrigin(0.5, 0.5).setDepth(999).setVisible(false),
+      bl: this.add.image(0, 0, 'SEL_BL').setOrigin(0.5, 0.5).setDepth(999).setVisible(false),
+      br: this.add.image(0, 0, 'SEL_BR').setOrigin(0.5, 0.5).setDepth(999).setVisible(false),
+    };
 
     const MAP_WIDTH = 2 * 16 * 64;
     const MAP_HEIGHT = 1 * 16 * 64;
@@ -117,9 +125,16 @@ export class GameScene extends Phaser.Scene {
     */
 
     this.physics.add.collider(this.#player, this.#interactibles);
+    this.input.on('gameobjectdown', (_pointer: Phaser.Input.Pointer, obj: Phaser.GameObjects.GameObject) => {
+      if (obj instanceof Interactibles && this.#player.nearInteractibles.has(obj)) {
+          Interactibles.setSelected(obj);
+      }
+    });
   }
 
   update() {
+
+    //Player zone interaction
     this.physics.overlap(
       this.#player.getInteractZone(),
       this.#interactibles,
@@ -130,13 +145,57 @@ export class GameScene extends Phaser.Scene {
         } 
       }
     );
+    
+    //Click Interactibles
+    const isDown = this.input.activePointer.isDown;
+    const justClicked = isDown && !this.#wasPointerDown;
+    this.#wasPointerDown = isDown;
 
+    if (justClicked) {
+    const hovered = Interactibles.currentHovered;
+      if (hovered && !hovered.isDead && this.#player.nearInteractibles.has(hovered)) {
+        Interactibles.setSelected(hovered);
+      }
+    }
+    
+    //Opaque Zone check for trees
+    const body = this.#player.body as Phaser.Physics.Arcade.Body;
+    const playerRect = new Phaser.Geom.Rectangle(body.x, body.y, body.width, body.height);
+    this.#interactibles.getChildren().forEach(obj => {
+      if (!(obj instanceof Tree) || obj.isDead) return;
+      const overlap = Phaser.Geom.Rectangle.Overlaps(
+          playerRect,
+          obj.opaqueZone.getBounds()
+      );
+      const behind = this.#player.y < obj.y;
+      obj.setAlpha(overlap && behind ? 0.5 : 1);
+    });
+
+    //Mouse hover icons
     const hovered = Interactibles.currentHovered;
     if (hovered && !hovered.isDead) {
       const reachable = this.#player.nearInteractibles.has(hovered);
       this.input.setDefaultCursor(reachable ? Cursors.CLICKABLE : Cursors.UNREACHABLE);
     } else {
       this.input.setDefaultCursor(Cursors.DEFAULT);
+    }
+
+    //Select icons
+    const selected = Interactibles.currentSelected;
+
+    if (selected && !selected.isDead && selected.input) {
+      const hit = selected.hitRect;
+      const left = selected.x - selected.originX * selected.width  + hit.x;
+      const top = selected.y - selected.originY * selected.height + hit.y;
+      const right = left + hit.width;
+      const bottom = top  + hit.height;
+
+      this.#selectionCorners.tl.setPosition(left,  top).setVisible(true);
+      this.#selectionCorners.tr.setPosition(right, top).setVisible(true);
+      this.#selectionCorners.bl.setPosition(left,  bottom).setVisible(true);
+      this.#selectionCorners.br.setPosition(right, bottom).setVisible(true);
+    } else {
+      Object.values(this.#selectionCorners).forEach(c => c.setVisible(false));
     }
 
     this.#player.update();
