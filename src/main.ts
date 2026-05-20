@@ -8,10 +8,8 @@ const config: Phaser.Types.Core.GameConfig = {
   roundPixels: true,
   scale: {
     parent: 'game-container',
-    width: 22 * 64,
-    height: 12 * 64,
+    mode: Phaser.Scale.RESIZE,
     autoCenter: Phaser.Scale.CENTER_BOTH,
-    mode: Phaser.Scale.FIT,
   },
   backgroundColor: '#47ABA9',
   scene: [PreloadScene, GameScene],
