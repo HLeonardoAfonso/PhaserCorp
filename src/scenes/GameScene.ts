@@ -51,11 +51,13 @@ export class GameScene extends Phaser.Scene {
       groundLayer.setDepth(1);
     }
 
-    //Animated water foam behind water tiles
-    const waterSet = new Set(WATER_TILES);
+    const waterFoamSet = new Set(WATER_TILES);
+    const waterColliders = this.physics.add.staticGroup();
+
     for (let row = 0; row < MAP_DATA.length; row++) {
       for (let col = 0; col < MAP_DATA[row].length; col++) {
-        if (waterSet.has(MAP_DATA[row][col])) {
+
+        if (waterFoamSet.has(MAP_DATA[row][col])) {
           const foam = this.add.sprite(
             col * 64 + 32, 
             row * 64 + 32,
@@ -65,6 +67,11 @@ export class GameScene extends Phaser.Scene {
           foam.setDepth(0);
           foam.play('WATER_FOAM_ANIM');
         }
+        // water collider
+        if (MAP_DATA[row][col] === 4) {
+        const waterZone = this.add.zone( col * 64 + 32, row * 64 + 32, 64, 64 );
+        waterColliders.add(waterZone);
+      }
       }
     }
 
@@ -126,6 +133,7 @@ export class GameScene extends Phaser.Scene {
     */
 
     this.physics.add.collider(this.#player, this.#interactibles);
+    this.physics.add.collider(this.#player, waterColliders);
     this.input.on('gameobjectdown', (_pointer: Phaser.Input.Pointer, obj: Phaser.GameObjects.GameObject) => {
       if (obj instanceof Interactibles && this.#player.nearInteractibles.has(obj)) {
           Interactibles.setSelected(obj);
