@@ -1,6 +1,8 @@
 import { Interactibles, type InteractiblesConfig } from "./interactibles";
 
 export class Tree extends Interactibles {
+    get resourceKey(): string { return 'WOOD_ITEM'; }
+
     #opaqueZone: Phaser.GameObjects.Zone;
     constructor(config: InteractiblesConfig) {
         super(config, 100);
@@ -38,6 +40,7 @@ export class Tree extends Interactibles {
             this.stop();
             this.setFrame(8);
             Interactibles.clearHovered();
+            Interactibles.onEntityDied?.(this.resourceKey);
             this.removeInteractive();
             this.#opaqueZone.destroy();
             this.setAlpha(1);

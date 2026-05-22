@@ -42,6 +42,10 @@ export class PreloadScene extends Phaser.Scene {
       frameWidth: 128,
       frameHeight: 128,
     });
+
+    this.load.image('INVENTORY_BANNER', 'assets/Inventory/Banner.png');
+    this.load.image('GOLD_ITEM', 'assets/Inventory/Gold_Resource.png');
+    this.load.image('WOOD_ITEM', 'assets/Inventory/Wood_Resource.png');
   }
 
   public create(): void {

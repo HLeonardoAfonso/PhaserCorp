@@ -4,6 +4,7 @@ import { KeyboardComponent } from '../components/input/keyboard-component';
 import { Tree } from '../game-objects/tree';
 import { Interactibles } from '../game-objects/interactibles';
 import { Cursors } from '../common/cursor';
+import { Inventory } from '../components/game-object/inventory-component';
 import { createAnimations } from '../construction/animations';
 import { createWorld, WORLD, WATER_TILES } from '../construction/level';
 import { Ore } from '../game-objects/ore';
@@ -13,6 +14,7 @@ export class GameScene extends Phaser.Scene {
   #player!: Player;
   #interactibles!: Phaser.Physics.Arcade.StaticGroup
   #controls!: KeyboardComponent
+  #inventory!: Inventory;
   #selectionCorners!: { tl: Phaser.GameObjects.Image, tr: Phaser.GameObjects.Image, bl: Phaser.GameObjects.Image, br: Phaser.GameObjects.Image };
   #wasPointerDown = false;
 
@@ -56,14 +58,10 @@ export class GameScene extends Phaser.Scene {
 
     for (let row = 0; row < MAP_DATA.length; row++) {
       for (let col = 0; col < MAP_DATA[row].length; col++) {
-
+        
+        // water foam render
         if (waterFoamSet.has(MAP_DATA[row][col])) {
-          const foam = this.add.sprite(
-            col * 64 + 32, 
-            row * 64 + 32,
-            'WATER_FOAM',
-            0
-          );
+          const foam = this.add.sprite( col * 64 + 32, row * 64 + 32, 'WATER_FOAM', 0);
           foam.setDepth(0);
           foam.play('WATER_FOAM_ANIM');
         }
@@ -80,6 +78,8 @@ export class GameScene extends Phaser.Scene {
       return;
     }
     this.#controls = new KeyboardComponent(this.input.keyboard);
+    this.#inventory = new Inventory(this, this.#controls, this.physics.world.drawDebug);
+    Interactibles.onEntityDied = (key) => this.#inventory.addItems(key, 32);
 
     this.physics.world.setBounds(0, 0, MAP_WIDTH, MAP_HEIGHT);
 
@@ -93,7 +93,6 @@ export class GameScene extends Phaser.Scene {
 
     this.cameras.main.setBounds(0, 0, MAP_WIDTH, MAP_HEIGHT);
     this.cameras.main.startFollow(this.#player);
-    this.cameras.main.setZoom(2);
 
     this.#player.setDepth(2);
 
@@ -101,36 +100,23 @@ export class GameScene extends Phaser.Scene {
     this.#interactibles = this.physics.add.staticGroup();
 
     const tree = new Tree({ scene: this, position: { x: 100, y: 180 }, assetKey: 'TREE' });
+    const tree1 = new Tree({ scene: this, position: { x: (3*64)+32, y: (3*64)+32 }, assetKey: 'TREE' });
+    const tree2 = new Tree({ scene: this, position: { x: (6*64)+32, y: (3*64)+32 }, assetKey: 'TREE' });
+    const tree3 = new Tree({ scene: this, position: { x: (4*64)+32, y: (4*64)+32 }, assetKey: 'TREE' });
     const ore = new Ore({ scene: this, position: { x: 200, y: 180 }, assetKey: 'ORE'});
 
     this.input.enableDebug(tree);
+    this.input.enableDebug(tree1);
+    this.input.enableDebug(tree2);
+    this.input.enableDebug(tree3);
     this.input.enableDebug(ore);
 
     this.#interactibles.add(tree);
+    this.#interactibles.add(tree1);
+    this.#interactibles.add(tree2);
+    this.#interactibles.add(tree3);
     this.#interactibles.add(ore);
 
-    /**this.#interactibles.add(
-      new Tree({
-      scene: this,
-      position: { x: (3*64)+32, y: (3*64)+32 },
-      assetKey: 'TREE',
-      })
-    );
-    this.#interactibles.add(
-      new Tree({
-      scene: this,
-      position: { x: (6*64)+32, y: (3*64)+32 },
-      assetKey: 'TREE',
-      })
-    );
-    this.#interactibles.add(
-      new Tree({
-      scene: this,
-      position: { x: (4*64)+32, y: (4*64)+32 },
-      assetKey: 'TREE',
-      })
-    );
-    */
 
     this.physics.add.collider(this.#player, this.#interactibles);
     this.physics.add.collider(this.#player, waterColliders);
@@ -208,5 +194,6 @@ export class GameScene extends Phaser.Scene {
     }
 
     this.#player.update();
+    this.#inventory.handleInput();
   }
 }

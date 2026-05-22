@@ -1,6 +1,8 @@
 import { Interactibles, type InteractiblesConfig } from "./interactibles";
 
 export class Ore extends Interactibles {
+    get resourceKey(): string { return 'GOLD_ITEM'; }
+
     constructor(config: InteractiblesConfig) {
         super(config, 100);
         this.playIdleAnimation();
@@ -21,6 +23,7 @@ export class Ore extends Interactibles {
         if (this.isDead) {
             Interactibles.clearSelected();
             Interactibles.clearHovered();
+            Interactibles.onEntityDied?.(this.resourceKey);
             this.removeInteractive();
             this.destroy();
         }
