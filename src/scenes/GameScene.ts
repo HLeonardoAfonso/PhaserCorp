@@ -8,6 +8,7 @@ import { Inventory } from '../components/game-object/inventory-component';
 import { createAnimations } from '../construction/animations';
 import { createWorld, WORLD, WATER_TILES } from '../construction/level';
 import { Ore } from '../game-objects/ore';
+import { Furnace } from '../game-objects/furnace';
 
 export class GameScene extends Phaser.Scene {
 
@@ -102,19 +103,21 @@ export class GameScene extends Phaser.Scene {
     const tree = new Tree({ scene: this, position: { x: 100, y: 180 }, assetKey: 'TREE' });
     const tree1 = new Tree({ scene: this, position: { x: (3*64)+32, y: (3*64)+32 }, assetKey: 'TREE' });
     const tree2 = new Tree({ scene: this, position: { x: (6*64)+32, y: (3*64)+32 }, assetKey: 'TREE' });
-    const tree3 = new Tree({ scene: this, position: { x: (4*64)+32, y: (4*64)+32 }, assetKey: 'TREE' });
+    // const tree3 = new Tree({ scene: this, position: { x: (4*64)+32, y: (4*64)+32 }, assetKey: 'TREE' });
     const ore = new Ore({ scene: this, position: { x: 200, y: 180 }, assetKey: 'ORE'});
+    const furnace = new Furnace({ scene: this, position: { x: 600, y: 600 }, assetKey: 'FURNACE'});
+
 
     this.input.enableDebug(tree);
     this.input.enableDebug(tree1);
     this.input.enableDebug(tree2);
-    this.input.enableDebug(tree3);
+    this.input.enableDebug(furnace);
     this.input.enableDebug(ore);
 
     this.#interactibles.add(tree);
     this.#interactibles.add(tree1);
     this.#interactibles.add(tree2);
-    this.#interactibles.add(tree3);
+    this.#interactibles.add(furnace);
     this.#interactibles.add(ore);
 
 
