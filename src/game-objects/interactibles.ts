@@ -8,6 +8,7 @@ export type InteractiblesConfig = {
 }
 
 export abstract class Interactibles extends Phaser.Physics.Arcade.Sprite {
+    
     static #currentHovered: Interactibles | null = null;
     static get currentHovered() { return Interactibles.#currentHovered; }
     static clearHovered() { Interactibles.#currentHovered = null; }

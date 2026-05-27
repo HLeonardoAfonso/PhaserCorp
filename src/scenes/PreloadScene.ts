@@ -44,10 +44,7 @@ export class PreloadScene extends Phaser.Scene {
       frameHeight: 128,
     });
 
-    this.load.spritesheet('FURNACE', 'assets/machines/Furnace.png', {
-      frameWidth: 64,
-      frameHeight: 128,
-    });
+    
 
 
     this.load.image('INVENTORY_BANNER', 'assets/Inventory/Banner.png');
@@ -55,7 +52,10 @@ export class PreloadScene extends Phaser.Scene {
     this.load.image('GOLD_ITEM', 'assets/Inventory/Gold_Resource.png');
     this.load.image('WOOD_ITEM', 'assets/Inventory/Wood_Resource.png');
 
-    this.load.image('MACHINE_FURNACE', 'assets/machines/Furnace.png');
+    this.load.image('FURNACE', 'assets/machines/Furnace.png');
+    this.load.image('CONVEYOR', 'assets/machines/Conveyor.png');
+    this.load.image('CONVEYOR_CURVE', 'assets/machines/Conveyor_Curve.png');
+
   }
 
   public create(): void {

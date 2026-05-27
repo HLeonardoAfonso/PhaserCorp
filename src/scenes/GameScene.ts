@@ -6,9 +6,12 @@ import { Interactibles } from '../game-objects/interactibles';
 import { Cursors } from '../common/cursor';
 import { Inventory } from '../components/game-object/inventory-component';
 import { createAnimations } from '../construction/animations';
-import { createWorld, WORLD, WATER_TILES } from '../construction/level';
+import { createWorld, WATER_TILES } from '../construction/world-render';
+import { WORLD } from '../construction/world';
 import { Ore } from '../game-objects/ore';
-import { Furnace } from '../game-objects/furnace';
+import { Furnace } from '../game-objects/machines/furnace';
+import { Conveyer } from '../game-objects/machines/conveyer';
+import { ConveyerCurve } from '../game-objects/machines/conveyer-curve';
 
 export class GameScene extends Phaser.Scene {
 
@@ -32,8 +35,8 @@ export class GameScene extends Phaser.Scene {
       br: this.add.image(0, 0, 'SEL_BR').setOrigin(0.5, 0.5).setDepth(999).setVisible(false),
     };
 
-    const MAP_WIDTH = 2 * 16 * 64;
-    const MAP_HEIGHT = 1 * 16 * 64;
+    const MAP_WIDTH = 3 * 16 * 64;
+    const MAP_HEIGHT = 3 * 16 * 64;
 
     createAnimations(this);
     const MAP_DATA = createWorld(WORLD);
@@ -105,7 +108,12 @@ export class GameScene extends Phaser.Scene {
     const tree2 = new Tree({ scene: this, position: { x: (6*64)+32, y: (3*64)+32 }, assetKey: 'TREE' });
     // const tree3 = new Tree({ scene: this, position: { x: (4*64)+32, y: (4*64)+32 }, assetKey: 'TREE' });
     const ore = new Ore({ scene: this, position: { x: 200, y: 180 }, assetKey: 'ORE'});
-    const furnace = new Furnace({ scene: this, position: { x: 600, y: 600 }, assetKey: 'FURNACE'});
+    const furnace = new Furnace({ scene: this, position: { x: 64*10, y: 600 }, assetKey: 'FURNACE'});
+    const conveyer = new Conveyer({ scene: this, position: { x: (12*64)+32, y: (2*64)+32 }, assetKey: 'CONVEYOR'});
+    const conveyerCurve = new ConveyerCurve({ scene: this, position: { x: (11*64)+32, y: (2*64)+32 }, assetKey: 'CONVEYOR_CURVE'});
+    const furnace3 = new Furnace({ scene: this, position: { x: 64*13, y: 600 }, assetKey: 'FURNACE'});
+    const furnace4 = new Furnace({ scene: this, position: { x: 64*14, y: 600 }, assetKey: 'FURNACE'});
+    
 
 
     this.input.enableDebug(tree);
@@ -119,7 +127,7 @@ export class GameScene extends Phaser.Scene {
     this.#interactibles.add(tree2);
     this.#interactibles.add(furnace);
     this.#interactibles.add(ore);
-
+    this.#interactibles.add(conveyer);
 
     this.physics.add.collider(this.#player, this.#interactibles);
     this.physics.add.collider(this.#player, waterColliders);

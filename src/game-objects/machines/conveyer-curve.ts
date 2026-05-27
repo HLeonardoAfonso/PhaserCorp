@@ -1,7 +1,7 @@
-import { Interactibles, type InteractiblesConfig } from "./interactibles";
+import { Interactibles, type InteractiblesConfig } from "../interactibles";
 
-export class Furnace extends Interactibles {
-    get resourceKey(): string { return 'MACHINE_FURNACE'; }
+export class ConveyerCurve extends Interactibles {
+    get resourceKey(): string { return 'MACHINE_CONVEYOR_CURVE'; }
 
     constructor(config: InteractiblesConfig) {
         super(config, 100);
@@ -17,7 +17,7 @@ export class Furnace extends Interactibles {
     }
 
     playIdleAnimation(): void {
-        this.play('MACHINE_FURNACE');
+        this.play('MACHINE_CONVEYOR_CURVE');
     }
 
     update(): void {

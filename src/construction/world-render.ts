@@ -1,18 +1,5 @@
-// ============================================================
-// TILE LABELS
-// ============================================================
-// The tileset Tilemap_color1.png is 9×6 tiles of 64×64px each.
-// Tile indices go row-by-row left-to-right:
-//   Row 0: indices  0 -  8
-//   Row 1: indices  9 - 17
-//   Row 2: indices 18 - 26
-//   Row 3: indices 27 - 35
-//   Row 4: indices 36 - 44
-//   Row 5: indices 45 - 53
-//
-// Edit the TILES object below to give meaningful names
-// to each tile after inspecting the tileset image.
-// ============================================================
+import type { world, chunk } from '../common/types';
+
 export const TILES = {
 
   WATER:      4,
@@ -69,12 +56,6 @@ export const TILES = {
 
 } as const;
 
-// ============================================================
-// WATER TILES
-// ============================================================
-// Tile indices that should have animated water foam behind them.
-// Add any tile index here that represents water or a water-adjacent tile.
-// ============================================================
 export const WATER_TILES: number[] = [
 
   TILES.WATER_GRASS_UP_LEFT,
@@ -94,55 +75,6 @@ export const WATER_TILES: number[] = [
   TILES.WATER_GRASS_HORIZONTAL_RIGHT,
 ];
 
-// CHUNKS ARE 16x16
-
-export const CHUNK_00: number[][] = [
-  [0,0,0,0 ,0,0,0,0 ,0,0,0,0 ,0,0,0,0],
-  [0,1,1,1 ,1,1,1,1 ,1,1,1,1 ,1,1,1,1],
-  [0,1,1,1 ,1,1,1,1 ,1,1,1,1 ,1,1,1,1],
-  [0,1,1,1 ,1,1,1,1 ,1,1,1,1 ,1,1,1,1],
-
-  [0,1,1,1 ,1,1,1,1 ,1,1,1,1 ,1,1,1,1],
-  [0,1,1,1 ,1,1,1,1 ,1,1,1,1 ,1,1,1,1],
-  [0,1,1,1 ,1,1,1,1 ,1,1,1,1 ,1,1,1,1],
-  [0,1,1,1 ,1,1,1,1 ,1,1,1,1 ,1,1,1,1],
-
-  [0,1,1,1 ,1,1,1,1 ,1,1,1,1 ,1,1,1,0],
-  [0,1,1,1 ,1,1,1,1 ,1,1,1,1 ,1,1,1,1],
-  [0,1,1,1 ,1,1,1,1 ,1,1,1,1 ,1,1,1,0],
-  [0,1,1,1 ,1,1,1,1 ,1,1,1,1 ,1,1,1,1],
-
-  [0,1,1,1 ,1,1,1,1 ,1,1,1,1 ,1,1,1,1],
-  [0,1,1,1 ,1,1,1,1 ,1,1,1,1 ,1,1,1,1],
-  [0,1,1,1 ,1,1,1,1 ,1,1,1,1 ,1,1,1,1],
-  [0,0,0,0 ,0,0,0,0 ,0,0,0,0 ,0,0,0,0],
-];
-
-const CHUNK_01: number[][] = [
-  [0,0,0,0 ,0,0,0,0 ,0,0,0,0 ,0,0,0,0],
-  [1,1,1,1 ,1,1,1,1 ,1,1,1,1 ,1,1,1,0],
-  [1,1,1,1 ,1,1,1,1 ,1,1,1,1 ,1,1,1,0],
-  [0,1,1,1 ,1,1,1,1 ,1,1,1,1 ,1,1,1,0],
-
-  [1,1,1,1 ,1,1,1,1 ,1,1,1,1 ,1,1,1,0],
-  [1,1,1,1 ,0,1,0,1 ,1,1,1,1 ,1,1,1,0],
-  [1,1,1,0 ,1,0,0,0 ,1,1,1,1 ,1,1,1,0],
-  [1,1,0,1 ,1,1,0,1 ,1,1,1,1 ,1,1,1,0],
-
-  [0,1,1,0 ,1,0,1,1 ,1,1,1,1 ,1,1,1,0],
-  [1,1,1,1 ,0,0,1,1 ,1,1,1,1 ,1,1,1,0],
-  [1,1,1,1 ,1,0,1,0 ,1,1,1,1 ,1,1,1,0],
-  [1,1,1,1 ,1,1,1,1 ,1,1,1,1 ,1,1,1,0],
-
-  [1,1,1,1 ,1,1,1,1 ,1,1,1,1 ,1,1,1,0],
-  [1,0,0,0 ,1,1,1,1 ,1,1,1,1 ,1,1,1,0],
-  [1,0,1,0 ,1,1,1,1 ,1,1,1,1 ,1,1,1,0],
-  [0,0,0,0 ,0,0,0,0 ,0,0,0,0 ,0,0,0,0],
-];
-
-type chunk = number[][];
-type world = chunk[][]
-
 type NeighborEdges = {
   up?:    number[];  // bottom row of chunk above  (16 values)
   down?:  number[];  // top row of chunk below     (16 values)
@@ -150,41 +82,14 @@ type NeighborEdges = {
   right?: number[];  // left column of chunk right  (16 values)
 }
 
-export const WORLD: world = [
-  [CHUNK_00, CHUNK_01],
-]
-
 
 function getNeighborEdges(world: world, chunkRow: number, chunkCol: number): NeighborEdges {
   return {
-    up:    chunkRow > 0        ? world[chunkRow-1][chunkCol][15] : undefined,
-    down:  chunkRow < world.length-1 ? world[chunkRow+1][chunkCol][0] : undefined,
-    left:  chunkCol > 0        ? world[chunkRow][chunkCol-1].map(r => r[15]) : undefined,
-    right: chunkCol < world[0].length-1 ? world[chunkRow][chunkCol+1].map(r => r[0]) : undefined,
+    up:    chunkRow > 0                 ? world[chunkRow-1][chunkCol][15]             : undefined,
+    down:  chunkRow < world.length-1    ? world[chunkRow+1][chunkCol][0]              : undefined,
+    left:  chunkCol > 0                 ? world[chunkRow][chunkCol-1].map(r => r[15]) : undefined,
+    right: chunkCol < world[0].length-1 ? world[chunkRow][chunkCol+1].map(r => r[0])  : undefined,
   };
-}
-
-export function createWorld(world: world): number[][] {
-  const chunkRows = world.length;
-  const chunkCols = world[0].length;
-  const mapHeight = chunkRows * 16;
-  const mapWidth  = chunkCols * 16;
-
-  const result: number[][] = Array.from({ length: mapHeight }, () => new Array(mapWidth).fill(0));
-
-  for (let chunkRow = 0; chunkRow < chunkRows; chunkRow++) {
-    for (let chunkCol = 0; chunkCol < chunkCols; chunkCol++) {
-      const edges = getNeighborEdges(world, chunkRow, chunkCol);
-      const chunk = convertChunk(world[chunkRow][chunkCol], edges);
-      for (let r = 0; r < 16; r++) {
-        for (let c = 0; c < 16; c++) {
-          result[chunkRow * 16 + r][chunkCol * 16 + c] = chunk[r][c];
-        }
-      }
-    }
-  }
-
-  return result;
 }
 
 function convertChunk(chunk: chunk, edges?: NeighborEdges): chunk {
@@ -234,4 +139,27 @@ function convertChunk(chunk: chunk, edges?: NeighborEdges): chunk {
     }
   }
   return converted;
+}
+
+export function createWorld(world: world): number[][] {
+  const chunkRows = world.length;
+  const chunkCols = world[0].length;
+  const mapHeight = chunkRows * 16;
+  const mapWidth  = chunkCols * 16;
+
+  const result: number[][] = Array.from({ length: mapHeight }, () => new Array(mapWidth).fill(0));
+
+  for (let chunkRow = 0; chunkRow < chunkRows; chunkRow++) {
+    for (let chunkCol = 0; chunkCol < chunkCols; chunkCol++) {
+      const edges = getNeighborEdges(world, chunkRow, chunkCol);
+      const chunk = convertChunk(world[chunkRow][chunkCol], edges);
+      for (let r = 0; r < 16; r++) {
+        for (let c = 0; c < 16; c++) {
+          result[chunkRow * 16 + r][chunkCol * 16 + c] = chunk[r][c];
+        }
+      }
+    }
+  }
+
+  return result;
 }
