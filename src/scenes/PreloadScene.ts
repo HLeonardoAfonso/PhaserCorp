@@ -43,8 +43,10 @@ export class PreloadScene extends Phaser.Scene {
       frameWidth: 128,
       frameHeight: 128,
     });
-
-    
+    this.load.spritesheet('PAPER', 'assets/Inventory/SpecialPaper.png', {
+      frameWidth: 64,
+      frameHeight: 64,
+    });
 
 
     this.load.image('INVENTORY_BANNER', 'assets/Inventory/Banner.png');

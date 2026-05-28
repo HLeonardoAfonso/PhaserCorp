@@ -12,11 +12,15 @@ type CraftingSlot = {
 const MACHINE_LIST = ['FURNACE', 'CONVEYOR', 'CONVEYOR_CURVE'] as const;
 
 export class Crafting {
+
+  static readonly PAPER_FRAMES = [[0, 2], [6, 8]];
   
   #table: Phaser.GameObjects.Image;
   #controls: KeyboardComponent;
   #slots: CraftingSlot[] = [];
   #debugRects: Phaser.GameObjects.Rectangle[] = [];
+  #paperSprites: Phaser.GameObjects.Sprite[][] = [];
+  #isHovering = false;
 
   constructor(scene: Phaser.Scene, controls: KeyboardComponent, debug: boolean) {
     this.#controls = controls;
@@ -30,8 +34,56 @@ export class Crafting {
       .setDepth(1000)
       .setVisible(false);
 
+    this.#paperSprites = Crafting.PAPER_FRAMES.map(row =>
+      row.map(frame =>
+        scene.add.sprite(0, 0, 'PAPER', frame)
+          .setScrollFactor(0)
+          .setDepth(1100)
+          .setVisible(false)
+      )
+    );
+
+    scene.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
+      if (this.#isHovering) {
+        this.#showPaperSprites(pointer);
+      }
+    });
+
     this.#initSlotData(scene, debug);
     this.#populateMachines(scene);
+  }
+
+  #onMachinePointerOver(_index: number, pointer: Phaser.Input.Pointer): void {
+    this.#isHovering = true;
+    this.#showPaperSprites(pointer);
+  }
+
+  #onMachinePointerOut(): void {
+    this.#isHovering = false;
+    this.#hidePaperSprites();
+  }
+
+  #showPaperSprites(pointer: Phaser.Input.Pointer): void {
+    const offsetX = 20;
+    const offsetY = -80;
+    const spacing = 48;
+    const lineHeight = 64;
+
+    this.#paperSprites.forEach((row, ri) => {
+      row.forEach((sprite, ci) => {
+        sprite.setPosition(
+          pointer.x + offsetX + ci * spacing,
+          pointer.y + offsetY + ri * lineHeight
+        );
+        sprite.setVisible(true);
+      });
+    });
+  }
+
+  #hidePaperSprites(): void {
+    this.#paperSprites.forEach(row =>
+      row.forEach(sprite => sprite.setVisible(false))
+    );
   }
 
   #populateMachines(scene: Phaser.Scene): void {
@@ -40,7 +92,10 @@ export class Crafting {
       const image = scene.add.image(slot.x, slot.y, MACHINE_LIST[i])
         .setScrollFactor(0)
         .setDepth(1002)
-        .setVisible(this.#table.visible);
+        .setVisible(this.#table.visible)
+        .setInteractive()
+        .on('pointerover', (pointer: Phaser.Input.Pointer) => this.#onMachinePointerOver(i, pointer))
+        .on('pointerout', () => this.#onMachinePointerOut());
 
       slot.occupied = true;
       slot.itemKey = MACHINE_LIST[i];
@@ -93,6 +148,11 @@ export class Crafting {
     this.#slots.forEach(s => {
       s.image?.setVisible(visible);
     });
+
+    if (!visible) {
+      this.#isHovering = false;
+      this.#hidePaperSprites();
+    }
   }
 
   handleInput(): void {
