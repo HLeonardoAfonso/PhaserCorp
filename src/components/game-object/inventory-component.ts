@@ -16,7 +16,6 @@ export class Inventory {
   static MAX_STACK_SIZE = 64;
   
   #banner: Phaser.GameObjects.Image;
-  #table: Phaser.GameObjects.Image;
   #controls: KeyboardComponent;
   #scene: Phaser.Scene;
   #slots: InventorySlot[] = [];
@@ -29,15 +28,6 @@ export class Inventory {
       (scene.cameras.main.centerX)-200,
       scene.cameras.main.centerY,
       'INVENTORY_BANNER'
-    )
-      .setScrollFactor(0)
-      .setDepth(1000)
-      .setVisible(false);
-
-    this.#table = scene.add.image(
-      (scene.cameras.main.centerX)+200,
-      scene.cameras.main.centerY,
-      'INVENTORY_TABLE'
     )
       .setScrollFactor(0)
       .setDepth(1000)
@@ -89,7 +79,6 @@ export class Inventory {
   toggle(): void {
     const visible = !this.#banner.visible;
     this.#banner.setVisible(visible);
-    this.#table.setVisible(visible);
     this.#debugRects.forEach(r => r.setVisible(visible));
     this.#slots.forEach(s => {
       s.image?.setVisible(visible);
