@@ -8,6 +8,7 @@ export type InteractiblesConfig = {
 }
 
 export abstract class Interactibles extends Phaser.Physics.Arcade.Sprite {
+    
     static #currentHovered: Interactibles | null = null;
     static get currentHovered() { return Interactibles.#currentHovered; }
     static clearHovered() { Interactibles.#currentHovered = null; }
@@ -18,10 +19,14 @@ export abstract class Interactibles extends Phaser.Physics.Arcade.Sprite {
     static setSelected(interactible: Interactibles) { 
     Interactibles.#currentSelected = interactible; 
     }
+
+    static onEntityDied: ((resourceKey: string) => void) | null = null;
     
     #health: number;
     #hovered = false;
     #hitRect!: Phaser.Geom.Rectangle;
+
+    abstract get resourceKey(): string;
 
     constructor(config: InteractiblesConfig, health: number) {
         const { scene, position, assetKey, frame } = config;

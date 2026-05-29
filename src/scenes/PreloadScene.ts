@@ -10,6 +10,7 @@ export class PreloadScene extends Phaser.Scene {
     this.load.image('SEL_TR', 'assets/cursors/select_tr.png');
     this.load.image('SEL_BL', 'assets/cursors/select_bl.png');
     this.load.image('SEL_BR', 'assets/cursors/select_br.png');
+
     this.load.spritesheet('PLAYER_IDLE', 'assets/pawn/Pawn_Idle.png', {
       frameWidth: 192,
       frameHeight: 192,
@@ -42,6 +43,21 @@ export class PreloadScene extends Phaser.Scene {
       frameWidth: 128,
       frameHeight: 128,
     });
+    this.load.spritesheet('PAPER', 'assets/Inventory/SpecialPaper.png', {
+      frameWidth: 64,
+      frameHeight: 64,
+    });
+
+
+    this.load.image('INVENTORY_BANNER', 'assets/Inventory/Banner.png');
+    this.load.image('INVENTORY_TABLE', 'assets/Inventory/WoodTable.png');
+    this.load.image('GOLD_ITEM', 'assets/Inventory/Gold_Resource.png');
+    this.load.image('WOOD_ITEM', 'assets/Inventory/Wood_Resource.png');
+
+    this.load.image('FURNACE', 'assets/machines/Furnace.png');
+    this.load.image('CONVEYOR', 'assets/machines/Conveyor.png');
+    this.load.image('CONVEYOR_CURVE', 'assets/machines/Conveyor_Curve.png');
+
   }
 
   public create(): void {
