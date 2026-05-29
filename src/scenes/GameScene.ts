@@ -131,6 +131,9 @@ export class GameScene extends Phaser.Scene {
     this.#interactibles.add(furnace);
     this.#interactibles.add(ore);
     this.#interactibles.add(conveyer);
+    this.#interactibles.add(conveyerCurve);
+    this.#interactibles.add(furnace3);
+    this.#interactibles.add(furnace4);
 
     this.physics.add.collider(this.#player, this.#interactibles);
     this.physics.add.collider(this.#player, waterColliders);
