@@ -13,6 +13,7 @@ import { Furnace } from '../game-objects/machines/furnace';
 import { Conveyer } from '../game-objects/machines/conveyer';
 import { ConveyerCurve } from '../game-objects/machines/conveyer-curve';
 import { Crafting } from '../components/game-object/crafting-component';
+import { PlacementSystem } from '../systems/placement-system';
 
 export class GameScene extends Phaser.Scene {
 
@@ -23,6 +24,7 @@ export class GameScene extends Phaser.Scene {
   #crafting!: Crafting;
   #selectionCorners!: { tl: Phaser.GameObjects.Image, tr: Phaser.GameObjects.Image, bl: Phaser.GameObjects.Image, br: Phaser.GameObjects.Image };
   #wasPointerDown = false;
+  #placement!: PlacementSystem;
 
   constructor() {
     super({ key: 'GAME_SCENE' });
@@ -105,6 +107,7 @@ export class GameScene extends Phaser.Scene {
 
     //Refresh do grupo interactibles através de um evento (desaparecer ore)
     this.#interactibles = this.physics.add.staticGroup();
+    this.#placement = new PlacementSystem(this, this.#interactibles);
 
     const tree = new Tree({ scene: this, position: { x: 100, y: 180 }, assetKey: 'TREE' });
     const tree1 = new Tree({ scene: this, position: { x: (3*64)+32, y: (3*64)+32 }, assetKey: 'TREE' });
@@ -116,8 +119,6 @@ export class GameScene extends Phaser.Scene {
     const conveyerCurve = new ConveyerCurve({ scene: this, position: { x: (11*64)+32, y: (2*64)+32 }, assetKey: 'CONVEYOR_CURVE'});
     const furnace3 = new Furnace({ scene: this, position: { x: 64*13, y: 600 }, assetKey: 'FURNACE'});
     const furnace4 = new Furnace({ scene: this, position: { x: 64*14, y: 600 }, assetKey: 'FURNACE'});
-    
-
 
     this.input.enableDebug(tree);
     this.input.enableDebug(tree1);
@@ -154,20 +155,24 @@ export class GameScene extends Phaser.Scene {
         } 
       }
     );
-    
-    if (!this.#inventory.isOpen) {
-      //Click Interactibles
+
+    //Click Interactibles
       const isDown = this.input.activePointer.isDown;
       const justClicked = isDown && !this.#wasPointerDown;
       this.#wasPointerDown = isDown;
 
-      if (justClicked) {
-      const hovered = Interactibles.currentHovered;
+    if (!this.#inventory.isOpen) {
+      if (this.#controls.isPKeyJustDown){
+        this.#placement.toggle(Furnace, 'Furnace', Furnace.placementRect);
+      }
+      this.#placement.update(justClicked);
+
+      if (justClicked && !this.#placement.isActive) {
+        const hovered = Interactibles.currentHovered;
         if (hovered && !hovered.isDead && this.#player.nearInteractibles.has(hovered)) {
           Interactibles.setSelected(hovered);
         }
       }
-      
       //Opaque Zone check for trees
       const body = this.#player.body as Phaser.Physics.Arcade.Body;
       const playerRect = new Phaser.Geom.Rectangle(body.x, body.y, body.width, body.height);

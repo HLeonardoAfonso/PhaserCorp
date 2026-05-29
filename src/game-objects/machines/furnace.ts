@@ -17,9 +17,7 @@ export class Furnace extends Interactibles {
         this.setInteractive(rect, Phaser.Geom.Rectangle.Contains);
     }
 
-    playIdleAnimation(): void {
-        this.play('MACHINE_FURNACE');
-    }
+    playIdleAnimation(): void {}
 
     update(): void {
         if (this.isDead) {
@@ -29,5 +27,8 @@ export class Furnace extends Interactibles {
             this.removeInteractive();
             this.destroy();
         }
+    }
+    static get placementRect(): Phaser.Geom.Rectangle {
+    return new Phaser.Geom.Rectangle(-32, 64 + 5, 64, 54);
     }
 }
