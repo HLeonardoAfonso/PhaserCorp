@@ -4,6 +4,8 @@ export type Position = {
 }
 
 export type chunk = number[][];
-export type world = chunk[][]
+export type world = chunk[][];
+
+export type Recipe = {key: string; amount: number }[];
 
 export type GameObject = Phaser.GameObjects.Sprite | Phaser.GameObjects.Image;

@@ -1,16 +1,24 @@
 import Phaser from 'phaser';
 import { KeyboardComponent } from '../input/keyboard-component';
 import { RecipeOverlay } from './recipe-component';
+import type { Recipe } from '../../common/types';
 
 type CraftingSlot = {
   x: number;
   y: number;
   occupied: boolean;
   itemKey: string | null;
+  recipe: Recipe | null;
   image: Phaser.GameObjects.Image | null;
 };
 
 const MACHINE_LIST = ['FURNACE', 'CONVEYOR', 'CONVEYOR_CURVE'] as const;
+
+const MACHINE_RECIPES: Record<string, Recipe> = {
+  FURNACE: [{ key: 'WOOD_ITEM', amount: 1 }, { key: 'GOLD_ITEM', amount: 1 }],
+  CONVEYOR: [{ key: 'WOOD_ITEM', amount: 1 }, { key: 'WOOD_ITEM', amount: 1 }, { key: 'WOOD_ITEM', amount: 1 }],
+  CONVEYOR_CURVE: [{ key: 'WOOD_ITEM', amount: 1 }],
+};
 
 export class Crafting {
   
@@ -32,13 +40,15 @@ export class Crafting {
       .setDepth(1000)
       .setVisible(false);
 
-    this.#recipeOverlay = new RecipeOverlay(scene, debug);
+    this.#recipeOverlay = new RecipeOverlay(scene);
     this.#initSlotData(scene, debug);
     this.#populateMachines(scene);
   }
 
   #onMachinePointerOver(_index: number, pointer: Phaser.Input.Pointer): void {
-    this.#recipeOverlay.show(pointer);
+    const machineKey = MACHINE_LIST[_index];
+    const recipe = MACHINE_RECIPES[machineKey];
+    this.#recipeOverlay.show(pointer, recipe);
   }
 
   #onMachinePointerOut(): void {
@@ -58,6 +68,7 @@ export class Crafting {
 
       slot.occupied = true;
       slot.itemKey = MACHINE_LIST[i];
+      slot.recipe = MACHINE_RECIPES[MACHINE_LIST[i]];
       slot.image = image;
     }
   }
@@ -81,6 +92,7 @@ export class Crafting {
           y: cy,
           occupied: false,
           itemKey: null,
+          recipe: null,
           image: null,
         });
 

@@ -1,68 +1,99 @@
 import Phaser from 'phaser';
+import type { Recipe } from '../../common/types';
 
 export class RecipeOverlay {
+    #scene: Phaser.Scene;
     #sprites: Phaser.GameObjects.Sprite[][] = [];
-    #goldItem: Phaser.GameObjects.Image;
-    #debugRect: Phaser.GameObjects.Rectangle | null = null;
+    #recipeImages: Phaser.GameObjects.Image[] = [];
     #isHovering = false;
 
-    constructor(scene: Phaser.Scene, debug = false) {
-        const FRAMES = [[0, 2], [6, 8]];
-        this.#sprites = FRAMES.map(row =>
-            row.map(frame =>
-                scene.add.sprite(0, 0, 'PAPER', frame)
-                .setScrollFactor(0)
-                .setDepth(1100)
-                .setVisible(false)
-            )
-        );
-
-        this.#goldItem = scene.add.image(0, 0, 'GOLD_ITEM')
-            .setScrollFactor(0)
-            .setDepth(1101)
-            .setVisible(false);
-
-        if (debug) {
-            this.#debugRect = scene.add.rectangle(0, 0, 64, 64)
-                .setStrokeStyle(1, 0x00ff00, 0.8)
-                .setScrollFactor(0)
-                .setDepth(1102)
-                .setVisible(false);
-        }
+    constructor(scene: Phaser.Scene) {
+        this.#scene = scene;
 
         scene.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
             if (this.#isHovering) this.#follow(pointer);
         });
     }
 
+    #buildFrameSprites(recipeLength: number): void {
+
+        const columns = recipeLength + 1;
+
+        for (let row = 0; row < 2; row++) {
+            this.#sprites[row] = [];
+            for (let col = 0; col < columns; col++) {
+                let frame: number;
+                if (col === 0) {
+                    frame = row === 0 ? 0 : 6;
+                } else if (col === columns - 1) {
+                    frame = row === 0 ? 2 : 8;
+                } else {
+                    frame = row === 0 ? 1 : 7;
+                }
+
+                const sprite = this.#scene.add.sprite(0, 0, 'PAPER', frame)
+                    .setScrollFactor(0)
+                    .setDepth(1100)
+                    .setVisible(this.#isHovering);
+
+                this.#sprites[row].push(sprite);
+            }
+        }
+    }
+
+    #destroyFrameSprites(): void {
+        this.#sprites.forEach(row => row.forEach(sprite => sprite.destroy()));
+        this.#sprites = [];
+    }
+
+    #buildRecipeImages(recipe: Recipe): void {
+        recipe.forEach(item => {
+            const img = this.#scene.add.image(0, 0, item.key)
+                .setScrollFactor(0)
+                .setDepth(1101)
+                .setVisible(this.#isHovering);
+            this.#recipeImages.push(img);
+        });
+    }
+
     #follow(pointer: Phaser.Input.Pointer): void {
+        const columns = this.#sprites[0]?.length ?? 0;
+
         this.#sprites.forEach((row, ri) => {
             row.forEach((sprite, ci) => {
                 sprite.setPosition(
-                    pointer.x + 20 + ci * 48, 
+                    pointer.x + 20 + ci * 48,
                     pointer.y - 80 + ri * 64
                 );
             });
         });
 
-        const goldX = pointer.x + 20 + 24;
-        const goldY = pointer.y - 80 + 32;
-        this.#goldItem.setPosition(goldX, goldY);
-        this.#debugRect?.setPosition(goldX, goldY);
+        if (columns > 0) {
+            const baseY = pointer.y - 80 + 32;
+            this.#recipeImages.forEach((img, i) => {
+                const x = pointer.x + 20 + (i + 0.5) * 48;
+                img.setPosition(x, baseY);
+            });
+        }
     }
 
-    show(pointer: Phaser.Input.Pointer): void {
+    show(pointer: Phaser.Input.Pointer, recipe?: Recipe): void {
         this.#isHovering = true;
+
+        if (recipe) {
+            this.#buildFrameSprites(recipe.length);
+            this.#buildRecipeImages(recipe);
+        }
+
         this.#follow(pointer);
         this.#sprites.forEach(row => row.forEach(s => s.setVisible(true)));
-        this.#goldItem.setVisible(true);
-        this.#debugRect?.setVisible(true);
+        this.#recipeImages.forEach(img => img.setVisible(true));
     }
 
     hide(): void {
         this.#isHovering = false;
-        this.#sprites.forEach(row => row.forEach(s => s.setVisible(false)));
-        this.#goldItem.setVisible(false);
-        this.#debugRect?.setVisible(false);
+        this.#destroyFrameSprites();
+        this.#recipeImages.forEach(img => img.destroy());
+        this.#recipeImages = [];
     }
 }
