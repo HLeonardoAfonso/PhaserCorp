@@ -12,10 +12,12 @@ export class PlacementSystem {
     #factory!: PlaceableConstructor;
     #assetKey!: string;
     #animKey: string | null = null;
+    #debugGraphic!: Phaser.GameObjects.Graphics;
 
     constructor(scene: Phaser.Scene, group: Phaser.Physics.Arcade.StaticGroup){
         this.#scene = scene;
         this.#group = group;
+        this.#debugGraphic = scene.add.graphics();
     }
 
     get isActive() { return this.#active; }
@@ -29,6 +31,7 @@ export class PlacementSystem {
             this.#ghost = this.#scene.add.sprite(0,0, assetKey).setAlpha(0.5).setDepth(999);
             if (this.#animKey)this.#ghost.play(this.#animKey);  
         } else {
+            this.#debugGraphic.clear();
             this.#ghost?.destroy();
             this.#active = false;
             this.#ghost = null;
@@ -42,8 +45,8 @@ export class PlacementSystem {
         this.#ghost.setPosition(wp.x, wp.y);
         
         const ghostRect = new Phaser.Geom.Rectangle(
-            wp.x + this.#placementRect.x,
-            wp.y + this.#placementRect.y,
+            wp.x - this.#placementRect.width/2,
+            wp.y - this.#placementRect.height/2,
             this.#placementRect.width,
             this.#placementRect.height,
         );
@@ -65,5 +68,10 @@ export class PlacementSystem {
             this.#ghost = null;
             this.#active = false
         }
+
+        //Debug rectangle show (eliminar mais tarde)
+        this.#debugGraphic.clear();
+        this.#debugGraphic.lineStyle(2, canPlace ? 0x00ff00 : 0xff0000, 1);
+        this.#debugGraphic.strokeRect(ghostRect.x, ghostRect.y, ghostRect.width, ghostRect.height);
     }
 }

@@ -163,7 +163,7 @@ export class GameScene extends Phaser.Scene {
 
     if (!this.#inventory.isOpen) {
       if (this.#controls.isPKeyJustDown){
-        this.#placement.toggle(Furnace, 'Furnace', Furnace.placementRect);
+        this.#placement.toggle(Furnace, 'FURNACE', Furnace.placementRect);
       }
       this.#placement.update(justClicked);
 
