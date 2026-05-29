@@ -109,16 +109,15 @@ export class GameScene extends Phaser.Scene {
     this.#interactibles = this.physics.add.staticGroup();
     this.#placement = new PlacementSystem(this, this.#interactibles);
 
-    const tree = new Tree({ scene: this, position: { x: 100, y: 180 }, assetKey: 'TREE' });
+    const tree = new Tree({ scene: this, position: { x: (1*64)+32, y: (2*64)+32 }, assetKey: 'TREE' });
     const tree1 = new Tree({ scene: this, position: { x: (3*64)+32, y: (3*64)+32 }, assetKey: 'TREE' });
     const tree2 = new Tree({ scene: this, position: { x: (6*64)+32, y: (3*64)+32 }, assetKey: 'TREE' });
-    // const tree3 = new Tree({ scene: this, position: { x: (4*64)+32, y: (4*64)+32 }, assetKey: 'TREE' });
-    const ore = new Ore({ scene: this, position: { x: 200, y: 180 }, assetKey: 'ORE'});
-    const furnace = new Furnace({ scene: this, position: { x: 64*10, y: 600 }, assetKey: 'FURNACE'});
+    const ore = new Ore({ scene: this, position: { x: (4*64)+32, y: (2*64)+32 }, assetKey: 'ORE'});
+    const furnace = new Furnace({ scene: this, position: { x: (10*64)+32, y: (9*64)+32 }, assetKey: 'FURNACE'});
     const conveyer = new Conveyer({ scene: this, position: { x: (12*64)+32, y: (2*64)+32 }, assetKey: 'CONVEYOR'});
     const conveyerCurve = new ConveyerCurve({ scene: this, position: { x: (11*64)+32, y: (2*64)+32 }, assetKey: 'CONVEYOR_CURVE'});
-    const furnace3 = new Furnace({ scene: this, position: { x: 64*13, y: 600 }, assetKey: 'FURNACE'});
-    const furnace4 = new Furnace({ scene: this, position: { x: 64*14, y: 600 }, assetKey: 'FURNACE'});
+    const furnace3 = new Furnace({ scene: this, position: { x: (13*64)+32, y: (9*64)+32 }, assetKey: 'FURNACE'});
+    const furnace4 = new Furnace({ scene: this, position: { x: (14*64)+32, y: (9*64)+32 }, assetKey: 'FURNACE'});
 
     this.input.enableDebug(tree);
     this.input.enableDebug(tree1);
@@ -163,7 +162,7 @@ export class GameScene extends Phaser.Scene {
 
     if (!this.#inventory.isOpen) {
       if (this.#controls.isPKeyJustDown){
-        this.#placement.toggle(Furnace, 'FURNACE', Furnace.placementRect);
+        this.#placement.toggle(Furnace, 'FURNACE');
       }
       this.#placement.update(justClicked);
 

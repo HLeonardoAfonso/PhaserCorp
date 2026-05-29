@@ -7,7 +7,7 @@ export class Furnace extends Interactibles {
     constructor(config: InteractiblesConfig) {
         super(config, 100);
         this.playIdleAnimation();
-        this.setBodySize(64, 64-10);
+        this.setBodySize(64, 64);
         this.body?.setOffset(0, 64+5)
         this.setDepth(config.position.y);
 
