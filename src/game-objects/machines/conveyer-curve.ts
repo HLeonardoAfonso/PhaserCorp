@@ -16,9 +16,7 @@ export class ConveyerCurve extends Interactibles {
         this.setInteractive(rect, Phaser.Geom.Rectangle.Contains);
     }
 
-    playIdleAnimation(): void {
-        this.play('MACHINE_CONVEYOR_CURVE');
-    }
+    playIdleAnimation(): void {}
 
     update(): void {
         if (this.isDead) {

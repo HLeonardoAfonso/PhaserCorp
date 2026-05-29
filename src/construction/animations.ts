@@ -44,7 +44,7 @@ export function createAnimations(scene: Phaser.Scene): void {
 
   scene.anims.create({
     key: 'WATER_FOAM_ANIM',
-    frames: scene.anims.generateFrameNumbers('WATER_FOAM', { start: 0, end: 16 }),
+    frames: scene.anims.generateFrameNumbers('WATER_FOAM', { start: 0, end: 15 }),
     frameRate: 8,
     repeat: -1,
   });
