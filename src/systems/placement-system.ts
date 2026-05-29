@@ -8,7 +8,6 @@ export class PlacementSystem {
     #group: Phaser.Physics.Arcade.StaticGroup;
     #ghost: Phaser.GameObjects.Sprite | null = null;
     #active = false;
-    #placementRect!: Phaser.Geom.Rectangle;
     #factory!: PlaceableConstructor;
     #assetKey!: string;
     #animKey: string | null = null;
@@ -20,14 +19,13 @@ export class PlacementSystem {
 
     get isActive() { return this.#active; }
 
-    toggle(factory?: PlaceableConstructor, assetKey?: string, placementRect?: Phaser.Geom.Rectangle): void {
+    toggle(factory?: PlaceableConstructor, assetKey?: string): void {
         this.#active = !this.#active;
-        if (this.#active && factory && assetKey && placementRect){
+        if (this.#active && factory && assetKey){
             this.#factory = factory;
             this.#assetKey = assetKey;
-            this.#placementRect = placementRect;
             this.#ghost = this.#scene.add.sprite(0,0, assetKey).setAlpha(0.5).setDepth(999);
-            if (this.#animKey)this.#ghost.play(this.#animKey);  
+            if (this.#animKey)this.#ghost.play(this.#animKey)  
         } else {
             this.#ghost?.destroy();
             this.#active = false;
@@ -39,31 +37,28 @@ export class PlacementSystem {
         if(!this.#active || !this.#ghost) return;
 
         const wp = this.#scene.cameras.main.getWorldPoint(this.#scene.input.activePointer.x, this.#scene.input.activePointer.y);
-        this.#ghost.setPosition(wp.x, wp.y);
-        
-        const ghostRect = new Phaser.Geom.Rectangle(
-            wp.x + this.#placementRect.x,
-            wp.y + this.#placementRect.y,
-            this.#placementRect.width,
-            this.#placementRect.height,
-        );
+        const TILE = 64;
+        const snappedX = Math.floor(wp.x / TILE) * TILE + TILE / 2;
+        const snappedY = Math.floor(wp.y / TILE) * TILE;
+        this.#ghost.setPosition(snappedX, snappedY);
 
-        let canPlace:boolean = true;
+        const tileKey = (x: number, y: number) => `${Math.floor(x / TILE)},${Math.floor(y / TILE)}`;
+        const key = tileKey(snappedX, snappedY);
+
+        let canPlace = true;
         this.#group.getChildren().forEach(obj => {
-            const body = (obj as Interactibles).body as Phaser.Physics.Arcade.StaticBody;
-            if (Phaser.Geom.Rectangle.Overlaps(ghostRect, new Phaser.Geom.Rectangle(body.x, body.y, body.width, body.height))){
-                canPlace = false;
-            }
+            const sprite = obj as Phaser.GameObjects.Sprite;
+            if (tileKey(sprite.x, sprite.y) === key) canPlace = false;
         });
 
         this.#ghost.setTint(canPlace ? 0x00ff00 : 0xff0000);
 
         if (justClicked && canPlace){
-            const placedObj = new this.#factory({ scene: this.#scene, position: { x: wp.x, y: wp.y }, assetKey: this.#assetKey });
+            const placedObj = new this.#factory({ scene: this.#scene, position: { x: snappedX, y: snappedY }, assetKey: this.#assetKey });
             this.#group.add(placedObj);
             this.#ghost.destroy();
             this.#ghost = null;
-            this.#active = false
+            this.#active = false;
         }
     }
 }
