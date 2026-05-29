@@ -11,12 +11,10 @@ export class PlacementSystem {
     #factory!: PlaceableConstructor;
     #assetKey!: string;
     #animKey: string | null = null;
-    #debugGraphic!: Phaser.GameObjects.Graphics;
 
     constructor(scene: Phaser.Scene, group: Phaser.Physics.Arcade.StaticGroup){
         this.#scene = scene;
         this.#group = group;
-        this.#debugGraphic = scene.add.graphics().setDepth(1000);
     }
 
     get isActive() { return this.#active; }
@@ -29,7 +27,6 @@ export class PlacementSystem {
             this.#ghost = this.#scene.add.sprite(0,0, assetKey).setAlpha(0.5).setDepth(999);
             if (this.#animKey)this.#ghost.play(this.#animKey)  
         } else {
-            this.#debugGraphic.clear();
             this.#ghost?.destroy();
             this.#active = false;
             this.#ghost = null;
