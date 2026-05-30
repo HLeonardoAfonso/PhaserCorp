@@ -6,7 +6,8 @@ import { Interactibles } from '../game-objects/interactibles';
 import { Cursors } from '../common/cursor';
 import { Inventory } from '../components/game-object/inventory-component';
 import { createAnimations } from '../construction/animations';
-import { createWorld, WATER_TILES } from '../construction/world-render';
+import { createWorld } from '../construction/world-render';
+import { WATER_TILES } from '../construction/tile-config';
 import { WORLD } from '../construction/world';
 import { Ore } from '../game-objects/ore';
 import { Furnace } from '../game-objects/machines/furnace';
@@ -39,8 +40,8 @@ export class GameScene extends Phaser.Scene {
       br: this.add.image(0, 0, 'SEL_BR').setOrigin(0.5, 0.5).setDepth(999).setVisible(false),
     };
 
-    const MAP_WIDTH = 3 * 16 * 64;
-    const MAP_HEIGHT = 3 * 16 * 64;
+    const MAP_WIDTH = WORLD.length * 16 * 64;
+    const MAP_HEIGHT = WORLD[0].length * 16 * 64;
 
     createAnimations(this);
     const MAP_DATA = createWorld(WORLD);
@@ -75,9 +76,9 @@ export class GameScene extends Phaser.Scene {
         }
         // water collider
         if (MAP_DATA[row][col] === 4) {
-        const waterZone = this.add.zone( col * 64 + 32, row * 64 + 32, 64, 64 );
-        waterColliders.add(waterZone);
-      }
+          const waterZone = this.add.zone( col * 64 + 32, row * 64 + 32, 64, 64 );
+          waterColliders.add(waterZone);
+        }
       }
     }
 
@@ -87,7 +88,7 @@ export class GameScene extends Phaser.Scene {
     }
     this.#controls = new KeyboardComponent(this.input.keyboard);
     this.#inventory = new Inventory(this, this.#controls, this.physics.world.drawDebug);
-    this.#crafting = new Crafting(this, this.#controls, this.physics.world.drawDebug);
+    this.#crafting = new Crafting(this, this.#controls, this.#inventory, this.physics.world.drawDebug);
     Interactibles.onEntityDied = (key) => this.#inventory.addItems(key, 32);
 
     this.physics.world.setBounds(0, 0, MAP_WIDTH, MAP_HEIGHT);
@@ -103,7 +104,7 @@ export class GameScene extends Phaser.Scene {
     this.cameras.main.setBounds(0, 0, MAP_WIDTH, MAP_HEIGHT);
     this.cameras.main.startFollow(this.#player);
 
-    this.#player.setDepth(2);
+    this.#player.setDepth(3);
 
     //Refresh do grupo interactibles através de um evento (desaparecer ore)
     this.#interactibles = this.physics.add.staticGroup();
@@ -113,27 +114,22 @@ export class GameScene extends Phaser.Scene {
     const tree1 = new Tree({ scene: this, position: { x: (3*64)+32, y: (3*64)+32 }, assetKey: 'TREE' });
     const tree2 = new Tree({ scene: this, position: { x: (6*64)+32, y: (3*64)+32 }, assetKey: 'TREE' });
     const ore = new Ore({ scene: this, position: { x: (4*64)+32, y: (2*64)+32 }, assetKey: 'ORE'});
-    const furnace = new Furnace({ scene: this, position: { x: (10*64)+32, y: (9*64)+32 }, assetKey: 'FURNACE'});
+
     const conveyer = new Conveyer({ scene: this, position: { x: (12*64)+32, y: (2*64)+32 }, assetKey: 'CONVEYOR'});
     const conveyerCurve = new ConveyerCurve({ scene: this, position: { x: (11*64)+32, y: (2*64)+32 }, assetKey: 'CONVEYOR_CURVE'});
-    const furnace3 = new Furnace({ scene: this, position: { x: (13*64)+32, y: (9*64)+32 }, assetKey: 'FURNACE'});
-    const furnace4 = new Furnace({ scene: this, position: { x: (14*64)+32, y: (9*64)+32 }, assetKey: 'FURNACE'});
 
     this.input.enableDebug(tree);
     this.input.enableDebug(tree1);
     this.input.enableDebug(tree2);
-    this.input.enableDebug(furnace);
     this.input.enableDebug(ore);
 
     this.#interactibles.add(tree);
     this.#interactibles.add(tree1);
     this.#interactibles.add(tree2);
-    this.#interactibles.add(furnace);
     this.#interactibles.add(ore);
+    
     this.#interactibles.add(conveyer);
     this.#interactibles.add(conveyerCurve);
-    this.#interactibles.add(furnace3);
-    this.#interactibles.add(furnace4);
 
     this.physics.add.collider(this.#player, this.#interactibles);
     this.physics.add.collider(this.#player, waterColliders);

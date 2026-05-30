@@ -8,7 +8,7 @@ export class Tree extends Interactibles {
         super(config, 100);
         this.playIdleAnimation();
         this.setOrigin(0.51, 0.83);
-        this.setBodySize(64, 64);
+        this.setBodySize(30, 30);
         this.setDepth(config.position.y);
 
         this.removeInteractive();

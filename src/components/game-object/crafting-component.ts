@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { KeyboardComponent } from '../input/keyboard-component';
 import { RecipeOverlay } from './recipe-component';
+import { Inventory } from './inventory-component';
 import type { Recipe } from '../../common/types';
 
 type CraftingSlot = {
@@ -20,15 +21,23 @@ const MACHINE_RECIPES: Record<string, Recipe> = {
   CONVEYOR_CURVE: [{ key: 'WOOD_ITEM', amount: 1 }],
 };
 
+const MACHINE_TO_ITEM_KEY: Record<string, string> = {
+  FURNACE: 'MACHINE_FURNACE',
+  CONVEYOR: 'MACHINE_CONVEYOR',
+  CONVEYOR_CURVE: 'MACHINE_CONVEYOR_CURVE',
+};
+
 export class Crafting {
   
   #table: Phaser.GameObjects.Image;
   #controls: KeyboardComponent;
+  #inventory: Inventory;
   #slots: CraftingSlot[] = [];
   #debugRects: Phaser.GameObjects.Rectangle[] = [];
   #recipeOverlay: RecipeOverlay;
 
-  constructor(scene: Phaser.Scene, controls: KeyboardComponent, debug: boolean) {
+  constructor(scene: Phaser.Scene, controls: KeyboardComponent, inventory: Inventory, debug: boolean) {
+    this.#inventory = inventory;
     this.#controls = controls;
 
     this.#table = scene.add.image(
@@ -55,6 +64,27 @@ export class Crafting {
     this.#recipeOverlay.hide();
   }
 
+  #onMachineClick(_index: number): void {
+    const machineKey = MACHINE_LIST[_index];
+    const recipe = MACHINE_RECIPES[machineKey];
+    const itemKey = MACHINE_TO_ITEM_KEY[machineKey];
+
+    // Check if player has enough of each ingredient
+    for (const ingredient of recipe) {
+      if (!this.#inventory.hasEnoughOf(ingredient.key, ingredient.amount)) {
+        return; // Not enough resources, abort
+      }
+    }
+
+    // Remove ingredients
+    for (const ingredient of recipe) {
+      this.#inventory.removeItems(ingredient.key, ingredient.amount);
+    }
+
+    // Add the crafted machine item to inventory
+    this.#inventory.addItem(itemKey);
+  }
+
   #populateMachines(scene: Phaser.Scene): void {
     for (let i = 0; i < MACHINE_LIST.length && i < this.#slots.length; i++) {
       const slot = this.#slots[i];
@@ -64,7 +94,8 @@ export class Crafting {
         .setVisible(this.#table.visible)
         .setInteractive()
         .on('pointerover', (pointer: Phaser.Input.Pointer) => this.#onMachinePointerOver(i, pointer))
-        .on('pointerout', () => this.#onMachinePointerOut());
+        .on('pointerout', () => this.#onMachinePointerOut())
+        .on('pointerdown', () => this.#onMachineClick(i));
 
       slot.occupied = true;
       slot.itemKey = MACHINE_LIST[i];

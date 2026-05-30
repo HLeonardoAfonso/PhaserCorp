@@ -141,4 +141,40 @@ export class Inventory {
     emptySlot.amount = 1;
     return true;
   }
+
+  hasEnoughOf(itemKey: string, amount: number): boolean {
+    let total = 0;
+    for (const slot of this.#slots) {
+      if (slot.itemKey === itemKey) {
+        total += slot.amount;
+        if (total >= amount) return true;
+      }
+    }
+    return false;
+  }
+
+  removeItems(itemKey: string, amount: number): void {
+    let remaining = amount;
+    for (const slot of this.#slots) {
+      if (remaining <= 0) break;
+      if (slot.itemKey === itemKey) {
+        const toRemove = Math.min(slot.amount, remaining);
+        slot.amount -= toRemove;
+        remaining -= toRemove;
+
+        if (slot.amount <= 0) {
+          // Destroy visuals and clear slot
+          slot.image?.destroy();
+          slot.amountText?.destroy();
+          slot.occupied = false;
+          slot.itemKey = null;
+          slot.image = null;
+          slot.amountText = null;
+          slot.amount = 0;
+        } else {
+          slot.amountText?.setText(`${slot.amount}`);
+        }
+      }
+    }
+  }
 }
