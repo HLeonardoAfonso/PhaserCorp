@@ -52,6 +52,21 @@ export const TILES = {
 
   ROCK_GRASS_SINGLE:         35,
 
+  // -- ramp
+
+  // -- walls
+  ROCK_WALL_GRASS_LEFT:          41,
+  ROCK_WALL_GRASS_MID:           42,
+  ROCK_WALL_GRASS_RIGHT:         43,
+
+  ROCK_WALL_GRASS_SINGLE:           44,
+
+  ROCK_WALL_WATER_LEFT:           50,
+  ROCK_WALL_WATER_MID:            51,
+  ROCK_WALL_WATER_RIGHT:          52,
+
+  ROCK_WALL_WATER_SINGLE:            53,
+
 } as const;
 
 export const WATER_TILES: number[] = [
@@ -96,4 +111,29 @@ export const BINARY_MAP: Record<number, number> = {
   0b1110: TILES.WATER_GRASS_VERTICAL_DOWN,    // down + left + right
 
   0b1111: TILES.WATER_GRASS_SINGLE,           // all 4 sides
+};
+
+export const ROCK_BINARY_MAP: Record<number, number> = {
+  0b0000: TILES.ROCK_GRASS_MID,              // all 4 sides are level 2
+
+  0b0001: TILES.ROCK_GRASS_UP,               // up
+  0b0010: TILES.ROCK_GRASS_DOWN,             // down
+  0b0100: TILES.ROCK_GRASS_MID_LEFT,         // left
+  0b1000: TILES.ROCK_GRASS_MID_RIGHT,        // right
+
+  0b0101: TILES.ROCK_GRASS_UP_LEFT,          // up + left
+  0b0110: TILES.ROCK_GRASS_DOWN_LEFT,        // down + left
+
+  0b1001: TILES.ROCK_GRASS_UP_RIGHT,         // up + right
+  0b1010: TILES.ROCK_GRASS_DOWN_RIGHT,       // down + right
+
+  0b0011: TILES.ROCK_GRASS_HORIZONTAL_MIDLE, // up + down
+  0b0111: TILES.ROCK_GRASS_HORIZONTAL_LEFT,  // up + down + left
+  0b1011: TILES.ROCK_GRASS_HORIZONTAL_RIGHT, // up + down + right
+
+  0b1100: TILES.ROCK_GRASS_VERTICAL_MIDLE,   // left + right
+  0b1101: TILES.ROCK_GRASS_VERTICAL_UP,      // up + left + right
+  0b1110: TILES.ROCK_GRASS_VERTICAL_DOWN,    // down + left + right
+
+  0b1111: TILES.ROCK_GRASS_SINGLE,           // all 4 sides are level 1
 };

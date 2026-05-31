@@ -6,8 +6,7 @@ import { Interactibles } from '../game-objects/interactibles';
 import { Cursors } from '../common/cursor';
 import { Inventory } from '../components/game-object/inventory-component';
 import { createAnimations } from '../construction/animations';
-import { createWorld } from '../construction/world-render';
-import { WATER_TILES } from '../construction/tile-config';
+import { createWorld, createRockLayer, createWaterEffects } from '../construction/world-render';
 import { WORLD } from '../construction/world';
 import { Ore } from '../game-objects/ore';
 import { Furnace } from '../game-objects/machines/furnace';
@@ -62,25 +61,22 @@ export class GameScene extends Phaser.Scene {
       groundLayer.setDepth(1);
     }
 
-    const waterFoamSet = new Set(WATER_TILES);
-    const waterColliders = this.physics.add.staticGroup();
-
-    for (let row = 0; row < MAP_DATA.length; row++) {
-      for (let col = 0; col < MAP_DATA[row].length; col++) {
-        
-        // water foam render
-        if (waterFoamSet.has(MAP_DATA[row][col])) {
-          const foam = this.add.sprite( col * 64 + 32, row * 64 + 32, 'WATER_FOAM', 0);
-          foam.setDepth(0);
-          foam.play('WATER_FOAM_ANIM');
-        }
-        // water collider
-        if (MAP_DATA[row][col] === 4) {
-          const waterZone = this.add.zone( col * 64 + 32, row * 64 + 32, 64, 64 );
-          waterColliders.add(waterZone);
-        }
+    // Rock overlay layer at depth 2
+    const rockData = createRockLayer(WORLD);
+    const rockLayer = this.make.tilemap({
+      data: rockData,
+      tileWidth: 64,
+      tileHeight: 64,
+    });
+    const rockTileset = rockLayer.addTilesetImage('tileset', 'TILESET_COLOR1', 64, 64, 0, 0);
+    if (rockTileset) {
+      const rockGroundLayer = rockLayer.createLayer(0, rockTileset, 0, 0);
+      if (rockGroundLayer) {
+        rockGroundLayer.setDepth(2);
       }
     }
+
+    const waterColliders = createWaterEffects(this, MAP_DATA);
 
     if (!this.input.keyboard) {
       console.warn('Phaser keyboard plugin not setup');
