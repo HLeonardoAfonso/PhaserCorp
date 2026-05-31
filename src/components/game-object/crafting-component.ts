@@ -2,6 +2,9 @@ import Phaser from 'phaser';
 import { KeyboardComponent } from '../input/keyboard-component';
 import { RecipeOverlay } from './recipe-component';
 import { Inventory } from './inventory-component';
+import { Furnace } from '../../game-objects/machines/furnace';
+import { Conveyer } from '../../game-objects/machines/conveyer';
+import { ConveyerCurve } from '../../game-objects/machines/conveyer-curve';
 import type { Recipe } from '../../common/types';
 
 type CraftingSlot = {
@@ -13,19 +16,7 @@ type CraftingSlot = {
   image: Phaser.GameObjects.Image | null;
 };
 
-const MACHINE_LIST = ['FURNACE', 'CONVEYOR', 'CONVEYOR_CURVE'] as const;
-
-const MACHINE_RECIPES: Record<string, Recipe> = {
-  FURNACE: [{ key: 'WOOD_ITEM', amount: 1 }, { key: 'GOLD_ITEM', amount: 1 }],
-  CONVEYOR: [{ key: 'WOOD_ITEM', amount: 1 }, { key: 'WOOD_ITEM', amount: 1 }, { key: 'WOOD_ITEM', amount: 1 }],
-  CONVEYOR_CURVE: [{ key: 'WOOD_ITEM', amount: 1 }],
-};
-
-const MACHINE_TO_ITEM_KEY: Record<string, string> = {
-  FURNACE: 'MACHINE_FURNACE',
-  CONVEYOR: 'MACHINE_CONVEYOR',
-  CONVEYOR_CURVE: 'MACHINE_CONVEYOR_CURVE',
-};
+const CRAFTABLE_MACHINES = [Furnace, Conveyer, ConveyerCurve] as const;
 
 export class Crafting {
   
@@ -55,9 +46,8 @@ export class Crafting {
   }
 
   #onMachinePointerOver(_index: number, pointer: Phaser.Input.Pointer): void {
-    const machineKey = MACHINE_LIST[_index];
-    const recipe = MACHINE_RECIPES[machineKey];
-    this.#recipeOverlay.show(pointer, recipe);
+    const machineClass = CRAFTABLE_MACHINES[_index];
+    this.#recipeOverlay.show(pointer, machineClass.craftRecipe);
   }
 
   #onMachinePointerOut(): void {
@@ -65,9 +55,9 @@ export class Crafting {
   }
 
   #onMachineClick(_index: number): void {
-    const machineKey = MACHINE_LIST[_index];
-    const recipe = MACHINE_RECIPES[machineKey];
-    const itemKey = MACHINE_TO_ITEM_KEY[machineKey];
+    const machineClass = CRAFTABLE_MACHINES[_index];
+    const recipe = machineClass.craftRecipe;
+    const itemKey = machineClass.craftItemKey;
 
     // Check if player has enough of each ingredient
     for (const ingredient of recipe) {
@@ -86,9 +76,10 @@ export class Crafting {
   }
 
   #populateMachines(scene: Phaser.Scene): void {
-    for (let i = 0; i < MACHINE_LIST.length && i < this.#slots.length; i++) {
+    for (let i = 0; i < CRAFTABLE_MACHINES.length && i < this.#slots.length; i++) {
+      const machineClass = CRAFTABLE_MACHINES[i];
       const slot = this.#slots[i];
-      const image = scene.add.image(slot.x, slot.y, MACHINE_LIST[i])
+      const image = scene.add.image(slot.x, slot.y, machineClass.craftDisplayKey)
         .setScrollFactor(0)
         .setDepth(1002)
         .setVisible(this.#table.visible)
@@ -98,8 +89,8 @@ export class Crafting {
         .on('pointerdown', () => this.#onMachineClick(i));
 
       slot.occupied = true;
-      slot.itemKey = MACHINE_LIST[i];
-      slot.recipe = MACHINE_RECIPES[MACHINE_LIST[i]];
+      slot.itemKey = machineClass.craftDisplayKey;
+      slot.recipe = machineClass.craftRecipe;
       slot.image = image;
     }
   }

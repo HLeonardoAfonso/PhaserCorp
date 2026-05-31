@@ -1,7 +1,12 @@
 import { Interactibles, type InteractiblesConfig } from "../interactibles";
+import type { Recipe } from "../../common/types";
 
 export class Furnace extends Interactibles {
     
+    static readonly craftRecipe: Recipe = [{ key: 'WOOD_ITEM', amount: 1 }];
+    static readonly craftItemKey = 'MACHINE_FURNACE';
+    static readonly craftDisplayKey = 'FURNACE';
+
     get resourceKey(): string { return 'MACHINE_FURNACE'; }
 
     constructor(config: InteractiblesConfig) {
@@ -19,6 +24,10 @@ export class Furnace extends Interactibles {
 
     playIdleAnimation(): void {}
 
+    getRecipe(): Recipe {
+        return Furnace.craftRecipe;
+    }
+
     update(): void {
         if (this.isDead) {
             Interactibles.clearSelected();
@@ -29,6 +38,6 @@ export class Furnace extends Interactibles {
         }
     }
     static get placementRect(): Phaser.Geom.Rectangle {
-    return new Phaser.Geom.Rectangle(-32, 64 + 5, 64, 54);
+        return new Phaser.Geom.Rectangle(-32, 64 + 5, 64, 54);
     }
 }

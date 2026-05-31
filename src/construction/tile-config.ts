@@ -54,6 +54,12 @@ export const TILES = {
 
   // -- ramp
 
+  ROCK_RAMP_UP_LEFT:         36,
+  ROCK_RAMP_DOWN_LEFT:       45,
+
+  ROCK_RAMP_UP_RIGHT:        39,
+  ROCK_RAMP_DOWN_RIGHT:      48,
+
   // -- walls
   ROCK_WALL_GRASS_LEFT:          41,
   ROCK_WALL_GRASS_MID:           42,

@@ -14,6 +14,7 @@ Ressources
 
 Wood
 Stone
+Coal
 Iron Ore -> Iron Plate -> Iron Gears
 Copper Ore -> Copper Plate -> Copper Wire
 

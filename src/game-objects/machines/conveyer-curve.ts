@@ -1,6 +1,12 @@
+import type { Recipe } from "../../common/types";
 import { Interactibles, type InteractiblesConfig } from "../interactibles";
 
 export class ConveyerCurve extends Interactibles {
+    
+    static readonly craftRecipe: Recipe = [{ key: 'WOOD_ITEM', amount: 1 }];
+    static readonly craftItemKey = 'MACHINE_CONVEYOR_CURVE';
+    static readonly craftDisplayKey = 'CONVEYOR_CURVE';
+
     get resourceKey(): string { return 'MACHINE_CONVEYOR_CURVE'; }
 
     constructor(config: InteractiblesConfig) {
@@ -17,6 +23,10 @@ export class ConveyerCurve extends Interactibles {
     }
 
     playIdleAnimation(): void {}
+
+    getRecipe(): Recipe {
+        return ConveyerCurve.craftRecipe;
+    }
 
     update(): void {
         if (this.isDead) {
