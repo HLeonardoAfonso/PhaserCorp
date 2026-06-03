@@ -1,5 +1,5 @@
 import type { world, chunk } from '../common/types';
-import { TILES, BINARY_MAP, ROCK_BINARY_MAP, WATER_TILES } from './tile-config';
+import { TILES, BINARY_MAP, ROCK_BINARY_MAP, WATER_TILES, ROCK_TILES } from './tile-config';
 
 type NeighborEdges = {
   up?:    number[];  // bottom row of chunk above  (16 values)
@@ -122,7 +122,7 @@ export function createWaterEffects(
   mapData: number[][]
 ): Phaser.Physics.Arcade.StaticGroup {
   const waterFoamSet = new Set(WATER_TILES);
-  const waterColliders = scene.physics.add.staticGroup();
+  const colliders = scene.physics.add.staticGroup();
 
   for (let row = 0; row < mapData.length; row++) {
     for (let col = 0; col < mapData[row].length; col++) {
@@ -135,10 +135,63 @@ export function createWaterEffects(
       // water collider
       if (mapData[row][col] === 4) {
         const waterZone = scene.add.zone(col * 64 + 32, row * 64 + 32, 64, 64);
-        waterColliders.add(waterZone);
+        colliders.add(waterZone);
       }
     }
   }
 
-  return waterColliders;
+  return colliders;
+}
+
+export function createRockColliders(
+  scene: Phaser.Scene,
+  rockData: number[][]
+): Phaser.Physics.Arcade.StaticGroup {
+  const rockWallSet = new Set(ROCK_TILES);
+  const colliders = scene.physics.add.staticGroup();
+
+  // Build reverse map: tile value -> bitmask code for edge detection
+  const tileToRockBitmask: Record<number, number> = {};
+  for (const [code, tile] of Object.entries(ROCK_BINARY_MAP)) {
+    tileToRockBitmask[tile] = Number(code);
+  }
+
+  for (let row = 0; row < rockData.length; row++) {
+    for (let col = 0; col < rockData[row].length; col++) {
+      const tile = rockData[row][col];
+
+      // Full 64x64 collider for wall tiles
+      if (rockWallSet.has(tile)) {
+        const rockZone = scene.add.zone(col * 64 + 32, row * 64 + 32, 64, 64);
+        colliders.add(rockZone);
+      }
+
+      // 2px-thick colliders for exposed rock edges
+      const code = tileToRockBitmask[tile];
+      if (code !== undefined) {
+        // 0b0001 = top edge exposed
+        if (code & 0b0001) {
+          const zone = scene.add.zone(col * 64 + 32, row * 64 + 1, 64, 2);
+          colliders.add(zone);
+        }
+        // 0b0010 = bottom edge exposed
+        if (code & 0b0010) {
+          const zone = scene.add.zone(col * 64 + 32, row * 64 + 63, 64, 2);
+          colliders.add(zone);
+        }
+        // 0b0100 = left edge exposed
+        if (code & 0b0100) {
+          const zone = scene.add.zone(col * 64 + 1, row * 64 + 32, 2, 64);
+          colliders.add(zone);
+        }
+        // 0b1000 = right edge exposed
+        if (code & 0b1000) {
+          const zone = scene.add.zone(col * 64 + 63, row * 64 + 32, 2, 64);
+          colliders.add(zone);
+        }
+      }
+    }
+  }
+
+  return colliders;
 }

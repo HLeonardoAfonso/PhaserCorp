@@ -5,14 +5,11 @@ import { Inventory } from './inventory-component';
 import { Furnace } from '../../game-objects/machines/furnace';
 import { Conveyer } from '../../game-objects/machines/conveyer';
 import { ConveyerCurve } from '../../game-objects/machines/conveyer-curve';
-import type { Recipe } from '../../common/types';
 
 type CraftingSlot = {
   x: number;
   y: number;
   occupied: boolean;
-  itemKey: string | null;
-  recipe: Recipe | null;
   image: Phaser.GameObjects.Image | null;
 };
 
@@ -89,8 +86,6 @@ export class Crafting {
         .on('pointerdown', () => this.#onMachineClick(i));
 
       slot.occupied = true;
-      slot.itemKey = machineClass.craftDisplayKey;
-      slot.recipe = machineClass.craftRecipe;
       slot.image = image;
     }
   }
@@ -113,8 +108,6 @@ export class Crafting {
           x: cx,
           y: cy,
           occupied: false,
-          itemKey: null,
-          recipe: null,
           image: null,
         });
 

@@ -17,7 +17,7 @@ export abstract class Interactibles extends Phaser.Physics.Arcade.Sprite {
     static get currentSelected() { return Interactibles.#currentSelected; }
     static clearSelected() { Interactibles.#currentSelected = null; }
     static setSelected(interactible: Interactibles) { 
-    Interactibles.#currentSelected = interactible; 
+        Interactibles.#currentSelected = interactible; 
     }
 
     static onEntityDied: ((resourceKey: string) => void) | null = null;

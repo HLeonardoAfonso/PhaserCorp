@@ -6,7 +6,7 @@ import { Interactibles } from '../game-objects/interactibles';
 import { Cursors } from '../common/cursor';
 import { Inventory } from '../components/game-object/inventory-component';
 import { createAnimations } from '../construction/animations';
-import { createWorld, createRockLayer, createWaterEffects } from '../construction/world-render';
+import { createWorld, createRockLayer, createWaterEffects, createRockColliders } from '../construction/world-render';
 import { WORLD } from '../construction/world';
 import { Ore } from '../game-objects/ore';
 import { Furnace } from '../game-objects/machines/furnace';
@@ -76,6 +76,7 @@ export class GameScene extends Phaser.Scene {
       }
     }
 
+    const rockColliders = createRockColliders(this, rockData);
     const waterColliders = createWaterEffects(this, MAP_DATA);
 
     if (!this.input.keyboard) {
@@ -128,6 +129,7 @@ export class GameScene extends Phaser.Scene {
     this.#interactibles.add(conveyerCurve);
 
     this.physics.add.collider(this.#player, this.#interactibles);
+    this.physics.add.collider(this.#player, rockColliders);
     this.physics.add.collider(this.#player, waterColliders);
     this.input.on('gameobjectdown', (_pointer: Phaser.Input.Pointer, obj: Phaser.GameObjects.GameObject) => {
       if (obj instanceof Interactibles && this.#player.nearInteractibles.has(obj)) {
