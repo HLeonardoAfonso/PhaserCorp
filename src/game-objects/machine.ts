@@ -2,8 +2,8 @@ import { Interactibles, type InteractiblesConfig } from "./interactibles";
 
 export abstract class Machine extends Interactibles {
 
-    constructor(config: InteractiblesConfig, health: number) {
-        super(config, health);
+    constructor(config: InteractiblesConfig, health: number, assetKey: string) {
+        super(config, health, assetKey);
     }
 
     playIdleAnimation(): void {}

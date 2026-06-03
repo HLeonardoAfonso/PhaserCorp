@@ -9,7 +9,6 @@ export class PlacementSystem {
     #ghost: Phaser.GameObjects.Sprite | null = null;
     #active = false;
     #factory!: PlaceableConstructor;
-    #assetKey!: string;
     #animKey: string | null = null;
 
     constructor(scene: Phaser.Scene, group: Phaser.Physics.Arcade.StaticGroup){
@@ -23,7 +22,6 @@ export class PlacementSystem {
         this.#active = !this.#active;
         if (this.#active && factory && assetKey){
             this.#factory = factory;
-            this.#assetKey = assetKey;
             this.#ghost = this.#scene.add.sprite(0,0, assetKey).setAlpha(0.5).setDepth(999);
             if (this.#animKey)this.#ghost.play(this.#animKey)  
         } else {
@@ -54,7 +52,7 @@ export class PlacementSystem {
         this.#ghost.setTint(canPlace ? 0x00ff00 : 0xff0000);
 
         if (justClicked && canPlace){
-            const placedObj = new this.#factory({ scene: this.#scene, position: { x: snappedX, y: snappedY }, assetKey: this.#assetKey });
+            const placedObj = new this.#factory({ scene: this.#scene, position: { x: snappedX, y: snappedY } });
             this.#group.add(placedObj);
             this.#ghost.destroy();
             this.#ghost = null;

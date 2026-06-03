@@ -11,7 +11,7 @@ export class ConveyerCurve extends Machine {
     get resourceKey(): string { return 'MACHINE_CONVEYOR_CURVE'; }
 
     constructor(config: InteractiblesConfig) {
-        super(config, 100);
+        super(config, 100, 'CONVEYOR_CURVE');
         this.playIdleAnimation();
         this.setBodySize(64, 64-10);
         this.body?.setOffset(0, 64+5)

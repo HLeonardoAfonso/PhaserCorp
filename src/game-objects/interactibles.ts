@@ -3,7 +3,6 @@ import type { Position } from "../common/types";
 export type InteractiblesConfig = {
     scene: Phaser.Scene;
     position: Position;
-    assetKey: string;
     frame?: number;
 }
 
@@ -28,8 +27,8 @@ export abstract class Interactibles extends Phaser.Physics.Arcade.Sprite {
 
     abstract get resourceKey(): string;
 
-    constructor(config: InteractiblesConfig, health: number) {
-        const { scene, position, assetKey, frame } = config;
+    constructor(config: InteractiblesConfig, health: number, assetKey: string) {
+        const { scene, position, frame } = config;
         super(scene, position.x, position.y, assetKey, frame);
 
         scene.add.existing(this);

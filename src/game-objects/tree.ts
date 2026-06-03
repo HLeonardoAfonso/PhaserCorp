@@ -5,7 +5,7 @@ export class Tree extends Interactibles {
 
     #opaqueZone: Phaser.GameObjects.Zone;
     constructor(config: InteractiblesConfig) {
-        super(config, 100);
+        super(config, 100, 'TREE');
         this.playIdleAnimation();
         this.setOrigin(0.51, 0.83);
         this.setBodySize(30, 30);

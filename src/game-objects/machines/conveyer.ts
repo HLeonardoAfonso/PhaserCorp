@@ -11,7 +11,7 @@ export class Conveyer extends Machine {
     get resourceKey(): string { return 'MACHINE_CONVEYOR'; }
 
     constructor(config: InteractiblesConfig) {
-        super(config, 100);
+        super(config, 100, 'CONVEYOR');
         this.playIdleAnimation();
         this.setBodySize(64, 64);
         this.body?.setOffset(0, 0)

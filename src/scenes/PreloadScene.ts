@@ -48,11 +48,27 @@ export class PreloadScene extends Phaser.Scene {
       frameHeight: 64,
     });
 
-
+    // UI
     this.load.image('INVENTORY_BANNER', 'assets/Inventory/Banner.png');
     this.load.image('INVENTORY_TABLE', 'assets/Inventory/WoodTable.png');
+
+    // Resources
+
     this.load.image('GOLD_ITEM', 'assets/Inventory/Gold_Resource.png');
     this.load.image('WOOD_ITEM', 'assets/Inventory/Wood_Resource.png');
+
+    this.load.image('IRON_ITEM', 'assets/ressources/Iron_Resource.png');
+    this.load.image('COPPER_ITEM', 'assets/ressources/Copper_Resource.png'); 
+    this.load.image('COAL_ITEM', 'assets/ressources/Coal_Resource.png');
+
+    this.load.spritesheet('IRON_STONE', 'assets/ressources/Iron_Stone.png', {
+      frameWidth: 128,
+      frameHeight: 128,
+    });
+    this.load.image('COPPER_STONE', 'assets/ressources/Copper_Stone.png'); 
+    this.load.image('COAL_STONE', 'assets/ressources/Coal_Stone.png'); 
+
+    // Machines
 
     this.load.image('FURNACE', 'assets/machines/Furnace.png');
     this.load.image('CONVEYOR', 'assets/machines/Conveyor.png');
