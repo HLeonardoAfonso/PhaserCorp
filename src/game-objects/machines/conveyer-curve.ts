@@ -1,7 +1,8 @@
 import type { Recipe } from "../../common/types";
-import { Interactibles, type InteractiblesConfig } from "../interactibles";
+import type { InteractiblesConfig } from "../interactibles";
+import { Machine } from "../machine";
 
-export class ConveyerCurve extends Interactibles {
+export class ConveyerCurve extends Machine {
     
     static readonly craftRecipe: Recipe = [{ key: 'WOOD_ITEM', amount: 1 }];
     static readonly craftItemKey = 'MACHINE_CONVEYOR_CURVE';
@@ -20,21 +21,5 @@ export class ConveyerCurve extends Interactibles {
         const rect = new Phaser.Geom.Rectangle(0, 64, 64, 64);
         this.hitRect = rect;
         this.setInteractive(rect, Phaser.Geom.Rectangle.Contains);
-    }
-
-    playIdleAnimation(): void {}
-
-    getRecipe(): Recipe {
-        return ConveyerCurve.craftRecipe;
-    }
-
-    update(): void {
-        if (this.isDead) {
-            Interactibles.clearSelected();
-            Interactibles.clearHovered();
-            Interactibles.onEntityDied?.(this.resourceKey);
-            this.removeInteractive();
-            this.destroy();
-        }
     }
 }
