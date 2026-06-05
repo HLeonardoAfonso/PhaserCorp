@@ -1,6 +1,6 @@
 import Phaser from "phaser";
-import type { InteractiblesConfig } from "./interactibles";
-import { Ore } from "./ore";
+import type { InteractiblesConfig } from "../interactibles";
+import { Ore } from "../ore";
 
 export class GoldStone extends Ore {
     get resourceKey(): string { return 'GOLD_ITEM'; }

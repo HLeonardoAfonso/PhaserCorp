@@ -4,7 +4,13 @@ import type { Recipe } from "../../common/types";
 
 export class Furnace extends Machine {
     
-    static readonly craftRecipe: Recipe = [{ key: 'WOOD_ITEM', amount: 1 }];
+    static readonly craftRecipe: Recipe = [
+        { key: 'GOLD_ITEM', amount: 2, },
+        { key: 'IRON_ITEM', amount: 2, }, 
+        { key: 'COPPER_ITEM', amount: 2 },
+        { key: 'COAL_ITEM', amount: 2 },
+
+    ];    
     static readonly craftItemKey = 'MACHINE_FURNACE';
     static readonly craftDisplayKey = 'FURNACE';
 

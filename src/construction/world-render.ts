@@ -171,22 +171,22 @@ export function createRockColliders(
       if (code !== undefined) {
         // 0b0001 = top edge exposed
         if (code & 0b0001) {
-          const zone = scene.add.zone(col * 64 + 32, row * 64 + 1, 64, 2);
+          const zone = scene.add.zone(col * 64 + 32, row * 64 + 1, 62, 1);
           colliders.add(zone);
         }
         // 0b0010 = bottom edge exposed
         if (code & 0b0010) {
-          const zone = scene.add.zone(col * 64 + 32, row * 64 + 63, 64, 2);
+          const zone = scene.add.zone(col * 64 + 32, row * 64 + 63, 62, 1);
           colliders.add(zone);
         }
         // 0b0100 = left edge exposed
         if (code & 0b0100) {
-          const zone = scene.add.zone(col * 64 + 1, row * 64 + 32, 2, 64);
+          const zone = scene.add.zone(col * 64 + 1, row * 64 + 32, 1, 62);
           colliders.add(zone);
         }
         // 0b1000 = right edge exposed
         if (code & 0b1000) {
-          const zone = scene.add.zone(col * 64 + 63, row * 64 + 32, 2, 64);
+          const zone = scene.add.zone(col * 64 + 63, row * 64 + 32, 1, 62);
           colliders.add(zone);
         }
       }

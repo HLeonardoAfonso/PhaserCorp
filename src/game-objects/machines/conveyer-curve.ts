@@ -4,7 +4,10 @@ import { Machine } from "../machine";
 
 export class ConveyerCurve extends Machine {
     
-    static readonly craftRecipe: Recipe = [{ key: 'WOOD_ITEM', amount: 1 }];
+    static readonly craftRecipe: Recipe = [
+        { key: 'COPPER_PLATE', amount: 2, }, 
+        { key: 'IRON_PLATE', amount: 2 }, 
+    ];    
     static readonly craftItemKey = 'MACHINE_CONVEYOR_CURVE';
     static readonly craftDisplayKey = 'CONVEYOR_CURVE';
 

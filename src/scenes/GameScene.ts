@@ -8,13 +8,15 @@ import { Inventory } from '../components/game-object/inventory-component';
 import { createAnimations } from '../construction/animations';
 import { createWorld, createRockLayer, createWaterEffects, createRockColliders } from '../construction/world-render';
 import { WORLD } from '../construction/world';
-import { GoldStone } from '../game-objects/gold-stone';
-import { IronStone } from '../game-objects/iron-stone';
+import { GoldStone } from '../game-objects/ores/gold-stone';
+import { IronStone } from '../game-objects/ores/iron-stone';
+import { CoalStone } from '../game-objects/ores/coal-stone';
 import { Furnace } from '../game-objects/machines/furnace';
 import { Conveyer } from '../game-objects/machines/conveyer';
 import { ConveyerCurve } from '../game-objects/machines/conveyer-curve';
 import { Crafting } from '../components/game-object/crafting-component';
 import { PlacementSystem } from '../systems/placement-system';
+import { CopperStone } from '../game-objects/ores/copper-stone';
 
 export class GameScene extends Phaser.Scene {
 
@@ -93,7 +95,7 @@ export class GameScene extends Phaser.Scene {
 
     this.#player = new Player({
       scene: this,
-      position: { x: (10*64)+32, y: (8*64)+32 },
+      position: { x: (6*64)+32, y: (5*64)+32 },
       assetKey: 'PLAYER_IDLE',
       frame: 0,
       controls: this.#controls,
@@ -111,24 +113,34 @@ export class GameScene extends Phaser.Scene {
     const tree = new Tree({ scene: this, position: { x: (1*64)+32, y: (2*64)+32 } });
     const tree1 = new Tree({ scene: this, position: { x: (3*64)+32, y: (3*64)+32 } });
     const tree2 = new Tree({ scene: this, position: { x: (6*64)+32, y: (3*64)+32 } });
-    const ore = new GoldStone({ scene: this, position: { x: (4*64)+32, y: (2*64)+32 } });
+
+    const goldOre = new GoldStone({ scene: this, position: { x: (4*64)+32, y: (2*64)+32 } });
     const ironOre = new IronStone({ scene: this, position: { x: (8*64)+32, y: (2*64)+32 } });
+    const copperOre = new CopperStone({ scene: this, position: { x: (8*64)+32, y: (4*64)+32 } });
+    const coalOre = new CoalStone({ scene: this, position: { x: (10*64)+32, y: (2*64)+32 } });
 
     const conveyer = new Conveyer({ scene: this, position: { x: (12*64)+32, y: (2*64)+32 } });
     const conveyerCurve = new ConveyerCurve({ scene: this, position: { x: (11*64)+32, y: (2*64)+32 } });
 
-    this.input.enableDebug(tree);
-    this.input.enableDebug(tree1);
-    this.input.enableDebug(tree2);
-    this.input.enableDebug(ore);
-    this.input.enableDebug(ironOre);
+    if (this.physics.world.drawDebug) {
+      this.input.enableDebug(tree);
+      this.input.enableDebug(tree1);
+      this.input.enableDebug(tree2);
+
+      this.input.enableDebug(goldOre);
+      this.input.enableDebug(ironOre);
+      this.input.enableDebug(copperOre);
+      this.input.enableDebug(coalOre);
+    }
 
     this.#interactibles.add(tree);
     this.#interactibles.add(tree1);
     this.#interactibles.add(tree2);
-    this.#interactibles.add(ore);
+
+    this.#interactibles.add(goldOre);
     this.#interactibles.add(ironOre);
-    
+    this.#interactibles.add(copperOre);
+    this.#interactibles.add(coalOre);
     this.#interactibles.add(conveyer);
     this.#interactibles.add(conveyerCurve);
 

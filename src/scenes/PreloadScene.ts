@@ -52,7 +52,22 @@ export class PreloadScene extends Phaser.Scene {
     this.load.image('INVENTORY_BANNER', 'assets/Inventory/Banner.png');
     this.load.image('INVENTORY_TABLE', 'assets/Inventory/WoodTable.png');
 
-    // Resources
+    // Resource stones
+
+    this.load.spritesheet('IRON_STONE', 'assets/ressources/Iron_Stone.png', {
+      frameWidth: 128,
+      frameHeight: 128,
+    });
+    this.load.spritesheet('COPPER_STONE', 'assets/ressources/Copper_Stone.png', {
+      frameWidth: 128,
+      frameHeight: 128,
+    });
+    this.load.spritesheet('COAL_STONE', 'assets/ressources/Coal_Stone.png', {
+      frameWidth: 128,
+      frameHeight: 128,
+    });
+
+    // Resource items
 
     this.load.image('GOLD_ITEM', 'assets/Inventory/Gold_Resource.png');
     this.load.image('WOOD_ITEM', 'assets/Inventory/Wood_Resource.png');
@@ -61,12 +76,13 @@ export class PreloadScene extends Phaser.Scene {
     this.load.image('COPPER_ITEM', 'assets/ressources/Copper_Resource.png'); 
     this.load.image('COAL_ITEM', 'assets/ressources/Coal_Resource.png');
 
-    this.load.spritesheet('IRON_STONE', 'assets/ressources/Iron_Stone.png', {
-      frameWidth: 128,
-      frameHeight: 128,
-    });
-    this.load.image('COPPER_STONE', 'assets/ressources/Copper_Stone.png'); 
-    this.load.image('COAL_STONE', 'assets/ressources/Coal_Stone.png'); 
+    // Crafted items
+
+    this.load.image('IRON_PLATE', 'assets/ressources/Iron_Plate.png');
+    this.load.image('COPPER_PLATE', 'assets/ressources/Copper_Plate.png');
+
+    this.load.image('IRON_GEAR', 'assets/ressources/Iron_Gear.png');
+    this.load.image('COPPER_WIRE', 'assets/ressources/Copper_Wire.png');    
 
     // Machines
 
