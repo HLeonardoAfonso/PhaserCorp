@@ -1,28 +1,18 @@
 import Phaser from 'phaser';
 import { KeyboardComponent } from '../input/keyboard-component';
-
-type InventorySlot = {
-  x: number;
-  y: number;
-  occupied: boolean;
-  itemKey: string | null;
-  amount: number;
-  image: Phaser.GameObjects.Image | null;
-  amountText: Phaser.GameObjects.Text | null;
-};
+import { Slot } from './slot-component';
 
 export class Inventory {
 
-  static MAX_STACK_SIZE = 64;
-  
   #banner: Phaser.GameObjects.Image;
   #controls: KeyboardComponent;
-  #scene: Phaser.Scene;
-  #slots: InventorySlot[] = [];
+  #slots: Slot[] = [];
   #debugRects: Phaser.GameObjects.Rectangle[] = [];
 
+  /** Callback invoked when a player clicks on an inventory slot. */
+  onSlotClick: ((itemKey: string) => void) | null = null;
+
   constructor(scene: Phaser.Scene, controls: KeyboardComponent, debug: boolean) {
-    this.#scene = scene;
     this.#controls = controls;
     this.#banner = scene.add.image(
       (scene.cameras.main.centerX)-200,
@@ -50,15 +40,13 @@ export class Inventory {
         const cx = topLeftX + offsetX + col * slotSize + slotSize / 2;
         const cy = topLeftY + offsetY + row * slotSize + slotSize / 2;
 
-        this.#slots.push({
-          x: cx,
-          y: cy,
-          occupied: false,
-          itemKey: null,
-          image: null,
-          amountText: null,
-          amount: 0,
-        });
+        const slot = new Slot(scene, cx, cy, false, true);
+        slot.onClick = (itemKey) => {
+          if (this.onSlotClick) {
+            this.onSlotClick(itemKey);
+          }
+        };
+        this.#slots.push(slot);
 
         if (debug) {
           const rect = scene.add.rectangle(cx, cy, slotSize, slotSize)
@@ -80,10 +68,7 @@ export class Inventory {
     const visible = !this.#banner.visible;
     this.#banner.setVisible(visible);
     this.#debugRects.forEach(r => r.setVisible(visible));
-    this.#slots.forEach(s => {
-      s.image?.setVisible(visible);
-      s.amountText?.setVisible(visible);
-    });
+    this.#slots.forEach(s => s.setVisible(visible));
   }
 
   handleInput(): void {
@@ -101,45 +86,20 @@ export class Inventory {
 
   addItem(itemKey: string): boolean {
     // Try to stack onto an existing slot with the same item
-    let existingSlot: InventorySlot | undefined;
     for (const slot of this.#slots) {
-      if (slot.itemKey === itemKey && slot.amount < Inventory.MAX_STACK_SIZE) {
-        existingSlot = slot;
-        break;
+      if (slot.itemKey === itemKey && slot.amount < 64) {
+        return slot.addOne(itemKey);
       }
-    }
-    if (existingSlot) {
-      existingSlot.amount++;
-      existingSlot.amountText?.setText(`${existingSlot.amount}`);
-      return true;
     }
 
     // Use the first empty slot
-    const emptySlot = this.#slots.find(s => !s.occupied);
-    if (!emptySlot) return false;
+    for (const slot of this.#slots) {
+      if (!slot.occupied) {
+        return slot.addOne(itemKey);
+      }
+    }
 
-    const image = this.#scene.add.image(emptySlot.x, emptySlot.y, itemKey)
-      .setScrollFactor(0)
-      .setDepth(1002)
-      .setVisible(this.#banner.visible);
-
-    const amountText = this.#scene.add.text(emptySlot.x + 34, emptySlot.y + 36, '1', {
-      fontSize: '16px',
-      color: '#ffffff',
-      stroke: '#000000',
-      strokeThickness: 3,
-    })
-      .setOrigin(1, 1)
-      .setScrollFactor(0)
-      .setDepth(1003)
-      .setVisible(this.#banner.visible);
-
-    emptySlot.occupied = true;
-    emptySlot.itemKey = itemKey;
-    emptySlot.image = image;
-    emptySlot.amountText = amountText;
-    emptySlot.amount = 1;
-    return true;
+    return false;
   }
 
   hasEnoughOf(itemKey: string, amount: number): boolean {
@@ -159,21 +119,10 @@ export class Inventory {
       if (remaining <= 0) break;
       if (slot.itemKey === itemKey) {
         const toRemove = Math.min(slot.amount, remaining);
-        slot.amount -= toRemove;
-        remaining -= toRemove;
-
-        if (slot.amount <= 0) {
-          // Destroy visuals and clear slot
-          slot.image?.destroy();
-          slot.amountText?.destroy();
-          slot.occupied = false;
-          slot.itemKey = null;
-          slot.image = null;
-          slot.amountText = null;
-          slot.amount = 0;
-        } else {
-          slot.amountText?.setText(`${slot.amount}`);
+        for (let i = 0; i < toRemove; i++) {
+          slot.removeOne();
         }
+        remaining -= toRemove;
       }
     }
   }

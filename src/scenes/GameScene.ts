@@ -15,6 +15,8 @@ import { Furnace } from '../game-objects/machines/furnace';
 import { Conveyer } from '../game-objects/machines/conveyer';
 import { ConveyerCurve } from '../game-objects/machines/conveyer-curve';
 import { Crafting } from '../components/game-object/crafting-component';
+import { MachineInterface } from '../components/game-object/machine-interface-component';
+import { Machine } from '../game-objects/machine';
 import { PlacementSystem } from '../systems/placement-system';
 import { CopperStone } from '../game-objects/ores/copper-stone';
 
@@ -25,6 +27,7 @@ export class GameScene extends Phaser.Scene {
   #controls!: KeyboardComponent
   #inventory!: Inventory;
   #crafting!: Crafting;
+  #machineInterface!: MachineInterface;
   #selectionCorners!: { tl: Phaser.GameObjects.Image, tr: Phaser.GameObjects.Image, bl: Phaser.GameObjects.Image, br: Phaser.GameObjects.Image };
   #wasPointerDown = false;
   #placement!: PlacementSystem;
@@ -89,6 +92,7 @@ export class GameScene extends Phaser.Scene {
     this.#controls = new KeyboardComponent(this.input.keyboard);
     this.#inventory = new Inventory(this, this.#controls, this.physics.world.drawDebug);
     this.#crafting = new Crafting(this, this.#controls, this.#inventory, this.physics.world.drawDebug);
+    this.#machineInterface = new MachineInterface(this, this.#controls, this.#inventory, this.physics.world.drawDebug);
     Interactibles.onEntityDied = (key) => this.#inventory.addItems(key, 32);
 
     this.physics.world.setBounds(0, 0, MAP_WIDTH, MAP_HEIGHT);
@@ -182,6 +186,19 @@ export class GameScene extends Phaser.Scene {
       if (justClicked && !this.#placement.isActive) {
         const hovered = Interactibles.currentHovered;
         if (hovered && !hovered.isDead && this.#player.nearInteractibles.has(hovered)) {
+          if (hovered instanceof Machine && hovered.interfaceble) {
+            this.#machineInterface.open(hovered.texture.key);
+            if (!this.#inventory.isOpen) {
+              this.#inventory.toggle();
+            }
+            // Wire inventory clicks to transfer items into machine input slot 1
+            this.#inventory.onSlotClick = (itemKey) => {
+              if (this.#inventory.hasEnoughOf(itemKey, 1)) {
+                this.#inventory.removeItems(itemKey, 1);
+                this.#machineInterface.addToInputSlot(itemKey);
+              }
+            };
+          }
           Interactibles.setSelected(hovered);
         }
       }
@@ -228,8 +245,16 @@ export class GameScene extends Phaser.Scene {
 
     this.#player.update();
     if (this.#controls.isEKeyJustDown) {
-      this.#inventory.toggle();
-      this.#crafting.toggle();
+      if (this.#machineInterface.isOpen) {
+        this.#inventory.onSlotClick = null;
+        this.#machineInterface.close();
+        if (this.#inventory.isOpen) {
+          this.#inventory.toggle();
+        }
+      } else {
+        this.#inventory.toggle();
+        this.#crafting.toggle();
+      }
     }
   }
 }

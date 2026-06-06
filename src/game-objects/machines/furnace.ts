@@ -17,7 +17,7 @@ export class Furnace extends Machine {
     get resourceKey(): string { return 'MACHINE_FURNACE'; }
 
     constructor(config: InteractiblesConfig) {
-        super(config, 100, 'FURNACE');
+        super(config, 100, 'FURNACE', true);
         this.playIdleAnimation();
         this.setBodySize(64, 64);
         this.body?.setOffset(0, 64)

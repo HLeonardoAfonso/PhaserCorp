@@ -2,8 +2,15 @@ import { Interactibles, type InteractiblesConfig } from "./interactibles";
 
 export abstract class Machine extends Interactibles {
 
-    constructor(config: InteractiblesConfig, health: number, assetKey: string) {
+    #Interfaceble: boolean;
+    
+    constructor(config: InteractiblesConfig, health: number, assetKey: string, interfaceble: boolean) {
         super(config, health, assetKey);
+        this.#Interfaceble = interfaceble;
+    }
+
+    get interfaceble(): boolean {
+        return this.#Interfaceble;
     }
 
     playIdleAnimation(): void {}

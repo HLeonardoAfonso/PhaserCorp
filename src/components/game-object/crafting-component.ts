@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import type { Recipe } from '../../common/types';
 import { KeyboardComponent } from '../input/keyboard-component';
 import { RecipeOverlay } from './recipe-component';
 import { Inventory } from './inventory-component';
@@ -13,7 +14,26 @@ type CraftingSlot = {
   image: Phaser.GameObjects.Image | null;
 };
 
+type CraftableEntry = {
+  craftRecipe: Recipe;
+  craftItemKey: string;
+  craftDisplayKey: string;
+};
+
 const CRAFTABLE_MACHINES = [Furnace, Conveyer, ConveyerCurve] as const;
+
+const CRAFTABLE_ITEMS: CraftableEntry[] = [
+  {
+    craftRecipe: [{ key: 'COPPER_ITEM', amount: 1 }],
+    craftItemKey: 'COPPER_PLATE',
+    craftDisplayKey: 'COPPER_PLATE',
+  },
+  {
+    craftRecipe: [{ key: 'COPPER_PLATE', amount: 1 }],
+    craftItemKey: 'COPPER_WIRE',
+    craftDisplayKey: 'COPPER_WIRE',
+  },
+];
 
 export class Crafting {
   
@@ -23,6 +43,16 @@ export class Crafting {
   #slots: CraftingSlot[] = [];
   #debugRects: Phaser.GameObjects.Rectangle[] = [];
   #recipeOverlay: RecipeOverlay;
+
+  // Combine machines (as CraftableEntry) and item entries into a single list
+  readonly #entries: CraftableEntry[] = [
+    ...CRAFTABLE_MACHINES.map(cls => ({
+      craftRecipe: cls.craftRecipe,
+      craftItemKey: cls.craftItemKey,
+      craftDisplayKey: cls.craftDisplayKey,
+    })),
+    ...CRAFTABLE_ITEMS,
+  ];
 
   constructor(scene: Phaser.Scene, controls: KeyboardComponent, inventory: Inventory, debug: boolean) {
     this.#inventory = inventory;
@@ -39,22 +69,22 @@ export class Crafting {
 
     this.#recipeOverlay = new RecipeOverlay(scene);
     this.#initSlotData(scene, debug);
-    this.#populateMachines(scene);
+    this.#populateCraftingGrid(scene);
   }
 
-  #onMachinePointerOver(_index: number, pointer: Phaser.Input.Pointer): void {
-    const machineClass = CRAFTABLE_MACHINES[_index];
-    this.#recipeOverlay.show(pointer, machineClass.craftRecipe);
+  #onCraftablePointerOver(index: number, pointer: Phaser.Input.Pointer): void {
+    const entry = this.#entries[index];
+    this.#recipeOverlay.show(pointer, entry.craftRecipe);
   }
 
-  #onMachinePointerOut(): void {
+  #onCraftablePointerOut(): void {
     this.#recipeOverlay.hide();
   }
 
-  #onMachineClick(_index: number): void {
-    const machineClass = CRAFTABLE_MACHINES[_index];
-    const recipe = machineClass.craftRecipe;
-    const itemKey = machineClass.craftItemKey;
+  #onCraftableClick(index: number): void {
+    const entry = this.#entries[index];
+    const recipe = entry.craftRecipe;
+    const itemKey = entry.craftItemKey;
 
     // Check if player has enough of each ingredient
     for (const ingredient of recipe) {
@@ -68,22 +98,22 @@ export class Crafting {
       this.#inventory.removeItems(ingredient.key, ingredient.amount);
     }
 
-    // Add the crafted machine item to inventory
+    // Add the crafted item to inventory
     this.#inventory.addItem(itemKey);
   }
 
-  #populateMachines(scene: Phaser.Scene): void {
-    for (let i = 0; i < CRAFTABLE_MACHINES.length && i < this.#slots.length; i++) {
-      const machineClass = CRAFTABLE_MACHINES[i];
+  #populateCraftingGrid(scene: Phaser.Scene): void {
+    for (let i = 0; i < this.#entries.length && i < this.#slots.length; i++) {
+      const entry = this.#entries[i];
       const slot = this.#slots[i];
-      const image = scene.add.image(slot.x, slot.y, machineClass.craftDisplayKey)
+      const image = scene.add.image(slot.x, slot.y, entry.craftDisplayKey)
         .setScrollFactor(0)
         .setDepth(1002)
         .setVisible(this.#table.visible)
         .setInteractive()
-        .on('pointerover', (pointer: Phaser.Input.Pointer) => this.#onMachinePointerOver(i, pointer))
-        .on('pointerout', () => this.#onMachinePointerOut())
-        .on('pointerdown', () => this.#onMachineClick(i));
+        .on('pointerover', (pointer: Phaser.Input.Pointer) => this.#onCraftablePointerOver(i, pointer))
+        .on('pointerout', () => this.#onCraftablePointerOut())
+        .on('pointerdown', () => this.#onCraftableClick(i));
 
       slot.occupied = true;
       slot.image = image;
