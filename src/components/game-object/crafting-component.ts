@@ -99,7 +99,7 @@ export class Crafting {
     }
 
     // Add the crafted item to inventory
-    this.#inventory.addItem(itemKey);
+    this.#inventory.addItems(itemKey, 1);
   }
 
   #populateCraftingGrid(scene: Phaser.Scene): void {

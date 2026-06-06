@@ -79,26 +79,25 @@ export class Inventory {
 
   addItems(itemKey: string, quantity: number): boolean {
     for (let i = 0; i < quantity; i++) {
-      if (!this.addItem(itemKey)) return false;
+      if (!this.addOneItem(itemKey)) return false;
     }
     return true;
   }
 
-  addItem(itemKey: string): boolean {
-    // Try to stack onto an existing slot with the same item
+  addOneItem(itemKey: string): boolean {
+
+    // add to existing stack if possible 
     for (const slot of this.#slots) {
       if (slot.itemKey === itemKey && slot.amount < 64) {
-        return slot.addOne(itemKey);
+        return slot.addOne();
       }
     }
-
-    // Use the first empty slot
+    // else use empty slot
     for (const slot of this.#slots) {
       if (!slot.occupied) {
-        return slot.addOne(itemKey);
+        return slot.addNew(itemKey);
       }
     }
-
     return false;
   }
 

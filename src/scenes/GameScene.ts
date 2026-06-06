@@ -12,6 +12,7 @@ import { GoldStone } from '../game-objects/ores/gold-stone';
 import { IronStone } from '../game-objects/ores/iron-stone';
 import { CoalStone } from '../game-objects/ores/coal-stone';
 import { Furnace } from '../game-objects/machines/furnace';
+import { Shop } from '../game-objects/shop';
 import { Conveyer } from '../game-objects/machines/conveyer';
 import { ConveyerCurve } from '../game-objects/machines/conveyer-curve';
 import { Crafting } from '../components/game-object/crafting-component';
@@ -126,6 +127,8 @@ export class GameScene extends Phaser.Scene {
     const conveyer = new Conveyer({ scene: this, position: { x: (12*64)+32, y: (2*64)+32 } });
     const conveyerCurve = new ConveyerCurve({ scene: this, position: { x: (11*64)+32, y: (2*64)+32 } });
 
+    const shop = new Shop({ scene: this, position: { x: (14*64), y: (6*64) } });
+
     if (this.physics.world.drawDebug) {
       this.input.enableDebug(tree);
       this.input.enableDebug(tree1);
@@ -147,6 +150,7 @@ export class GameScene extends Phaser.Scene {
     this.#interactibles.add(coalOre);
     this.#interactibles.add(conveyer);
     this.#interactibles.add(conveyerCurve);
+    this.#interactibles.add(shop);
 
     this.physics.add.collider(this.#player, this.#interactibles);
     this.physics.add.collider(this.#player, rockColliders);

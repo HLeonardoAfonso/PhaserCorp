@@ -48,6 +48,12 @@ export class PreloadScene extends Phaser.Scene {
       frameHeight: 64,
     });
 
+    // Shop
+    this.load.spritesheet('SHOP', 'assets/machines/Loja.png', {
+      frameWidth: 384,
+      frameHeight: 384,
+    });
+
     // UI
     this.load.image('INVENTORY_BANNER', 'assets/Inventory/Banner.png');
     this.load.image('INVENTORY_TABLE', 'assets/Inventory/WoodTable.png');

@@ -92,6 +92,13 @@ export class MachineInterface {
   addToInputSlot(itemKey: string): boolean {
     const slot = this.#slots[0];
     if (!slot) return false;
-    return slot.addOne(itemKey);
+
+    if (slot.itemKey === itemKey && slot.amount < 64) {
+      return slot.addOne();
+    }
+    if (!slot.occupied) {
+      return slot.addNew(itemKey);
+    }
+    return false;
   }
 }
