@@ -1,7 +1,11 @@
 import Phaser from 'phaser';
+import type { Direction } from '../common/types';
+import { RotatableMachine } from '../game-objects/machines/rotatable-machine';
 import { Interactibles, type InteractiblesConfig } from '../game-objects/interactibles';
 
 type PlaceableConstructor = new(config: InteractiblesConfig) => Interactibles;
+
+const DIRECTIONS: Direction[] = ['right', 'down', 'left', 'up'];
 
 export class PlacementSystem {
     #scene: Phaser.Scene;
@@ -10,6 +14,8 @@ export class PlacementSystem {
     #active = false;
     #factory!: PlaceableConstructor;
     #animKey: string | null = null;
+    #currentRotation = 0;
+    #hasRotation = false;
 
     constructor(scene: Phaser.Scene, group: Phaser.Physics.Arcade.StaticGroup){
         this.#scene = scene;
@@ -22,13 +28,30 @@ export class PlacementSystem {
         this.#active = !this.#active;
         if (this.#active && factory && assetKey){
             this.#factory = factory;
+            // Check if the factory constructor extends RotatableMachine
+            this.#hasRotation = RotatableMachine.prototype.isPrototypeOf(factory.prototype);
+            this.#currentRotation = 0;
             this.#ghost = this.#scene.add.sprite(0,0, assetKey).setAlpha(0.5).setDepth(999);
-            if (this.#animKey)this.#ghost.play(this.#animKey)  
+            if (this.#animKey) this.#ghost.play(this.#animKey);
+            this.#updateGhostRotation();
         } else {
             this.#ghost?.destroy();
             this.#active = false;
             this.#ghost = null;
         }
+    }
+
+    rotate(): void {
+        if (!this.#active || !this.#hasRotation) return;
+        this.#currentRotation = (this.#currentRotation + 1) % DIRECTIONS.length;
+        this.#updateGhostRotation();
+    }
+
+    #updateGhostRotation(): void {
+        if (!this.#ghost) return;
+        this.#ghost.setAngle(DIRECTIONS[this.#currentRotation] === 'up' ? -90 :
+                             DIRECTIONS[this.#currentRotation] === 'down' ? 90 :
+                             DIRECTIONS[this.#currentRotation] === 'left' ? 180 : 0);
     }
 
     update(justClicked: boolean): void{
@@ -37,7 +60,7 @@ export class PlacementSystem {
         const wp = this.#scene.cameras.main.getWorldPoint(this.#scene.input.activePointer.x, this.#scene.input.activePointer.y);
         const TILE = 64;
         const snappedX = Math.floor(wp.x / TILE) * TILE + TILE / 2;
-        const snappedY = Math.floor(wp.y / TILE) * TILE;
+        const snappedY = Math.floor(wp.y / TILE) * TILE + TILE / 2;
         this.#ghost.setPosition(snappedX, snappedY);
 
         const tileKey = (x: number, y: number) => `${Math.floor(x / TILE)},${Math.floor(y / TILE)}`;
@@ -52,7 +75,13 @@ export class PlacementSystem {
         this.#ghost.setTint(canPlace ? 0x00ff00 : 0xff0000);
 
         if (justClicked && canPlace){
-            const placedObj = new this.#factory({ scene: this.#scene, position: { x: snappedX, y: snappedY } });
+            const facing = this.#hasRotation ? DIRECTIONS[this.#currentRotation] : undefined;
+            const config: InteractiblesConfig & { facing?: Direction } = {
+                scene: this.#scene,
+                position: { x: snappedX, y: snappedY },
+                facing,
+            };
+            const placedObj = new this.#factory(config);
             this.#group.add(placedObj);
             this.#scene.sound.play('PLACING_SOUND');
             this.#ghost.destroy();

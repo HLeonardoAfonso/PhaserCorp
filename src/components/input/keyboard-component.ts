@@ -9,6 +9,7 @@ export class KeyboardComponent extends InputComponent {
     #dKey: Phaser.Input.Keyboard.Key;
     #eKey: Phaser.Input.Keyboard.Key;
     #pKey: Phaser.Input.Keyboard.Key;
+    #rKey: Phaser.Input.Keyboard.Key;
 
     constructor(keyboardPlugin: Phaser.Input.Keyboard.KeyboardPlugin) {
         super();
@@ -21,6 +22,7 @@ export class KeyboardComponent extends InputComponent {
 
         this.#pKey = keyboardPlugin.addKey(Phaser.Input.Keyboard.KeyCodes.P);
         this.#eKey = keyboardPlugin.addKey(Phaser.Input.Keyboard.KeyCodes.E);
+        this.#rKey = keyboardPlugin.addKey(Phaser.Input.Keyboard.KeyCodes.R);
     }
 
     get isUpDown(): boolean { return this.#cursorKeys.up.isDown || this.#wKey.isDown; }
@@ -35,5 +37,6 @@ export class KeyboardComponent extends InputComponent {
 
     get isEKeyJustDown(): boolean { return Phaser.Input.Keyboard.JustDown(this.#eKey); }
     get isPKeyJustDown(): boolean { return Phaser.Input.Keyboard.JustDown(this.#pKey); }
+    get isRKeyJustDown(): boolean { return Phaser.Input.Keyboard.JustDown(this.#rKey); }
 
 }
