@@ -36,10 +36,12 @@ export class ActState extends State {
                     selected.takeDamage(25);
                     if(selected instanceof Tree){
                         (selected as Tree).playInteractAnimation();
-                        
+                        this.gameObject.scene.sound.play('AXE_SOUND');
                     }
                     if(selected instanceof Ore){
                         (selected as Ore).update();
+                        this.gameObject.scene.sound.play('PICKAXE_SOUND');
+
                     }
                 }
             }
@@ -53,6 +55,7 @@ export class ActState extends State {
         const selected = Interactibles.currentSelected;
         if (isMoving || !selected || selected.isDead) {
             this.gameObject.off('animationupdate');
+            this.gameObject.scene.sound.stopAll();
             Interactibles.clearSelected();
             this.stateMachine.setState(
             isMoving

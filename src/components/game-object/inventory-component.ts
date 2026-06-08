@@ -7,7 +7,6 @@ export class Inventory {
   #banner: Phaser.GameObjects.Image;
   #controls: KeyboardComponent;
   #slots: Slot[] = [];
-  #debugRects: Phaser.GameObjects.Rectangle[] = [];
 
   /** Callback invoked when a player clicks on an inventory slot. */
   onSlotClick: ((itemKey: string) => void) | null = null;
@@ -40,22 +39,13 @@ export class Inventory {
         const cx = topLeftX + offsetX + col * slotSize + slotSize / 2;
         const cy = topLeftY + offsetY + row * slotSize + slotSize / 2;
 
-        const slot = new Slot(scene, cx, cy, false, true);
+        const slot = new Slot(scene, cx, cy, false, true, debug);
         slot.onClick = (itemKey) => {
           if (this.onSlotClick) {
             this.onSlotClick(itemKey);
           }
         };
         this.#slots.push(slot);
-
-        if (debug) {
-          const rect = scene.add.rectangle(cx, cy, slotSize, slotSize)
-            .setStrokeStyle(1, 0x000000, 0.5)
-            .setScrollFactor(0)
-            .setDepth(1001)
-            .setVisible(false);
-          this.#debugRects.push(rect);
-        }
       }
     }
   }
@@ -67,7 +57,6 @@ export class Inventory {
   toggle(): void {
     const visible = !this.#banner.visible;
     this.#banner.setVisible(visible);
-    this.#debugRects.forEach(r => r.setVisible(visible));
     this.#slots.forEach(s => s.setVisible(visible));
   }
 
@@ -116,7 +105,7 @@ export class Inventory {
     let remaining = amount;
     for (const slot of this.#slots) {
       if (remaining <= 0) break;
-      if (slot.itemKey === itemKey) {
+      if (slot.itemKey === itemKey) { 
         const toRemove = Math.min(slot.amount, remaining);
         for (let i = 0; i < toRemove; i++) {
           slot.removeOne();

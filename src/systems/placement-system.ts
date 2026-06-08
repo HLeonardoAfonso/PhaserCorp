@@ -54,6 +54,7 @@ export class PlacementSystem {
         if (justClicked && canPlace){
             const placedObj = new this.#factory({ scene: this.#scene, position: { x: snappedX, y: snappedY } });
             this.#group.add(placedObj);
+            this.#scene.sound.play('PLACING_SOUND');
             this.#ghost.destroy();
             this.#ghost = null;
             this.#active = false;

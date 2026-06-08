@@ -8,17 +8,26 @@ export class Slot {
     #amountText: Phaser.GameObjects.Text | null = null;
     #itemKey: string | null = null;
     #amount = 0;
+    #debugRect: Phaser.GameObjects.Rectangle | null = null;
     #scene: Phaser.Scene;
     #parentVisible: boolean;
     #onClick: ((itemKey: string) => void) | null = null;
     #interactive = false;
 
-    constructor(scene: Phaser.Scene, x: number, y: number, parentVisible: boolean, interactive = false) {
+    constructor(scene: Phaser.Scene, x: number, y: number, parentVisible: boolean, interactive = false, debug = false) {
         this.x = x;
         this.y = y;
         this.#scene = scene;
         this.#parentVisible = parentVisible;
         this.#interactive = interactive;
+
+        if (debug) {
+            this.#debugRect = scene.add.rectangle(x, y, 64, 64)
+                .setStrokeStyle(1, 0x000000, 0.5)
+                .setScrollFactor(0)
+                .setDepth(1001)
+                .setVisible(parentVisible);
+        }
     }
 
     get itemKey(): string | null { return this.#itemKey; }
@@ -88,10 +97,13 @@ export class Slot {
     this.#parentVisible = visible;
     this.#image?.setVisible(visible);
     this.#amountText?.setVisible(visible);
+    this.#debugRect?.setVisible(visible);
   }
 
   /** Destroy all game objects and reset state. */
   destroy(): void {
+    this.#debugRect?.destroy();
+    this.#debugRect = null;
     this.#image?.destroy();
     this.#amountText?.destroy();
     this.#image = null;
