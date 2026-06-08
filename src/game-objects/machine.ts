@@ -1,18 +1,19 @@
 import { Interactibles, type InteractiblesConfig } from "./interactibles";
-import type { StackData } from "../common/types";
+import type { StackData, Direction } from "../common/types";
+import { registry } from "../systems/machine-registry";
 
 export abstract class Machine extends Interactibles {
 
-    #Interfaceble: boolean;
+    #Interfacable: boolean;
     #stacks: StackData[] = [];
     
-    constructor(config: InteractiblesConfig, health: number, assetKey: string, interfaceble: boolean) {
+    constructor(config: InteractiblesConfig, health: number, assetKey: string, interfacable: boolean) {
         super(config, health, assetKey);
-        this.#Interfaceble = interfaceble;
+        this.#Interfacable = interfacable;
     }
 
-    get interfaceble(): boolean {
-        return this.#Interfaceble;
+    get interfacable(): boolean {
+        return this.#Interfacable;
     }
 
     /** Per-instance slot data. Mutated by the interface / process logic. */
@@ -36,7 +37,79 @@ export abstract class Machine extends Interactibles {
 
     playIdleAnimation(): void {}
 
-    update(): void {
+    // autonomous machine item trasnfer system 
+
+    //Accept an item from a neighbor. Returns true if accepted, false if rejected.
+    // Exemplo
+    // Conveyor calls neighbor.acceptItem({ itemKey: 'IRON_ORE', amount: 1 }).
+    // The furnace accepts it into its smeltable slot and returns true.
+    abstract acceptItem(stack: StackData): boolean;
+
+    /**
+     * Whether this machine can receive items from a given direction.
+     * 
+     * Example:
+     *   conveyor.canReceiveFrom('left') returns true if its facing is not 'left'
+     *   and its input slot is empty.
+     */
+    abstract canReceiveFrom(dir: Direction): boolean;
+
+    /**
+     * Called every game tick with delta in ms.
+     * 
+     * Example:
+     *   A furnace accumulates delta in smeltingProgress.
+     *   When smeltingProgress >= smeltingTime (100ms), it consumes fuel + ore
+     *   and produces an output.
+     */
+    abstract update(delta: number): void;
+
+    // ── Protected helpers ──────────────────────────────────────────
+
+    /**
+     * Attempt to insert a stack into a specific slot.
+     * Returns the leftover stack that didn't fit.
+     * 
+     * Example:
+     *   insertIntoSlot(0, { itemKey: 'COAL', amount: 5 })
+     *   If slot 0 is empty, it accepts 5 coal (or up to 64) and returns leftover.
+     *   If slot 0 already has COAL with amount 62, it accepts 2 and returns { itemKey: 'COAL', amount: 3 }.
+     *   If slot 0 has IRON_ORE, it rejects all and returns the original stack.
+     */
+    protected insertIntoSlot(slotIndex: number, stack: StackData): StackData {
+        const slot = this.#stacks[slotIndex];
+
+        if (!slot) return stack;
+
+        if (!slot.itemKey) {
+            slot.itemKey = stack.itemKey;
+            slot.amount  = Math.min(stack.amount, 64);
+            const leftover = stack.amount - slot.amount;
+            return { itemKey: leftover > 0 ? stack.itemKey : null, amount: leftover };
+        }
+
+        if (slot.itemKey === stack.itemKey && slot.amount < 64) {
+            const space    = 64 - slot.amount;
+            const accepted = Math.min(space, stack.amount);
+            slot.amount   += accepted;
+            const leftover = stack.amount - accepted;
+            return { itemKey: leftover > 0 ? stack.itemKey : null, amount: leftover };
+        }
+
+        return stack; // slot occupied with different item
+    }
+
+    /**
+     * Check death state and clean up if dead. Call from subclass update() if needed.
+     * 
+     * Example:
+     *   update(delta) {
+     *     this.checkDeath();
+     *     if (this.isDead) return;
+     *     // ... smelting logic
+     *   }
+     */
+    protected checkDeath(): void {
         if (this.isDead) {
             Interactibles.clearSelected();
             Interactibles.clearHovered();
@@ -44,5 +117,19 @@ export abstract class Machine extends Interactibles {
             this.removeInteractive();
             this.destroy();
         }
+    }
+
+    // ── Lifecycle ──────────────────────────────────────────────────
+
+    /**
+     * Override destroy to unregister from the MachineRegistry.
+     * 
+     * Example:
+     *   When a conveyor is mined, destroy() is called → it removes itself
+     *   from the registry so getNeighbor() no longer finds it.
+     */
+    destroy(): void {
+        registry.unregister(this);
+        super.destroy();
     }
 }

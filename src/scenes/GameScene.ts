@@ -157,7 +157,7 @@ export class GameScene extends Phaser.Scene {
       if (justClicked && !this.#placement.isActive) {
         const hovered = Interactibles.currentHovered;
         if (hovered && !hovered.isDead && this.#player.nearInteractibles.has(hovered)) {
-          if (hovered instanceof Machine && hovered.interfaceble) {
+          if (hovered instanceof Machine && hovered.interfacable) {
             // Bind the interface to the selected furnace so its stacks
             // are owned by the machine instance itself.
             this.#machineInterface.bind(hovered);

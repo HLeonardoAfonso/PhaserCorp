@@ -10,3 +10,5 @@ export type world = chunk[][];
 
 export type StackData = { itemKey: string | null; amount: number };
 export type Recipe = StackData[];
+
+export type Direction = 'up' | 'down' | 'left' | 'right';
