@@ -1,25 +1,20 @@
 import Phaser from 'phaser';
 import { Player } from '../game-objects/player';
 import { KeyboardComponent } from '../components/input/keyboard-component';
-import { Tree } from '../game-objects/tree';
 import { Interactibles } from '../game-objects/interactibles';
+import { Tree } from '../game-objects/tree';
 import { Cursors } from '../common/cursor';
 import { Inventory } from '../components/game-object/inventory-component';
 import { createAnimations } from '../construction/animations';
 import { createWorld, createRockLayer, createWaterEffects, createRockColliders } from '../construction/world-render';
 import { WORLD } from '../construction/world';
-import { GoldStone } from '../game-objects/ores/gold-stone';
-import { IronStone } from '../game-objects/ores/iron-stone';
-import { CoalStone } from '../game-objects/ores/coal-stone';
 import { Furnace } from '../game-objects/machines/furnace';
+import { spawnInteractibles } from '../game-objects/spawn';
 import { Shop } from '../game-objects/shop';
-import { Conveyer } from '../game-objects/machines/conveyer';
-import { ConveyerCurve } from '../game-objects/machines/conveyer-curve';
 import { Crafting } from '../components/game-object/crafting-component';
-import { MachineInterface } from '../components/game-object/machine-interface-component';
+import { FurnaceInterface } from '../components/game-object/furnace-interface-component';
 import { Machine } from '../game-objects/machine';
 import { PlacementSystem } from '../systems/placement-system';
-import { CopperStone } from '../game-objects/ores/copper-stone';
 
 export class GameScene extends Phaser.Scene {
 
@@ -28,7 +23,7 @@ export class GameScene extends Phaser.Scene {
   #controls!: KeyboardComponent
   #inventory!: Inventory;
   #crafting!: Crafting;
-  #machineInterface!: MachineInterface;
+  #machineInterface!: FurnaceInterface;
   #selectionCorners!: { tl: Phaser.GameObjects.Image, tr: Phaser.GameObjects.Image, bl: Phaser.GameObjects.Image, br: Phaser.GameObjects.Image };
   #wasPointerDown = false;
   #placement!: PlacementSystem;
@@ -93,7 +88,7 @@ export class GameScene extends Phaser.Scene {
     this.#controls = new KeyboardComponent(this.input.keyboard);
     this.#inventory = new Inventory(this, this.#controls, this.physics.world.drawDebug);
     this.#crafting = new Crafting(this, this.#controls, this.#inventory, this.physics.world.drawDebug);
-    this.#machineInterface = new MachineInterface(this, this.#controls, this.#inventory, this.physics.world.drawDebug);
+    this.#machineInterface = new FurnaceInterface(this, this.physics.world.drawDebug);
     Interactibles.onEntityDied = (key) => this.#inventory.addItems(key, 32);
 
     this.physics.world.setBounds(0, 0, MAP_WIDTH, MAP_HEIGHT);
@@ -115,46 +110,18 @@ export class GameScene extends Phaser.Scene {
     this.#interactibles = this.physics.add.staticGroup();
     this.#placement = new PlacementSystem(this, this.#interactibles);
 
-    const tree = new Tree({ scene: this, position: { x: (1*64)+32, y: (2*64)+32 } });
-    const tree1 = new Tree({ scene: this, position: { x: (3*64)+32, y: (3*64)+32 } });
-    const tree2 = new Tree({ scene: this, position: { x: (6*64)+32, y: (3*64)+32 } });
+    // populate the world with entities
+    spawnInteractibles(this, this.#interactibles, this.physics.world.drawDebug);
 
-    const goldOre = new GoldStone({ scene: this, position: { x: (4*64)+32, y: (2*64)+32 } });
-    const ironOre = new IronStone({ scene: this, position: { x: (8*64)+32, y: (2*64)+32 } });
-    const copperOre = new CopperStone({ scene: this, position: { x: (8*64)+32, y: (4*64)+32 } });
-    const coalOre = new CoalStone({ scene: this, position: { x: (10*64)+32, y: (2*64)+32 } });
-
-    const conveyer = new Conveyer({ scene: this, position: { x: (12*64)+32, y: (2*64)+32 } });
-    const conveyerCurve = new ConveyerCurve({ scene: this, position: { x: (11*64)+32, y: (2*64)+32 } });
-
+    // instanciate shop
     const shop = new Shop({ scene: this, position: { x: (14*64), y: (6*64) } });
-
-    if (this.physics.world.drawDebug) {
-      this.input.enableDebug(tree);
-      this.input.enableDebug(tree1);
-      this.input.enableDebug(tree2);
-
-      this.input.enableDebug(goldOre);
-      this.input.enableDebug(ironOre);
-      this.input.enableDebug(copperOre);
-      this.input.enableDebug(coalOre);
-    }
-
-    this.#interactibles.add(tree);
-    this.#interactibles.add(tree1);
-    this.#interactibles.add(tree2);
-
-    this.#interactibles.add(goldOre);
-    this.#interactibles.add(ironOre);
-    this.#interactibles.add(copperOre);
-    this.#interactibles.add(coalOre);
-    this.#interactibles.add(conveyer);
-    this.#interactibles.add(conveyerCurve);
     this.#interactibles.add(shop);
-
+    
+    // add colliders
     this.physics.add.collider(this.#player, this.#interactibles);
     this.physics.add.collider(this.#player, rockColliders);
     this.physics.add.collider(this.#player, waterColliders);
+    
     this.input.on('gameobjectdown', (_pointer: Phaser.Input.Pointer, obj: Phaser.GameObjects.GameObject) => {
       if (obj instanceof Interactibles && this.#player.nearInteractibles.has(obj)) {
           Interactibles.setSelected(obj);
@@ -191,15 +158,19 @@ export class GameScene extends Phaser.Scene {
         const hovered = Interactibles.currentHovered;
         if (hovered && !hovered.isDead && this.#player.nearInteractibles.has(hovered)) {
           if (hovered instanceof Machine && hovered.interfaceble) {
-            this.#machineInterface.open(hovered.texture.key);
+            // Bind the interface to the selected furnace so its stacks
+            // are owned by the machine instance itself.
+            this.#machineInterface.bind(hovered);
             if (!this.#inventory.isOpen) {
               this.#inventory.toggle();
             }
-            // Wire inventory clicks to transfer items into machine input slot 1
+            // Wire inventory clicks to transfer items into the bound machine's
+            // input slot. Only remove the item from the inventory if the
+            // transfer actually succeeded — otherwise the item would be lost.
             this.#inventory.onSlotClick = (itemKey) => {
-              if (this.#inventory.hasEnoughOf(itemKey, 1)) {
+              if (this.#inventory.hasEnoughOf(itemKey, 1) &&
+                  this.#machineInterface.tryAddToInput(itemKey)) {
                 this.#inventory.removeItems(itemKey, 1);
-                this.#machineInterface.addToInputSlot(itemKey);
               }
             };
           }
@@ -248,10 +219,17 @@ export class GameScene extends Phaser.Scene {
     }
 
     this.#player.update();
+
+    // Each frame, mirror the bound machine's stacks onto the interface visuals.
+    if (this.#machineInterface.isOpen) {
+      this.#machineInterface.update();
+    }
+
     if (this.#controls.isEKeyJustDown) {
       if (this.#machineInterface.isOpen) {
         this.#inventory.onSlotClick = null;
         this.#machineInterface.close();
+        this.#machineInterface.unbind();
         if (this.#inventory.isOpen) {
           this.#inventory.toggle();
         }

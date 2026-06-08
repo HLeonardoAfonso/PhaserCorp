@@ -5,9 +5,9 @@ import type { Recipe } from "../../common/types";
 export class Conveyer extends Machine {
     
     static readonly craftRecipe: Recipe = [
-        { key: 'WOOD_ITEM', amount: 2, },
-        { key: 'COPPER_WIRE', amount: 2, }, 
-        { key: 'IRON_GEAR', amount: 2 }, 
+        { itemKey: 'WOOD_ITEM', amount: 2, },
+        { itemKey: 'COPPER_WIRE', amount: 2, }, 
+        { itemKey: 'IRON_GEAR', amount: 2 }, 
     ];
     static readonly craftItemKey = 'MACHINE_CONVEYOR';
     static readonly craftDisplayKey = 'CONVEYOR';

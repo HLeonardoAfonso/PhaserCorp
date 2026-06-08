@@ -100,6 +100,43 @@ export class Slot {
     this.#debugRect?.setVisible(visible);
   }
 
+  /**
+   * Bring the visual state of this slot in line with the given target
+   * (itemKey, amount). Intended to be called every frame by the interface
+   * so the visuals always mirror the source-of-truth stack data.
+   */
+  sync(itemKey: string | null, amount: number): void {
+    const targetKey = itemKey;
+    const targetAmount = Math.max(0, amount | 0);
+
+    // Empty target → ensure the slot is empty.
+    if (targetKey === null || targetAmount <= 0) {
+      if (this.#amount > 0 || this.#itemKey !== null) {
+        this.destroy();
+      }
+      return;
+    }
+
+    // Need to create or change the icon.
+    if (this.#itemKey !== targetKey) {
+      if (this.#itemKey !== null) {
+        this.destroy();
+      }
+      this.addNew(targetKey);
+      if (this.#amountText) {
+        this.#amountText.setText(`${targetAmount}`);
+      }
+      this.#amount = targetAmount;
+      return;
+    }
+
+    // Same item, just update the amount text.
+    if (this.#amount !== targetAmount && this.#amountText) {
+      this.#amountText.setText(`${targetAmount}`);
+    }
+    this.#amount = targetAmount;
+  }
+
   /** Destroy all game objects and reset state. */
   destroy(): void {
     this.#debugRect?.destroy();
