@@ -1,6 +1,6 @@
 import { Machine } from "../machine";
 import type { InteractiblesConfig } from "../interactibles";
-import type { Recipe } from "../../common/types";
+import type { Recipe, Direction, StackData } from "../../common/types";
 
 export class Furnace extends Machine {
     
@@ -35,5 +35,20 @@ export class Furnace extends Machine {
     
     static get placementRect(): Phaser.Geom.Rectangle {
         return new Phaser.Geom.Rectangle(-32, 64 + 5, 64, 54);
+    }
+
+    acceptItem(_stack: StackData): boolean {
+        // Will be fully implemented in Step 6 with routing by item tag
+        return false;
+    }
+
+    canReceiveFrom(_dir: Direction): boolean {
+        // Will be fully implemented in Step 6 — accepts from all directions
+        return true;
+    }
+
+    update(_delta: number): void {
+        // Will be fully implemented in Step 6 — smelting logic
+        this.checkDeath();
     }
 }

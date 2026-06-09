@@ -1,4 +1,4 @@
-import type { Recipe } from "../../common/types";
+import type { Recipe, Direction, StackData } from "../../common/types";
 import type { InteractiblesConfig } from "../interactibles";
 import { Machine } from "../machine";
 
@@ -24,5 +24,17 @@ export class ConveyerCurve extends Machine {
         const rect = new Phaser.Geom.Rectangle(0, 64, 64, 64);
         this.hitRect = rect;
         this.setInteractive(rect, Phaser.Geom.Rectangle.Contains);
+    }
+
+    acceptItem(_stack: StackData): boolean {
+        return false;
+    }
+
+    canReceiveFrom(_dir: Direction): boolean {
+        return false;
+    }
+
+    update(_delta: number): void {
+        this.checkDeath();
     }
 }
