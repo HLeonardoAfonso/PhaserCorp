@@ -15,12 +15,14 @@ import { Crafting } from '../components/game-object/crafting-component';
 import { FurnaceInterface } from '../components/game-object/furnace-interface-component';
 import { Machine } from '../game-objects/machine';
 import { PlacementSystem } from '../systems/placement-system';
+import { Ribbon } from '../components/game-object/ribbon-component';
 
 export class GameScene extends Phaser.Scene {
 
   #player!: Player;
   #interactibles!: Phaser.Physics.Arcade.StaticGroup
   #controls!: KeyboardComponent
+  #ribbon!: Ribbon;
   #inventory!: Inventory;
   #crafting!: Crafting;
   #machineInterface!: FurnaceInterface;
@@ -89,6 +91,7 @@ export class GameScene extends Phaser.Scene {
     this.#inventory = new Inventory(this, this.#controls, this.physics.world.drawDebug);
     this.#crafting = new Crafting(this, this.#controls, this.#inventory, this.physics.world.drawDebug);
     this.#machineInterface = new FurnaceInterface(this, this.physics.world.drawDebug);
+    this.#ribbon = new Ribbon(this);
     Interactibles.onEntityDied = (key) => this.#inventory.addItems(key, 32);
 
     this.physics.world.setBounds(0, 0, MAP_WIDTH, MAP_HEIGHT);

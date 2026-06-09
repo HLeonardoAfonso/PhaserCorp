@@ -24,12 +24,12 @@ const CRAFTABLE_MACHINES = [Furnace, Conveyer, ConveyerCurve] as const;
 
 const CRAFTABLE_ITEMS: CraftableEntry[] = [
   {
-    craftRecipe: [{ key: 'COPPER_ITEM', amount: 1 }],
+    craftRecipe: [{ itemKey: 'COPPER_ITEM', amount: 1 }],
     craftItemKey: 'COPPER_PLATE',
     craftDisplayKey: 'COPPER_PLATE',
   },
   {
-    craftRecipe: [{ key: 'COPPER_PLATE', amount: 1 }],
+    craftRecipe: [{ itemKey: 'COPPER_PLATE', amount: 1 }],
     craftItemKey: 'COPPER_WIRE',
     craftDisplayKey: 'COPPER_WIRE',
   },
@@ -88,14 +88,16 @@ export class Crafting {
 
     // Check if player has enough of each ingredient
     for (const ingredient of recipe) {
-      if (!this.#inventory.hasEnoughOf(ingredient.key, ingredient.amount)) {
+      if (!ingredient.itemKey) return;
+      if (!this.#inventory.hasEnoughOf(ingredient.itemKey, ingredient.amount)) {
         return; // Not enough resources, abort
       }
     }
 
     // Remove ingredients
     for (const ingredient of recipe) {
-      this.#inventory.removeItems(ingredient.key, ingredient.amount);
+      if (!ingredient.itemKey) return;
+      this.#inventory.removeItems(ingredient.itemKey, ingredient.amount);
     }
 
     // Add the crafted item to inventory

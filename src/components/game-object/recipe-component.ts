@@ -48,7 +48,8 @@ export class RecipeOverlay {
 
     #buildRecipeImages(recipe: Recipe): void {
         recipe.forEach(item => {
-            const img = this.#scene.add.image(0, 0, item.key)
+            if (!item.itemKey) return;
+            const img = this.#scene.add.image(0, 0, item.itemKey)
                 .setScrollFactor(0)
                 .setDepth(1101)
                 .setVisible(this.#isHovering);
