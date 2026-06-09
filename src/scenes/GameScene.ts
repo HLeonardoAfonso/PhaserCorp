@@ -16,17 +16,20 @@ import { FurnaceInterface } from '../components/game-object/furnace-interface-co
 import { Machine } from '../game-objects/machine';
 import { PlacementSystem } from '../systems/placement-system';
 import { Ribbon } from '../components/game-object/ribbon-component';
+import { ShopInterface } from '../components/game-object/shop-interface-component';
+import type { Ribbon as RibbonType } from '../components/game-object/ribbon-component';
 
 export class GameScene extends Phaser.Scene {
 
   #player!: Player;
   #interactibles!: Phaser.Physics.Arcade.StaticGroup
   #controls!: KeyboardComponent
-  #ribbon!: Ribbon;
   #inventory!: Inventory;
   #crafting!: Crafting;
   #machineInterface!: FurnaceInterface;
+  #shopInterface!: ShopInterface;
   #selectionCorners!: { tl: Phaser.GameObjects.Image, tr: Phaser.GameObjects.Image, bl: Phaser.GameObjects.Image, br: Phaser.GameObjects.Image };
+  #ribbon!: RibbonType;
   #wasPointerDown = false;
   #placement!: PlacementSystem;
 
@@ -92,6 +95,7 @@ export class GameScene extends Phaser.Scene {
     this.#crafting = new Crafting(this, this.#controls, this.#inventory, this.physics.world.drawDebug);
     this.#machineInterface = new FurnaceInterface(this, this.physics.world.drawDebug);
     this.#ribbon = new Ribbon(this);
+    this.#shopInterface = new ShopInterface(this);
     Interactibles.onEntityDied = (key) => this.#inventory.addItems(key, 32);
 
     this.physics.world.setBounds(0, 0, MAP_WIDTH, MAP_HEIGHT);
@@ -179,6 +183,18 @@ export class GameScene extends Phaser.Scene {
                 this.#inventory.removeItems(itemKey, 1);
               }
             };
+          } else if (hovered instanceof Shop) {
+            this.#shopInterface.open();
+            if (!this.#inventory.isOpen) {
+              this.#inventory.toggle();
+            }
+            // Wire inventory clicks to consume 1 item and add 1 banner point
+            this.#inventory.onSlotClick = (itemKey) => {
+              if (this.#inventory.hasEnoughOf(itemKey, 1)) {
+                this.#inventory.removeItems(itemKey, 1);
+                this.#ribbon.points += 1;
+              }
+            };
           }
           Interactibles.setSelected(hovered);
         }
@@ -232,10 +248,11 @@ export class GameScene extends Phaser.Scene {
     }
 
     if (this.#controls.isEKeyJustDown) {
-      if (this.#machineInterface.isOpen) {
+      if (this.#machineInterface.isOpen || this.#shopInterface.isOpen) {
         this.#inventory.onSlotClick = null;
         this.#machineInterface.close();
         this.#machineInterface.unbind();
+        this.#shopInterface.close();
         if (this.#inventory.isOpen) {
           this.#inventory.toggle();
         }

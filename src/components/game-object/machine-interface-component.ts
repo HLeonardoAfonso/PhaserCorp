@@ -6,13 +6,13 @@ export class MachineInterface {
   protected table: Phaser.GameObjects.Image;
   protected machineImage: Phaser.GameObjects.Image | null = null;
 
-  constructor(scene: Phaser.Scene) {
+  constructor(scene: Phaser.Scene, tableTexture = 'MACHINE_TABLE') {
     this.scene = scene;
 
     this.table = scene.add.image(
       (scene.cameras.main.centerX)+200,
       scene.cameras.main.centerY,
-      'MACHINE_TABLE'
+      tableTexture
     )
       .setScrollFactor(0)
       .setDepth(1000)

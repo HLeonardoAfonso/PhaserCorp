@@ -59,6 +59,7 @@ export class PreloadScene extends Phaser.Scene {
     this.load.image('INVENTORY_BANNER', 'assets/Inventory/Banner.png');
     this.load.image('INVENTORY_TABLE', 'assets/Inventory/WoodTable.png');
     this.load.image('MACHINE_TABLE', 'assets/Inventory/MachineTable.png');
+    this.load.image('SHOP_OVERLAY', 'assets/Inventory/Shop_Overlay.png');
 
     // Resource stones
 
