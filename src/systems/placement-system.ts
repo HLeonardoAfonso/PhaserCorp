@@ -16,6 +16,7 @@ export class PlacementSystem {
     #animKey: string | null = null;
     #currentRotation = 0;
     #hasRotation = false;
+    onPlacement?: (obj: Interactibles) => void;
 
     constructor(scene: Phaser.Scene, group: Phaser.Physics.Arcade.StaticGroup){
         this.#scene = scene;
@@ -84,6 +85,7 @@ export class PlacementSystem {
             const placedObj = new this.#factory(config);
             this.#group.add(placedObj);
             this.#scene.sound.play('PLACING_SOUND');
+            this.onPlacement?.(placedObj);
             this.#ghost.destroy();
             this.#ghost = null;
             this.#active = false;
