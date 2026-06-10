@@ -8,7 +8,7 @@ import { Inventory } from '../components/game-object/inventory-component';
 import { createAnimations } from '../construction/animations';
 import { createWorld, createRockLayer, createWaterEffects, createRockColliders } from '../construction/world-render';
 import { WORLD } from '../construction/world';
-import { Conveyer } from '../game-objects/machines/conveyer';
+import { Furnace } from '../game-objects/machines/furnace';
 import { spawnInteractibles } from '../game-objects/spawn';
 import { Shop } from '../game-objects/shop';
 import { Crafting } from '../components/game-object/crafting-component';
@@ -32,6 +32,7 @@ export class GameScene extends Phaser.Scene {
   #ribbon!: RibbonType;
   #wasPointerDown = false;
   #placement!: PlacementSystem;
+  #machines: Machine[] = [];
 
   constructor() {
     super({ key: 'GAME_SCENE' });
@@ -116,6 +117,11 @@ export class GameScene extends Phaser.Scene {
     //Refresh do grupo interactibles através de um evento (desaparecer ore)
     this.#interactibles = this.physics.add.staticGroup();
     this.#placement = new PlacementSystem(this, this.#interactibles);
+    this.#placement.onPlacement = (obj) => {
+      if (obj instanceof Machine) {
+        this.#machines.push(obj);
+      }
+    };
 
     // populate the world with entities
     spawnInteractibles(this, this.#interactibles, this.physics.world.drawDebug);
@@ -136,7 +142,20 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
-  update() {
+  update(_time: number, delta: number) {
+
+
+    // --- needs change ----
+    // Update all machines sorted top->bottom, left->right
+    for (let i = this.#machines.length - 1; i >= 0; i--) {
+      const m = this.#machines[i];
+      if (m.isDead) {
+        this.#machines.splice(i, 1);
+      } else {
+        m.update(delta);
+      }
+    }
+        // --- needs change ----
 
     //Player zone interaction
     this.physics.overlap(
@@ -157,7 +176,7 @@ export class GameScene extends Phaser.Scene {
 
     if (!this.#inventory.isOpen) {
       if (this.#controls.isPKeyJustDown){
-        this.#placement.toggle(Conveyer, 'CONVEYOR');
+        this.#placement.toggle(Furnace, 'FURNACE');
       }
       if (this.#controls.isRKeyJustDown){
         this.#placement.rotate();
@@ -192,6 +211,7 @@ export class GameScene extends Phaser.Scene {
             this.#inventory.onSlotClick = (itemKey) => {
               if (this.#inventory.hasEnoughOf(itemKey, 1)) {
                 this.#inventory.removeItems(itemKey, 1);
+                this.sound.play('COIN_SOUND');
                 this.#ribbon.points += 1;
               }
             };

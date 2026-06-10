@@ -107,7 +107,7 @@ export class PreloadScene extends Phaser.Scene {
 
     this.load.audio('AXE_SOUND', 'assets/sound/Axe_Sound.mp3');
     this.load.audio('PICKAXE_SOUND', 'assets/sound/Pickaxe_Sound.mp3');
-
+    this.load.audio('COIN_SOUND', 'assets/sound/Coin_Sound.mp3');
     this.load.audio('PLACING_SOUND', 'assets/sound/Placing_Machine.mp3');
 
   }

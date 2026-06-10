@@ -4,8 +4,6 @@ import { Slot } from './slot-component';
 import { MachineInterface } from './machine-interface-component';
 import { Machine } from '../../game-objects/machine';
 
-const MAX_STACK = 64;
-
 export class FurnaceInterface extends MachineInterface {
 
   #slots: Slot[] = [];
@@ -23,8 +21,8 @@ export class FurnaceInterface extends MachineInterface {
 
     // Furnace-specific slot configurations
     const slotPositions: Position[] = [
-      { x: 90,  y: 129 },  // input slot 1
-      { x: 90,  y: 258 },  // input slot 2
+      { x: 90,  y: 129 },  // ore slot
+      { x: 90,  y: 258 },  // fuel slot
       { x: 367, y: 192 },  // output slot
     ];
 
@@ -59,10 +57,6 @@ export class FurnaceInterface extends MachineInterface {
     return this.#machine;
   }
 
-  /**
-   * Pull the latest stack data from the bound machine and apply it to
-   * the visual slots. Safe to call every frame.
-   */
   update(): void {
     if (!this.#machine) return;
     const stacks = this.#machine.stacks;
@@ -76,41 +70,9 @@ export class FurnaceInterface extends MachineInterface {
     }
   }
 
-  /** Indices of the input slots (everything except the output slot). */
-  static readonly INPUT_INDICES: readonly number[] = [0, 1];
 
-  /**
-   * Try to add 1 of `itemKey` to one of the input slots of the bound
-   * machine. The output slot is never targeted by this method.
-   *
-   * Strategy:
-   *   1. Stack onto an existing input slot that already holds `itemKey`
-   *      and is not full.
-   *   2. Otherwise, place it in the first empty input slot.
-   *   3. Otherwise, return false (caller should keep the item in inventory).
-   *
-   * Mutates the machine's stack data — the next update() reflects it visually.
-   */
   tryAddToInput(itemKey: string): boolean {
     if (!this.#machine) return false;
-    const stacks = this.#machine.stacks;
-
-    // 1. Stack onto a matching non-full input slot.
-    for (const i of FurnaceInterface.INPUT_INDICES) {
-      const s = stacks[i];
-      if (s && s.itemKey === itemKey && s.amount < MAX_STACK) {
-        this.#machine.setStack(i, { itemKey, amount: s.amount + 1 });
-        return true;
-      }
-    }
-    // 2. Fall back to the first empty input slot.
-    for (const i of FurnaceInterface.INPUT_INDICES) {
-      const s = stacks[i];
-      if (s && (s.itemKey === null || s.amount <= 0)) {
-        this.#machine.setStack(i, { itemKey, amount: 1 });
-        return true;
-      }
-    }
-    return false;
+    return this.#machine.acceptItem({ itemKey, amount: 1 });
   }
 }
