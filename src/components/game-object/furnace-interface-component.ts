@@ -9,6 +9,9 @@ export class FurnaceInterface extends MachineInterface {
   #slots: Slot[] = [];
   #machine: Machine | null = null;
 
+  // Callback fired when any slot is clicked
+  onSlotTransfer: ((slotIndex: number, itemKey: string, amount: number) => void) | null = null;
+
   constructor(scene: Phaser.Scene, debug: boolean) {
     super(scene);
     this.#initSlotData(scene, debug);
@@ -27,9 +30,17 @@ export class FurnaceInterface extends MachineInterface {
     ];
 
     // Create input/output slots from config data
-    this.#slots = slotPositions.map(({ x, y }) =>
-      new Slot(scene, topLeftX + x + size / 2, topLeftY + y + size / 2, false, false, debug)
-    );
+    this.#slots = slotPositions.map(({ x, y }, index) => {
+      const slot = new Slot(scene, topLeftX + x + size / 2, topLeftY + y + size / 2, false, true, debug);
+      slot.onClick = (itemKey) => {
+        if (!this.#machine || !this.onSlotTransfer) return;
+        const stack = this.#machine.stacks[index];
+        if (stack.amount > 0) {
+          this.onSlotTransfer(index, itemKey, stack.amount);
+        }
+      };
+      return slot;
+    });
   }
 
   toggleDisplay(bool: boolean): void {

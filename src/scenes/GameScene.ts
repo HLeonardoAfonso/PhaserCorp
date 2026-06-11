@@ -17,6 +17,7 @@ import { Machine } from '../game-objects/machine';
 import { PlacementSystem } from '../systems/placement-system';
 import { Ribbon } from '../components/game-object/ribbon-component';
 import { ShopInterface } from '../components/game-object/shop-interface-component';
+import { PRICES } from '../game-objects/machines/processes';
 import type { Ribbon as RibbonType } from '../components/game-object/ribbon-component';
 
 export class GameScene extends Phaser.Scene {
@@ -190,6 +191,22 @@ export class GameScene extends Phaser.Scene {
             // Bind the interface to the selected furnace so its stacks
             // are owned by the machine instance itself.
             this.#machineInterface.bind(hovered);
+            // Wire any furnace slot click to transfer items into player inventory
+            this.#machineInterface.onSlotTransfer = (slotIndex: number, itemKey: string, amount: number) => {
+              const machine = this.#machineInterface.currentMachine;
+              if (!machine) return;
+              const stack = machine.stacks[slotIndex];
+              if (!stack || stack.itemKey !== itemKey) return;
+
+              let transferred = 0;
+              for (let i = 0; i < amount; i++) {
+                if (this.#inventory.addOneItem(itemKey)) transferred++;
+                else break;
+              }
+              stack.amount -= transferred;
+              if (stack.amount <= 0) { stack.itemKey = null; stack.amount = 0; }
+            };
+
             if (!this.#inventory.isOpen) {
               this.#inventory.toggle();
             }
@@ -207,12 +224,13 @@ export class GameScene extends Phaser.Scene {
             if (!this.#inventory.isOpen) {
               this.#inventory.toggle();
             }
-            // Wire inventory clicks to consume 1 item and add 1 banner point
+            // Wire inventory clicks to consume 1 item and add the item's price to banner points
             this.#inventory.onSlotClick = (itemKey) => {
-              if (this.#inventory.hasEnoughOf(itemKey, 1)) {
+              const price = PRICES.get(itemKey);
+              if (price && this.#inventory.hasEnoughOf(itemKey, 1)) {
                 this.#inventory.removeItems(itemKey, 1);
                 this.sound.play('COIN_SOUND');
-                this.#ribbon.points += 1;
+                this.#ribbon.points += price;
               }
             };
           }
@@ -270,6 +288,7 @@ export class GameScene extends Phaser.Scene {
     if (this.#controls.isEKeyJustDown) {
       if (this.#machineInterface.isOpen || this.#shopInterface.isOpen) {
         this.#inventory.onSlotClick = null;
+        this.#machineInterface.onSlotTransfer = null;
         this.#machineInterface.close();
         this.#machineInterface.unbind();
         this.#shopInterface.close();

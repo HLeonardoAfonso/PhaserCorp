@@ -19,3 +19,14 @@ export const FUEL_ITEMS: string[] = [
 export const ORE_ITEMS: string[] = [
     'IRON_ITEM', 'COPPER_ITEM'
 ]
+
+export const PRICES = new Map<string, number>([
+    ['COAL_ITEM', 1],
+    ['WOOD_ITEM', 1],
+    ['COPPER_ITEM', 2],
+    ['COPPER_PLATE', 3],
+    ['COPPER_WIRE', 4],
+    ['IRON_ITEM', 2],
+    ['IRON_PLATE', 3],
+    ['IRON_GEAR', 4],
+]);
