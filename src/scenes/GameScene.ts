@@ -211,12 +211,25 @@ export class GameScene extends Phaser.Scene {
               this.#inventory.toggle();
             }
             // Wire inventory clicks to transfer items into the bound machine's
-            // input slot. Only remove the item from the inventory if the
-            // transfer actually succeeded — otherwise the item would be lost.
-            this.#inventory.onSlotClick = (itemKey) => {
-              if (this.#inventory.hasEnoughOf(itemKey, 1) &&
-                  this.#machineInterface.tryAddToInput(itemKey)) {
-                this.#inventory.removeItems(itemKey, 1);
+            // input slot.
+            //   Normal click  → transfer 1 item.
+            //   Shift+click   → transfer as many as possible from that stack.
+            this.#inventory.onSlotClick = (itemKey, shiftKey) => {
+              if (shiftKey) {
+                // Transfer as many as possible
+                const count = this.#inventory.countAllOf(itemKey);
+                if (count > 0) {
+                  const accepted = this.#machineInterface.tryAddToInputAmount(itemKey, count);
+                  if (accepted > 0) {
+                    this.#inventory.removeItems(itemKey, accepted);
+                  }
+                }
+              } else {
+                // Transfer 1
+                if (this.#inventory.hasEnoughOf(itemKey, 1) &&
+                    this.#machineInterface.tryAddToInput(itemKey)) {
+                  this.#inventory.removeItems(itemKey, 1);
+                }
               }
             };
           } else if (hovered instanceof Shop) {
@@ -224,13 +237,25 @@ export class GameScene extends Phaser.Scene {
             if (!this.#inventory.isOpen) {
               this.#inventory.toggle();
             }
-            // Wire inventory clicks to consume 1 item and add the item's price to banner points
-            this.#inventory.onSlotClick = (itemKey) => {
+            // Wire inventory clicks to consume 1 item and add the item's price to banner points.
+            //   Normal click  → sell 1 item.
+            //   Shift+click   → sell as many as possible of that item.
+            this.#inventory.onSlotClick = (itemKey, shiftKey) => {
               const price = PRICES.get(itemKey);
-              if (price && this.#inventory.hasEnoughOf(itemKey, 1)) {
-                this.#inventory.removeItems(itemKey, 1);
-                this.sound.play('COIN_SOUND');
-                this.#ribbon.points += price;
+              if (!price) return;
+              if (shiftKey) {
+                const count = this.#inventory.countAllOf(itemKey);
+                if (count > 0) {
+                  this.#inventory.removeItems(itemKey, count);
+                  this.sound.play('COIN_SOUND');
+                  this.#ribbon.points += price * count;
+                }
+              } else {
+                if (this.#inventory.hasEnoughOf(itemKey, 1)) {
+                  this.#inventory.removeItems(itemKey, 1);
+                  this.sound.play('COIN_SOUND');
+                  this.#ribbon.points += price;
+                }
               }
             };
           }

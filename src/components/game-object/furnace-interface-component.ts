@@ -32,11 +32,12 @@ export class FurnaceInterface extends MachineInterface {
     // Create input/output slots from config data
     this.#slots = slotPositions.map(({ x, y }, index) => {
       const slot = new Slot(scene, topLeftX + x + size / 2, topLeftY + y + size / 2, false, true, debug);
-      slot.onClick = (itemKey) => {
+      slot.onClick = (itemKey, shiftKey) => {
         if (!this.#machine || !this.onSlotTransfer) return;
         const stack = this.#machine.stacks[index];
         if (stack.amount > 0) {
-          this.onSlotTransfer(index, itemKey, stack.amount);
+          const amount = shiftKey ? stack.amount : 1;
+          this.onSlotTransfer(index, itemKey, amount);
         }
       };
       return slot;
@@ -83,7 +84,19 @@ export class FurnaceInterface extends MachineInterface {
 
 
   tryAddToInput(itemKey: string): boolean {
-    if (!this.#machine) return false;
-    return this.#machine.acceptItem({ itemKey, amount: 1 });
+    return this.tryAddToInputAmount(itemKey, 1) === 1;
+  }
+
+  tryAddToInputAmount(itemKey: string, amount: number): number {
+    if (!this.#machine) return 0;
+    let accepted = 0;
+    for (let i = 0; i < amount; i++) {
+      if (this.#machine.acceptItem({ itemKey, amount: 1 })) {
+        accepted++;
+      } else {
+        break;
+      }
+    }
+    return accepted;
   }
 }

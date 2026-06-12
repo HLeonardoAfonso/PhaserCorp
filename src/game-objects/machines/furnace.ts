@@ -6,13 +6,11 @@ import { FUEL_ITEMS, SMELT_MAP } from "./processes";
 export class Furnace extends Machine {
     
     static readonly craftRecipe: Recipe = [
-        { itemKey: 'GOLD_ITEM', amount: 2, },
         { itemKey: 'IRON_ITEM', amount: 2, }, 
-        { itemKey: 'COPPER_ITEM', amount: 2 },
-        { itemKey: 'COAL_ITEM', amount: 2 },
     ];    
     static readonly craftItemKey = 'MACHINE_FURNACE';
     static readonly craftDisplayKey = 'FURNACE';
+    static readonly displayOrigin = { x: 0.5, y: 0.75 };
 
     static readonly SMELT_TIME = 2000;
 
@@ -27,8 +25,9 @@ export class Furnace extends Machine {
 
     constructor(config: InteractiblesConfig) {
         super(config, 100, 'FURNACE', true);
+        this.setOrigin(Furnace.displayOrigin.x, Furnace.displayOrigin.y);
         this.setBodySize(64, 64);
-        this.body?.setOffset(0, 64)
+        this.body?.setOffset(0, 32)
         this.setDepth(config.position.y);
 
         this.stacks.push(this.#oreSlot);
@@ -60,8 +59,19 @@ export class Furnace extends Machine {
         this.checkDeath();
         if (this.isDead) return;
 
-        if (this.#fuelSlot.amount > 0 && this.#oreSlot.amount > 0 && this.#outputSlot.amount < 64) {
+        // has both fuel and ore
+        if (this.hasInputs()) {
+            
+            // output empty
+            if (this.isOutputEmpty()) {
+            // any ore is ok
+            // 
+            }
+            // output can recive
+                // same ore only
+            if (this.outputCanRecive()){
 
+            }
             const target = this.#oreSlot.itemKey ? SMELT_MAP.get(this.#oreSlot.itemKey) : null;
 
             if (target) {
@@ -88,16 +98,25 @@ export class Furnace extends Machine {
                         this.#outputSlot.amount = Math.min(this.#outputSlot.amount + 1, 64);
                     }
                 }
-            } else {
-                // Ore not smeltable — reset progress
-                this.#smeltingProgress = 0;
-                this.#currentSmeltTarget = null;
             }
-        } else {
-            // Missing fuel, ore, or output full — reset progress
-            this.#smeltingProgress = 0;
-            this.#currentSmeltTarget = null;
         }
+    }
+
+    private hasInputs(): boolean {
+        return  this.#fuelSlot.amount > 0 
+            && this.#oreSlot.amount > 0
+            && this.#oreSlot.itemKey !== null
+            && SMELT_MAP.has(this.#oreSlot.itemKey);
+    }
+
+    private isOutputEmpty(): boolean {
+        return this.#outputSlot.amount == 0;
+    }
+
+    private outputCanRecive(): boolean {
+        return this.#outputSlot.amount < 64 
+            && this.#oreSlot.itemKey !== null    
+            && this.#outputSlot.itemKey === SMELT_MAP.get(this.#oreSlot.itemKey);
     }
 
     private consumeItem(slot: StackData): void {

@@ -19,7 +19,6 @@ const entities: [EntityClass, { x: number; y: number }][] = [
   [CopperStone,   { x: (8 * 64) + 32,  y: (4 * 64) + 32 }],
   [CoalStone,     { x: (10 * 64) + 32, y: (2 * 64) + 32 }],
   [Conveyer,      { x: (12 * 64) + 32, y: (2 * 64) + 32 }],
-  [ConveyerCurve, { x: (11 * 64) + 32, y: (2 * 64) + 32 }],
 ];
 
 export function spawnInteractibles(

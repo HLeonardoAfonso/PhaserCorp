@@ -1,5 +1,7 @@
 import type { Direction, Position } from "./types";
 
+export const DIRECTIONS: Direction[] = ['right', 'down', 'left', 'up'];
+
 export const OPPOSITE: Record<Direction, Direction> = {
   up: 'down',
   down: 'up',

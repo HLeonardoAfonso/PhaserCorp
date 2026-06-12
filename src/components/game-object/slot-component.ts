@@ -11,7 +11,7 @@ export class Slot {
     #debugRect: Phaser.GameObjects.Rectangle | null = null;
     #scene: Phaser.Scene;
     #parentVisible: boolean;
-    #onClick: ((itemKey: string) => void) | null = null;
+    #onClick: ((itemKey: string, shiftKey: boolean) => void) | null = null;
     #interactive = false;
 
     constructor(scene: Phaser.Scene, x: number, y: number, parentVisible: boolean, interactive = false, debug = false) {
@@ -34,7 +34,7 @@ export class Slot {
     get amount(): number { return this.#amount; }
     get occupied(): boolean { return this.#itemKey !== null && this.#amount > 0; }
 
-    set onClick(cb: ((itemKey: string) => void) | null) { this.#onClick = cb; }
+    set onClick(cb: ((itemKey: string, shiftKey: boolean) => void) | null) { this.#onClick = cb; }
 
     /** Increment an existing stack by 1. Slot must already be occupied. */
     addOne(): boolean {
@@ -70,9 +70,10 @@ export class Slot {
         if (this.#interactive) {
             this.#image.setInteractive();
             const self = this;
-            this.#image.on('pointerdown', () => {
+            this.#image.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
                 if (self.#onClick && self.#itemKey) {
-                    self.#onClick(self.#itemKey);
+                    const shiftDown = pointer.event?.shiftKey ?? false;
+                    self.#onClick(self.#itemKey, shiftDown);
                 }
             });
         }

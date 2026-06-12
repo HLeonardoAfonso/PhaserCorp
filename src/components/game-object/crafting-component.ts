@@ -24,9 +24,9 @@ const CRAFTABLE_MACHINES = [Furnace, Conveyer, ConveyerCurve] as const;
 
 const CRAFTABLE_ITEMS: CraftableEntry[] = [
   {
-    craftRecipe: [{ itemKey: 'COPPER_ITEM', amount: 1 }],
-    craftItemKey: 'COPPER_PLATE',
-    craftDisplayKey: 'COPPER_PLATE',
+    craftRecipe: [{ itemKey: 'IRON_PLATE', amount: 1 }],
+    craftItemKey: 'IRON_GEAR',
+    craftDisplayKey: 'IRON_GEAR',
   },
   {
     craftRecipe: [{ itemKey: 'COPPER_PLATE', amount: 1 }],

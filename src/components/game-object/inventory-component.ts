@@ -9,7 +9,7 @@ export class Inventory {
   #slots: Slot[] = [];
 
   /** Callback invoked when a player clicks on an inventory slot. */
-  onSlotClick: ((itemKey: string) => void) | null = null;
+  onSlotClick: ((itemKey: string, shiftKey: boolean) => void) | null = null;
 
   constructor(scene: Phaser.Scene, controls: KeyboardComponent, debug: boolean) {
     this.#controls = controls;
@@ -40,9 +40,9 @@ export class Inventory {
         const cy = topLeftY + offsetY + row * slotSize + slotSize / 2;
 
         const slot = new Slot(scene, cx, cy, false, true, debug);
-        slot.onClick = (itemKey) => {
+        slot.onClick = (itemKey, shiftKey) => {
           if (this.onSlotClick) {
-            this.onSlotClick(itemKey);
+            this.onSlotClick(itemKey, shiftKey);
           }
         };
         this.#slots.push(slot);
@@ -99,6 +99,17 @@ export class Inventory {
       }
     }
     return false;
+  }
+
+  /** Return the total quantity of the given item across all inventory slots. */
+  countAllOf(itemKey: string): number {
+    let total = 0;
+    for (const slot of this.#slots) {
+      if (slot.itemKey === itemKey) {
+        total += slot.amount;
+      }
+    }
+    return total;
   }
 
   removeItems(itemKey: string, amount: number): void {

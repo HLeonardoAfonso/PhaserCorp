@@ -1,11 +1,10 @@
 import Phaser from 'phaser';
 import type { Direction } from '../common/types';
+import { DIRECTIONS } from '../common/const';
 import { RotatableMachine } from '../game-objects/machines/rotatable-machine';
 import { Interactibles, type InteractiblesConfig } from '../game-objects/interactibles';
 
 type PlaceableConstructor = new(config: InteractiblesConfig) => Interactibles;
-
-const DIRECTIONS: Direction[] = ['right', 'down', 'left', 'up'];
 
 export class PlacementSystem {
     #scene: Phaser.Scene;
@@ -33,6 +32,9 @@ export class PlacementSystem {
             this.#hasRotation = RotatableMachine.prototype.isPrototypeOf(factory.prototype);
             this.#currentRotation = 0;
             this.#ghost = this.#scene.add.sprite(0,0, assetKey).setAlpha(0.5).setDepth(999);
+            // Apply custom display origin if the factory defines one
+            const origin = (this.#factory as unknown as { displayOrigin?: { x: number; y: number } }).displayOrigin;
+            if (origin) this.#ghost.setOrigin(origin.x, origin.y);
             if (this.#animKey) this.#ghost.play(this.#animKey);
             this.#updateGhostRotation();
         } else {
