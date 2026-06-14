@@ -117,7 +117,7 @@ export class GameScene extends Phaser.Scene {
 
     //Refresh do grupo interactibles através de um evento (desaparecer ore)
     this.#interactibles = this.physics.add.staticGroup();
-    this.#placement = new PlacementSystem(this, this.#interactibles);
+    this.#placement = new PlacementSystem(this, this.#interactibles, this.#player);
     this.#placement.onPlacement = (obj) => {
       if (obj instanceof Machine) {
         this.#machines.push(obj);
