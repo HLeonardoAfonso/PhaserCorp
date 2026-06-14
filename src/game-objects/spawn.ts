@@ -6,19 +6,45 @@ import { IronStone } from './ores/iron-stone';
 import { CoalStone } from './ores/coal-stone';
 import { CopperStone } from './ores/copper-stone';
 import { Conveyer } from './machines/conveyer';
-import { ConveyerCurve } from './machines/conveyer-curve';
 
 type EntityClass = new (config: InteractiblesConfig) => any;
 
 const entities: [EntityClass, { x: number; y: number }][] = [
-  [Tree,          { x: (1 * 64) + 32,  y: (2 * 64) + 32 }],
-  [Tree,          { x: (3 * 64) + 32,  y: (3 * 64) + 32 }],
-  [Tree,          { x: (6 * 64) + 32,  y: (3 * 64) + 32 }],
-  [GoldStone,     { x: (4 * 64) + 32,  y: (2 * 64) + 32 }],
-  [IronStone,     { x: (8 * 64) + 32,  y: (2 * 64) + 32 }],
-  [CopperStone,   { x: (8 * 64) + 32,  y: (4 * 64) + 32 }],
-  [CoalStone,     { x: (10 * 64) + 32, y: (2 * 64) + 32 }],
-  [Conveyer,      { x: (12 * 64) + 32, y: (2 * 64) + 32 }],
+
+  // 00
+  [Tree,          { x: 1,  y: 2 }],
+  [Tree,          { x: 3,  y: 3 }],
+  [Tree,          { x: 6,  y: 3 }],
+
+  [GoldStone,     { x: 4,  y: 2 }],
+
+  // 01
+
+  [Tree,          { x: 16+11, y: 8 }],
+  [Tree,          { x: 16+12, y: 9 }],
+  [Tree,          { x: 16+3, y: 10 }],
+
+  // 02
+
+  [Tree,          { x: 32+11, y: 8 }],
+  [CopperStone,   { x: 32+3, y: 12 }],
+  [CopperStone,   { x: 32+1, y: 12 }],
+  [CopperStone,   { x: 32+2, y: 11 }],
+
+  // 11
+
+  [Tree,          { x: 16+10, y: 16+2 }],
+  [Tree,          { x: 16+12, y: 16+3 }],
+  [Tree,          { x: 16+4, y: 16+3 }],
+
+  [Tree,          { x: 16+2, y: 16+10 }],
+  [Tree,          { x: 16+3, y: 16+12 }],
+  [Tree,          { x: 16+1, y: 16+11 }],
+
+  [IronStone,     { x: 27, y: 27 }],
+  [CopperStone,   { x: 31, y: 23 }],
+  [CoalStone,     { x: 29, y: 25 }],
+  [Conveyer,     { x: 31, y: 25 }],
 ];
 
 export function spawnInteractibles(
@@ -29,7 +55,8 @@ export function spawnInteractibles(
   for (const [EntityClass, position] of entities) {
 
     // create entities
-    const entity = new EntityClass({ scene, position });
+    const correctPosition = { x: (position.x * 64) + 32, y: (position.y * 64) + 32 }
+    const entity = new EntityClass({ scene, position: correctPosition });
     // add debug square
     if (debug) scene.input.enableDebug(entity);
     // add entities to intecatables group

@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { KeyboardComponent } from '../input/keyboard-component';
 import { Slot } from './slot-component';
+import { DEPTH } from '../../common/depth';
 
 export class Inventory {
 
@@ -19,7 +20,7 @@ export class Inventory {
       'INVENTORY_BANNER'
     )
       .setScrollFactor(0)
-      .setDepth(1000)
+      .setDepth(DEPTH.TABLE_BG)
       .setVisible(false);
 
     this.#initSlotData(scene, debug);

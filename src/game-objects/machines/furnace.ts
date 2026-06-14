@@ -12,12 +12,12 @@ export class Furnace extends Machine {
     static readonly craftDisplayKey = 'FURNACE';
     static readonly displayOrigin = { x: 0.5, y: 0.75 };
 
-    static readonly SMELT_TIME = 2000;
+    static readonly SMELT_TIME = 500;
 
     get resourceKey(): string { return 'MACHINE_FURNACE'; }
 
     #smeltingProgress = 0;
-    #currentSmeltTarget: string | null = null; // result itemKey of current recipe
+    #currSmeltOutput: string | undefined;
 
     #oreSlot: StackData = { itemKey: null, amount: 0 };
     #fuelSlot: StackData = { itemKey: null, amount: 0 };
@@ -59,47 +59,36 @@ export class Furnace extends Machine {
         this.checkDeath();
         if (this.isDead) return;
 
-        // has both fuel and ore
-        if (this.hasInputs()) {
+        if (this.isProcessing()) {
+            this.continueProcess(delta);
             
-            // output empty
-            if (this.isOutputEmpty()) {
-            // any ore is ok
-            // 
-            }
-            // output can recive
-                // same ore only
-            if (this.outputCanRecive()){
-
-            }
-            const target = this.#oreSlot.itemKey ? SMELT_MAP.get(this.#oreSlot.itemKey) : null;
-
-            if (target) {
-                // If this is a different recipe than what we were working on, reset progress
-                if (this.#currentSmeltTarget !== target) {
-                    this.#smeltingProgress = 0;
-                    this.#currentSmeltTarget = target;
-                }
-
-                this.#smeltingProgress += delta;
-
-                if (this.#smeltingProgress >= Furnace.SMELT_TIME) {
-                    // Complete one smelt cycle
-                    this.#smeltingProgress = 0;
-
-                    this.consumeItem(this.#fuelSlot);
-                    this.consumeItem(this.#oreSlot);
-
-                    // Produce 1 result in output
-                    if (this.#outputSlot.itemKey === null) {
-                        this.#outputSlot.itemKey = target;
-                        this.#outputSlot.amount = 1;
-                    } else if (this.#outputSlot.itemKey === target) {
-                        this.#outputSlot.amount = Math.min(this.#outputSlot.amount + 1, 64);
-                    }
-                }
-            }
+        } else if (this.hasInputs() && (this.isOutputEmpty() || this.outputCanRecive())) {
+            
+            this.#currSmeltOutput = SMELT_MAP.get(this.#oreSlot.itemKey!);
+            this.consumeItem(this.#fuelSlot);
+            this.consumeItem(this.#oreSlot);
+            this.continueProcess(delta);
         }
+    }
+
+    private continueProcess(delta: number): void {
+        
+        this.#smeltingProgress += delta;
+
+        if (this.#smeltingProgress >= Furnace.SMELT_TIME) {
+
+            if (this.isOutputEmpty()) {
+                this.#outputSlot.itemKey = this.#currSmeltOutput!;
+                this.#outputSlot.amount = 1;
+            } else {
+                this.#outputSlot.amount += 1;
+            }
+            this.#smeltingProgress = 0;
+        }
+    }
+
+    private isProcessing(): boolean {
+        return this.#smeltingProgress > 0;
     }
 
     private hasInputs(): boolean {

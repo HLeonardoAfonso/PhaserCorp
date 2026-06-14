@@ -15,7 +15,7 @@ export class Tree extends Interactibles {
         const rect = new Phaser.Geom.Rectangle(66, 0, 64, 175);
         this.hitRect = rect;
         this.setInteractive(rect, Phaser.Geom.Rectangle.Contains);
-        this.#opaqueZone = this.scene.add.zone(this.x, this.y/1.7, 64, 175);
+        this.#opaqueZone = this.scene.add.zone(this.x, this.y-72, 64, 175);
         this.scene.physics.add.existing(this.#opaqueZone);
     }
 

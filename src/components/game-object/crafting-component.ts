@@ -3,9 +3,9 @@ import type { Recipe } from '../../common/types';
 import { KeyboardComponent } from '../input/keyboard-component';
 import { RecipeOverlay } from './recipe-component';
 import { Inventory } from './inventory-component';
+import { DEPTH } from '../../common/depth';
 import { Furnace } from '../../game-objects/machines/furnace';
 import { Conveyer } from '../../game-objects/machines/conveyer';
-import { ConveyerCurve } from '../../game-objects/machines/conveyer-curve';
 
 type CraftingSlot = {
   x: number;
@@ -20,7 +20,7 @@ type CraftableEntry = {
   craftDisplayKey: string;
 };
 
-const CRAFTABLE_MACHINES = [Furnace, Conveyer, ConveyerCurve] as const;
+const CRAFTABLE_MACHINES = [Furnace, Conveyer] as const;
 
 const CRAFTABLE_ITEMS: CraftableEntry[] = [
   {
@@ -64,7 +64,7 @@ export class Crafting {
       'INVENTORY_TABLE'
     )
       .setScrollFactor(0)
-      .setDepth(1000)
+      .setDepth(DEPTH.TABLE_BG)
       .setVisible(false);
 
     this.#recipeOverlay = new RecipeOverlay(scene);
@@ -110,7 +110,7 @@ export class Crafting {
       const slot = this.#slots[i];
       const image = scene.add.image(slot.x, slot.y, entry.craftDisplayKey)
         .setScrollFactor(0)
-        .setDepth(1002)
+        .setDepth(DEPTH.SLOT_IMAGE)
         .setVisible(this.#table.visible)
         .setInteractive()
         .on('pointerover', (pointer: Phaser.Input.Pointer) => this.#onCraftablePointerOver(i, pointer))
@@ -147,7 +147,7 @@ export class Crafting {
           const rect = scene.add.rectangle(cx, cy, slotSize, slotSize)
             .setStrokeStyle(1, 0x000000, 0.5)
             .setScrollFactor(0)
-            .setDepth(1001)
+            .setDepth(DEPTH.SLOT_DEBUG)
             .setVisible(false);
           this.#debugRects.push(rect);
         }

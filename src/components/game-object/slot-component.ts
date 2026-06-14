@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { DEPTH } from '../../common/depth';
 
 export class Slot {
 
@@ -25,7 +26,7 @@ export class Slot {
             this.#debugRect = scene.add.rectangle(x, y, 64, 64)
                 .setStrokeStyle(1, 0x000000, 0.5)
                 .setScrollFactor(0)
-                .setDepth(1001)
+                .setDepth(DEPTH.SLOT_DEBUG)
                 .setVisible(parentVisible);
         }
     }
@@ -53,7 +54,7 @@ export class Slot {
 
         this.#image = this.#scene.add.image(this.x, this.y, itemKey)
             .setScrollFactor(0)
-            .setDepth(1002)
+            .setDepth(DEPTH.SLOT_IMAGE)
             .setVisible(this.#parentVisible);
 
         this.#amountText = this.#scene.add.text(this.x + 34, this.y + 36, '1', {
@@ -64,7 +65,7 @@ export class Slot {
         })
             .setOrigin(1, 1)
             .setScrollFactor(0)
-            .setDepth(1003)
+            .setDepth(DEPTH.SLOT_TEXT)
             .setVisible(this.#parentVisible);
 
         if (this.#interactive) {

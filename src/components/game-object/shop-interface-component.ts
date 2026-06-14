@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { MachineInterface } from './machine-interface-component';
+import { DEPTH } from '../../common/depth';
 
 export class ShopInterface extends MachineInterface {
 
@@ -10,7 +11,7 @@ export class ShopInterface extends MachineInterface {
 
         this.#overlay = scene.add.image(this.table.x, this.table.y, 'SHOP_OVERLAY')
             .setScrollFactor(0)
-            .setDepth(1003)
+            .setDepth(DEPTH.SLOT_TEXT)
             .setVisible(false);
     }
 

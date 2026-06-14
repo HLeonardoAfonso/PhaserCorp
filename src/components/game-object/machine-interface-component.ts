@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { DEPTH } from '../../common/depth';
 
 export class MachineInterface {
   
@@ -15,7 +16,7 @@ export class MachineInterface {
       tableTexture
     )
       .setScrollFactor(0)
-      .setDepth(1000)
+      .setDepth(DEPTH.TABLE_BG)
       .setVisible(false);
   }
 
@@ -30,7 +31,7 @@ export class MachineInterface {
     // Create new machine image centered on the table
     this.machineImage = this.scene.add.image(this.table.x, this.table.y, textureKey)
       .setScrollFactor(0)
-      .setDepth(1002)
+      .setDepth(DEPTH.SLOT_IMAGE)
       .setVisible(true);
 
     // Open the interface via toggleDisplay

@@ -35,7 +35,7 @@ export class Conveyer extends RotatableMachine {
         this.setDepth(config.position.y);
 
         this.removeInteractive();
-        const rect = new Phaser.Geom.Rectangle(0, 64, 64, 64);
+        const rect = new Phaser.Geom.Rectangle(0, 0, 64, 64);
         this.hitRect = rect;
         this.setInteractive(rect, Phaser.Geom.Rectangle.Contains);
     }

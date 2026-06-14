@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import type { Recipe } from '../../common/types';
+import { DEPTH } from '../../common/depth';
 
 export class RecipeOverlay {
     #scene: Phaser.Scene;
@@ -33,7 +34,7 @@ export class RecipeOverlay {
 
                 const sprite = this.#scene.add.sprite(0, 0, 'PAPER', frame)
                     .setScrollFactor(0)
-                    .setDepth(1100)
+                    .setDepth(DEPTH.RECIPE_FRAME)
                     .setVisible(this.#isHovering);
 
                 this.#sprites[row].push(sprite);
@@ -51,7 +52,7 @@ export class RecipeOverlay {
             if (!item.itemKey) return;
             const img = this.#scene.add.image(0, 0, item.itemKey)
                 .setScrollFactor(0)
-                .setDepth(1101)
+                .setDepth(DEPTH.RECIPE_IMAGE)
                 .setVisible(this.#isHovering);
             this.#recipeImages.push(img);
         });

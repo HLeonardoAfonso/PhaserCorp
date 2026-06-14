@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { DEPTH } from '../../common/depth';
 
 export class Ribbon {
 
@@ -25,7 +26,7 @@ export class Ribbon {
 
         scene.add.image(this.x, this.y, 'RIBBON')
             .setScrollFactor(0)
-            .setDepth(1004);
+            .setDepth(DEPTH.RIBBON_BG);
 
         this.#pointsText = scene.add.text(this.x +50, this.y-8, this.#formatPoints(this.#points), {
             fontSize: '28px',
@@ -35,7 +36,7 @@ export class Ribbon {
         })
             .setOrigin(0.5)
             .setScrollFactor(0)
-            .setDepth(1005);
+            .setDepth(DEPTH.RIBBON_TEXT);
     }
 
     get points(): number { return this.#points; }

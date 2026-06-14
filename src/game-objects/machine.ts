@@ -65,8 +65,6 @@ export abstract class Machine extends Interactibles {
      */
     abstract update(delta: number): void;
 
-    // ── Protected helpers ──────────────────────────────────────────
-
     /**
      * Attempt to insert a stack into a specific slot.
      * Returns the leftover stack that didn't fit.
@@ -102,13 +100,6 @@ export abstract class Machine extends Interactibles {
 
     /**
      * Check death state and clean up if dead. Call from subclass update() if needed.
-     * 
-     * Example:
-     *   update(delta) {
-     *     this.checkDeath();
-     *     if (this.isDead) return;
-     *     // ... smelting logic
-     *   }
      */
     protected checkDeath(): void {
         if (this.isDead) {
@@ -119,8 +110,6 @@ export abstract class Machine extends Interactibles {
             this.destroy();
         }
     }
-
-    // ── Lifecycle ──────────────────────────────────────────────────
 
     /**
      * Override destroy to unregister from the MachineRegistry.

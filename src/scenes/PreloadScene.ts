@@ -97,11 +97,9 @@ export class PreloadScene extends Phaser.Scene {
 
     this.load.image('FURNACE', 'assets/machines/Furnace.png');
     this.load.image('CONVEYOR', 'assets/machines/Conveyor.png');
-    this.load.image('CONVEYOR_CURVE', 'assets/machines/Conveyor_Curve.png');
 
     this.load.image('MACHINE_FURNACE', 'assets/machines/Furnace_Item.png');
     this.load.image('MACHINE_CONVEYOR', 'assets/machines/Conveyor_Item.png');
-    this.load.image('MACHINE_CONVEYOR_CURVE', 'assets/machines/Conveyor_Curve_Item.png');
 
     // Sounds
 

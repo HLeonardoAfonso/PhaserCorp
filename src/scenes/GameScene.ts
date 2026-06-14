@@ -15,6 +15,7 @@ import { Crafting } from '../components/game-object/crafting-component';
 import { FurnaceInterface } from '../components/game-object/furnace-interface-component';
 import { Machine } from '../game-objects/machine';
 import { PlacementSystem } from '../systems/placement-system';
+import { DEPTH } from '../common/depth';
 import { Ribbon } from '../components/game-object/ribbon-component';
 import { ShopInterface } from '../components/game-object/shop-interface-component';
 import { PRICES } from '../game-objects/machines/processes';
@@ -42,10 +43,10 @@ export class GameScene extends Phaser.Scene {
   public create(): void {
     this.input.setDefaultCursor(Cursors.DEFAULT);
     this.#selectionCorners = {
-      tl: this.add.image(0, 0, 'SEL_TL').setOrigin(0.5, 0.5).setDepth(999).setVisible(false),
-      tr: this.add.image(0, 0, 'SEL_TR').setOrigin(0.5, 0.5).setDepth(999).setVisible(false),
-      bl: this.add.image(0, 0, 'SEL_BL').setOrigin(0.5, 0.5).setDepth(999).setVisible(false),
-      br: this.add.image(0, 0, 'SEL_BR').setOrigin(0.5, 0.5).setDepth(999).setVisible(false),
+      tl: this.add.image(0, 0, 'SEL_TL').setOrigin(0.5, 0.5).setDepth(DEPTH.SELECTION_CORNERS).setVisible(false),
+      tr: this.add.image(0, 0, 'SEL_TR').setOrigin(0.5, 0.5).setDepth(DEPTH.SELECTION_CORNERS).setVisible(false),
+      bl: this.add.image(0, 0, 'SEL_BL').setOrigin(0.5, 0.5).setDepth(DEPTH.SELECTION_CORNERS).setVisible(false),
+      br: this.add.image(0, 0, 'SEL_BR').setOrigin(0.5, 0.5).setDepth(DEPTH.SELECTION_CORNERS).setVisible(false),
     };
 
     const MAP_WIDTH = WORLD.length * 16 * 64;
@@ -67,7 +68,7 @@ export class GameScene extends Phaser.Scene {
     }
     const groundLayer = map.createLayer(0, tileset, 0, 0);
     if (groundLayer) {
-      groundLayer.setDepth(1);
+      groundLayer.setDepth(DEPTH.GROUND);
     }
 
     // Rock overlay layer at depth 2
@@ -81,7 +82,7 @@ export class GameScene extends Phaser.Scene {
     if (rockTileset) {
       const rockGroundLayer = rockLayer.createLayer(0, rockTileset, 0, 0);
       if (rockGroundLayer) {
-        rockGroundLayer.setDepth(2);
+        rockGroundLayer.setDepth(DEPTH.ROCK);
       }
     }
 
@@ -104,7 +105,7 @@ export class GameScene extends Phaser.Scene {
 
     this.#player = new Player({
       scene: this,
-      position: { x: (6*64)+32, y: (5*64)+32 },
+      position: { x: (28*64)+32, y: (28*64)+32 },
       assetKey: 'PLAYER_IDLE',
       frame: 0,
       controls: this.#controls,
@@ -113,7 +114,7 @@ export class GameScene extends Phaser.Scene {
     this.cameras.main.setBounds(0, 0, MAP_WIDTH, MAP_HEIGHT);
     this.cameras.main.startFollow(this.#player);
 
-    this.#player.setDepth(3);
+    this.#player.setDepth(DEPTH.ENTITY);
 
     //Refresh do grupo interactibles através de um evento (desaparecer ore)
     this.#interactibles = this.physics.add.staticGroup();
@@ -128,7 +129,7 @@ export class GameScene extends Phaser.Scene {
     spawnInteractibles(this, this.#interactibles, this.physics.world.drawDebug);
 
     // instanciate shop
-    const shop = new Shop({ scene: this, position: { x: (14*64), y: (6*64) } });
+    const shop = new Shop({ scene: this, position: { x: (24*64), y: (24*64) } });
     this.#interactibles.add(shop);
     
     // add colliders
