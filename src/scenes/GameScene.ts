@@ -26,6 +26,7 @@ export class GameScene extends Phaser.Scene {
 
   #player!: Player;
   #interactibles!: Phaser.Physics.Arcade.StaticGroup
+  #interactiblesMinusConveyors!: Phaser.Physics.Arcade.StaticGroup
   #controls!: KeyboardComponent
   #inventory!: Inventory;
   #crafting!: Crafting;
@@ -123,6 +124,9 @@ export class GameScene extends Phaser.Scene {
     this.#placement.onPlacement = (obj) => {
       if (obj instanceof Machine) {
         this.#machines.push(obj);
+        if (!(obj instanceof Conveyer)) {
+          this.#interactiblesMinusConveyors.add(obj);
+        }
       }
     };
 
@@ -132,9 +136,17 @@ export class GameScene extends Phaser.Scene {
     // instanciate shop
     const shop = new Shop({ scene: this, position: { x: (24*64), y: (24*64) } });
     this.#interactibles.add(shop);
-    
+
+    // Build a separate group excluding conveyors for collision
+    this.#interactiblesMinusConveyors = this.physics.add.staticGroup();
+    this.#interactibles.getChildren().forEach(obj => {
+      if (!(obj instanceof Conveyer)) {
+        this.#interactiblesMinusConveyors.add(obj);
+      }
+    });
+
     // add colliders
-    this.physics.add.collider(this.#player, this.#interactibles);
+    this.physics.add.collider(this.#player, this.#interactiblesMinusConveyors);
     this.physics.add.collider(this.#player, rockColliders);
     this.physics.add.collider(this.#player, waterColliders);
     

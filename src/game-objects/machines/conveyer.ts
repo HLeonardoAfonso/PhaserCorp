@@ -32,7 +32,7 @@ export class Conveyer extends RotatableMachine {
                       this.facing === 'left' ? 180 : 0);
         this.setBodySize(64, 64);
         this.body?.setOffset(0, 0)
-        this.setDepth(config.position.y);
+        this.setDepth(config.position.y-32);
 
         this.removeInteractive();
         const rect = new Phaser.Geom.Rectangle(0, 0, 64, 64);
