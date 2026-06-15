@@ -32,7 +32,6 @@ export class Shop extends Machine {
         // Register at all tile positions the shop body covers
         for (let dx = -2; dx <= 2; dx++) {              // 2 tiles before and after the center
             for (let dy = 0; dy <= 2; dy++) {          // 1 tile above and below
-                if (dx === 0 && dy === 0) continue; // already registered by super()
                 registry.registerAt(this, this.x + dx * 64, this.y + dy * 64);
                 config.scene.add.rectangle(this.x + dx * 64, this.y + dy * 64, 64, 64, 0x00ff00, 0.3).setDepth(9999);
             }

@@ -26,6 +26,7 @@ export class Conveyer extends RotatableMachine {
 
     constructor(config: RotatableConfig) {
         super(config, 100, 'CONVEYOR', false);
+        registry.register(this);
         this.setStackCount(3);
         this.setAngle(this.facing === 'up' ? -90 :
                       this.facing === 'down' ? 90 :

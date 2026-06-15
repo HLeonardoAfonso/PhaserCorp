@@ -5,8 +5,6 @@ import { GoldStone } from './ores/gold-stone';
 import { IronStone } from './ores/iron-stone';
 import { CoalStone } from './ores/coal-stone';
 import { CopperStone } from './ores/copper-stone';
-import { Conveyer } from './machines/conveyer';
-import { Drill } from './machines/drill';
 
 type EntityClass = new (config: InteractiblesConfig) => any;
 
@@ -63,9 +61,7 @@ const entities: [EntityClass, { x: number; y: number }][] = [
   [IronStone,     { x: 27, y: 27 }],
   [CopperStone,   { x: 31, y: 23 }],
   [CoalStone,     { x: 29, y: 25 }],
-  [Drill,     { x: 30, y: 25 }],
-  [Drill,     { x: 28, y: 27 }],
-  [Drill,     { x: 32, y: 23 }],
+  
 ];
 
 export function spawnInteractibles(

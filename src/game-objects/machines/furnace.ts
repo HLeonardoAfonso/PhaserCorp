@@ -27,6 +27,7 @@ export class Furnace extends Machine {
 
     constructor(config: InteractiblesConfig) {
         super(config, 100, 'FURNACE', true);
+        registry.register(this);
         this.setOrigin(Furnace.displayOrigin.x, Furnace.displayOrigin.y);
         this.setBodySize(64, 64);
         this.body?.setOffset(0, 32)
@@ -89,11 +90,7 @@ export class Furnace extends Machine {
                 amount: 1,
             };
             if (neighbor.acceptItem(stack)) {
-                this.#outputSlot.amount -= 1;
-                if (this.#outputSlot.amount <= 0) {
-                    this.#outputSlot.itemKey = null;
-                    this.#outputSlot.amount = 0;
-                }
+                this.consumeItem(this.#outputSlot);
                 return;
             }
         }

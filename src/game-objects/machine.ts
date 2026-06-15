@@ -10,7 +10,6 @@ export abstract class Machine extends Interactibles {
     constructor(config: InteractiblesConfig, health: number, assetKey: string, interfacable: boolean) {
         super(config, health, assetKey);
         this.#Interfacable = interfacable;
-        registry.register(this);
     }
 
     get interfacable(): boolean {

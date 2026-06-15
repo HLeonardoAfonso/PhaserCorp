@@ -1,4 +1,5 @@
 import { Interactibles, type InteractiblesConfig } from "./interactibles";
+import { oreRegistry } from "../systems/ore-registry";
 
 export abstract class Ore extends Interactibles {
     abstract get resourceKey(): string;
@@ -6,6 +7,7 @@ export abstract class Ore extends Interactibles {
     constructor(config: InteractiblesConfig, health: number, assetKey: string) {
         super(config, health, assetKey);
         this.setDepth(config.position.y);
+        oreRegistry.register(this);
     }
 
     playIdleAnimation(): void {
@@ -16,6 +18,7 @@ export abstract class Ore extends Interactibles {
             Interactibles.clearSelected();
             Interactibles.clearHovered();
             Interactibles.onEntityDied?.(this.resourceKey);
+            oreRegistry.unregister(this);
             this.removeInteractive();
             this.destroy();
         }
