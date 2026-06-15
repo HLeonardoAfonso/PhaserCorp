@@ -34,6 +34,7 @@ export class GameScene extends Phaser.Scene {
   #shopInterface!: ShopInterface;
   #selectionCorners!: { tl: Phaser.GameObjects.Image, tr: Phaser.GameObjects.Image, bl: Phaser.GameObjects.Image, br: Phaser.GameObjects.Image };
   #ribbon!: RibbonType;
+  #shop!: Shop;
   #wasPointerDown = false;
   #placement!: PlacementSystem;
   #machines: Machine[] = [];
@@ -134,8 +135,9 @@ export class GameScene extends Phaser.Scene {
     spawnInteractibles(this, this.#interactibles, this.physics.world.drawDebug);
 
     // instanciate shop
-    const shop = new Shop({ scene: this, position: { x: (24*64), y: (24*64) } });
-    this.#interactibles.add(shop);
+    this.#shop = new Shop({ scene: this, position: { x: (23*64)+32, y: (23*64)+32 } });
+    this.#machines.push(this.#shop);
+    this.#interactibles.add(this.#shop);
 
     // Build a separate group excluding conveyors for collision
     this.#interactiblesMinusConveyors = this.physics.add.staticGroup();
@@ -204,7 +206,7 @@ export class GameScene extends Phaser.Scene {
       if (justClicked && !this.#placement.isActive) {
         const hovered = Interactibles.currentHovered;
         if (hovered && !hovered.isDead && this.#player.nearInteractibles.has(hovered)) {
-          if (hovered instanceof Machine && hovered.interfacable) {
+          if (hovered instanceof Machine && hovered.interfacable && !(hovered instanceof Shop)) {
             // Bind the interface to the selected furnace so its stacks
             // are owned by the machine instance itself.
             this.#machineInterface.bind(hovered);
@@ -264,14 +266,12 @@ export class GameScene extends Phaser.Scene {
                 const count = this.#inventory.countAllOf(itemKey);
                 if (count > 0) {
                   this.#inventory.removeItems(itemKey, count);
-                  this.sound.play('COIN_SOUND');
-                  this.#ribbon.points += price * count;
+                  this.#shop.addPoints(price * count);
                 }
               } else {
                 if (this.#inventory.hasEnoughOf(itemKey, 1)) {
                   this.#inventory.removeItems(itemKey, 1);
-                  this.sound.play('COIN_SOUND');
-                  this.#ribbon.points += price;
+                  this.#shop.addPoints(price);
                 }
               }
             };
@@ -320,6 +320,7 @@ export class GameScene extends Phaser.Scene {
       }
     }
 
+    this.#ribbon.display(this.#shop.points);
     this.#player.update();
 
     // Each frame, mirror the bound machine's stacks onto the interface visuals.

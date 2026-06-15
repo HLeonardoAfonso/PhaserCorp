@@ -13,8 +13,15 @@ export class MachineRegistry {
     this.map.set(this.key(machine.x, machine.y), machine);
   }
 
+  registerAt(machine: Machine, x: number, y: number): void {
+    this.map.set(this.key(x, y), machine);
+  }
+
   unregister(machine: Machine): void {
-    this.map.delete(this.key(machine.x, machine.y));
+    // Remove all keys pointing to this machine
+    for (const [key, m] of this.map) {
+      if (m === machine) this.map.delete(key);
+    }
   }
 
   get(x: number, y: number): Machine | undefined {

@@ -6,7 +6,6 @@ export class Ribbon {
     readonly x: number;
     readonly y: number;
     #pointsText: Phaser.GameObjects.Text | null = null;
-    #points = -1000000;
 
     #formatPoints(value: number): string {
         const negative = value < 0;
@@ -28,7 +27,7 @@ export class Ribbon {
             .setScrollFactor(0)
             .setDepth(DEPTH.RIBBON_BG);
 
-        this.#pointsText = scene.add.text(this.x +50, this.y-8, this.#formatPoints(this.#points), {
+        this.#pointsText = scene.add.text(this.x +50, this.y-8, this.#formatPoints(-1000000), {
             fontSize: '28px',
             color: '#ffffff',
             stroke: '#000000',
@@ -39,10 +38,7 @@ export class Ribbon {
             .setDepth(DEPTH.RIBBON_TEXT);
     }
 
-    get points(): number { return this.#points; }
-
-    set points(value: number) {
-        this.#points = value;
-        this.#pointsText?.setText(this.#formatPoints(value));
+    display(points: number): void {
+        this.#pointsText?.setText(this.#formatPoints(points));
     }
 }
