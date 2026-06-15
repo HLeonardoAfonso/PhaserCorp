@@ -9,6 +9,7 @@ import { createAnimations } from '../construction/animations';
 import { createWorld, createRockLayer, createWaterEffects, createRockColliders } from '../construction/world-render';
 import { WORLD } from '../construction/world';
 import { Furnace } from '../game-objects/machines/furnace';
+import { Conveyer } from '../game-objects/machines/conveyer';
 import { spawnInteractibles } from '../game-objects/spawn';
 import { Shop } from '../game-objects/shop';
 import { Crafting } from '../components/game-object/crafting-component';
@@ -179,6 +180,9 @@ export class GameScene extends Phaser.Scene {
     if (!this.#inventory.isOpen) {
       if (this.#controls.isPKeyJustDown){
         this.#placement.toggle(Furnace, 'FURNACE');
+      }
+      if (this.#controls.isOKeyJustDown){
+        this.#placement.toggle(Conveyer, 'CONVEYOR');
       }
       if (this.#controls.isRKeyJustDown){
         this.#placement.rotate();

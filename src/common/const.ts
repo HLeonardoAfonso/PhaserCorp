@@ -10,10 +10,10 @@ export const OPPOSITE: Record<Direction, Direction> = {
 };
 
 export const DIR_OFFSET: Record<Direction, Position> = {
-  up:    { x:  0, y: -1 },
-  down:  { x:  0, y:  1 },
-  left:  { x: -1, y:  0 },
-  right: { x:  1, y:  0 },
+  up:    { x:  0, y: -64 },
+  down:  { x:  0, y:  64 },
+  left:  { x: -64, y:  0 },
+  right: { x:  64, y:  0 },
 };
 
 export function turnLeft(d: Direction): Direction {

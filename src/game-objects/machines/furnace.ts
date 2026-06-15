@@ -2,6 +2,8 @@ import { Machine } from "../machine";
 import type { InteractiblesConfig } from "../interactibles";
 import type { Recipe, Direction, StackData } from "../../common/types";
 import { FUEL_ITEMS, SMELT_MAP } from "./processes";
+import { OPPOSITE, DIRECTIONS } from "../../common/const";
+import { registry } from "../../systems/machine-registry";
 
 export class Furnace extends Machine {
     
@@ -68,6 +70,32 @@ export class Furnace extends Machine {
             this.consumeItem(this.#fuelSlot);
             this.consumeItem(this.#oreSlot);
             this.continueProcess(delta);
+        }
+        this.#pushOutputToNeighbor();
+    }
+
+    #pushOutputToNeighbor(): void {
+        if (this.#outputSlot.itemKey === null) return;
+
+        for (const dir of DIRECTIONS) {
+            
+            const neighbor = registry.getNeighbor(this, dir);
+            
+            if (!neighbor) continue;
+            if (!neighbor.canReceiveFrom(OPPOSITE[dir])) continue;
+
+            const stack: StackData = {
+                itemKey: this.#outputSlot.itemKey,
+                amount: 1,
+            };
+            if (neighbor.acceptItem(stack)) {
+                this.#outputSlot.amount -= 1;
+                if (this.#outputSlot.amount <= 0) {
+                    this.#outputSlot.itemKey = null;
+                    this.#outputSlot.amount = 0;
+                }
+                return;
+            }
         }
     }
 

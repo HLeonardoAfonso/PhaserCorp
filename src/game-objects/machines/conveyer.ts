@@ -63,10 +63,9 @@ export class Conveyer extends RotatableMachine {
     #pushToNeighbor(dir: Direction): void {
 
         const neighbor = registry.getNeighbor(this, dir);
-        if (!neighbor) return;
 
-        const neighborDir = OPPOSITE[dir];
-        if (!neighbor.canReceiveFrom(neighborDir)) return;
+        if (!neighbor) return;
+        if (!neighbor.canReceiveFrom(OPPOSITE[dir])) return;
 
         const stack: StackData = { 
             itemKey: this.stacks[Conveyer.OUTPUT].itemKey, 
@@ -77,9 +76,11 @@ export class Conveyer extends RotatableMachine {
 
     #moveStack(from: number, to: number): void {
 
-        this.stacks[to].itemKey = this.stacks[from].itemKey;
-        this.stacks[to].amount  = this.stacks[from].amount;
-        this.clearStack(this.stacks[from]);
+        if (this.isSlotEmpty(to)){
+            this.stacks[to].itemKey = this.stacks[from].itemKey;
+            this.stacks[to].amount  = this.stacks[from].amount;
+            this.clearStack(this.stacks[from]);
+        }
     }
 
     clearStack(stack: StackData): void {
@@ -89,21 +90,19 @@ export class Conveyer extends RotatableMachine {
 
     acceptItem(stack: StackData): boolean {
         if (stack.amount !== 1) return false;
+        if (!this.isSlotEmpty(Conveyer.INPUT)) return false;
 
-        const inputSlot = this.stacks[Conveyer.INPUT];
-        if (!inputSlot) return false;
-        if (inputSlot.itemKey !== null) return false;
-
-        inputSlot.itemKey = stack.itemKey;
-        inputSlot.amount = 1;
+        this.stacks[Conveyer.INPUT].itemKey = stack.itemKey;
+        this.stacks[Conveyer.INPUT].amount = 1;
         return true;
     }
 
     canReceiveFrom(dir: Direction): boolean {
-        if (dir === this.facing) return false;
+        return dir !== this.facing && this.isSlotEmpty(Conveyer.INPUT);
+    }
 
-        const inputSlot = this.stacks[Conveyer.INPUT];
-        return !inputSlot || inputSlot.itemKey === null;
+    private isSlotEmpty(slotIndex: number): boolean {
+        return this.stacks[slotIndex].itemKey === null;
     }
 
     static get placementRect(): Phaser.Geom.Rectangle {
