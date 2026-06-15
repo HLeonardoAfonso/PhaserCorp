@@ -12,6 +12,7 @@ export class KeyboardComponent extends InputComponent {
     #rKey: Phaser.Input.Keyboard.Key;
     #oKey: Phaser.Input.Keyboard.Key;
     #iKey: Phaser.Input.Keyboard.Key;
+    #lKey: Phaser.Input.Keyboard.Key;
 
     constructor(keyboardPlugin: Phaser.Input.Keyboard.KeyboardPlugin) {
         super();
@@ -27,6 +28,7 @@ export class KeyboardComponent extends InputComponent {
         this.#rKey = keyboardPlugin.addKey(Phaser.Input.Keyboard.KeyCodes.R);
         this.#oKey = keyboardPlugin.addKey(Phaser.Input.Keyboard.KeyCodes.O);
         this.#iKey = keyboardPlugin.addKey(Phaser.Input.Keyboard.KeyCodes.I);
+        this.#lKey = keyboardPlugin.addKey(Phaser.Input.Keyboard.KeyCodes.L);
     }
 
     get isUpDown(): boolean { return this.#cursorKeys.up.isDown || this.#wKey.isDown; }
@@ -44,5 +46,6 @@ export class KeyboardComponent extends InputComponent {
     get isRKeyJustDown(): boolean { return Phaser.Input.Keyboard.JustDown(this.#rKey); }
     get isOKeyJustDown(): boolean { return Phaser.Input.Keyboard.JustDown(this.#oKey); }
     get isIKeyJustDown(): boolean { return Phaser.Input.Keyboard.JustDown(this.#iKey); }
+    get isLKeyJustDown(): boolean { return Phaser.Input.Keyboard.JustDown(this.#lKey); }
 
 }

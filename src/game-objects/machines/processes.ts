@@ -3,10 +3,10 @@ export const SMELT_MAP = new Map<string, string>([
     ['IRON_ITEM', 'IRON_PLATE'],
 ]);
 
-export const CRAFTING_RECIPES: [string, string][] = [
+export const CRAFTING_RECIPES = new Map<string, string>([
     ['COPPER_PLATE', 'COPPER_WIRE'],
     ['IRON_PLATE', 'IRON_GEAR'],
-];
+]);
 
 export const FUEL_ITEMS: string[] = [
     'COAL_ITEM', 'WOOD_ITEM'
