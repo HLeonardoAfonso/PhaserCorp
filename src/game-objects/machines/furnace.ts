@@ -136,14 +136,6 @@ export class Furnace extends Machine {
             && this.#outputSlot.itemKey === SMELT_MAP.get(this.#oreSlot.itemKey);
     }
 
-    private consumeItem(slot: StackData): void {
-        slot.amount -= 1;
-        if (slot.amount <= 0) {
-            slot.itemKey = null;
-            slot.amount = 0;
-        }
-    }
-
     private routingStack(stack: StackData): StackData {
         if (!stack.itemKey) return stack;
 

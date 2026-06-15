@@ -122,4 +122,12 @@ export abstract class Machine extends Interactibles {
         registry.unregister(this);
         super.destroy();
     }
+
+    consumeItem(slot: StackData): void {
+        slot.amount -= 1;
+        if (slot.amount <= 0) {
+            slot.itemKey = null;
+            slot.amount = 0;
+        }
+    }
 }

@@ -6,6 +6,7 @@ import { Inventory } from './inventory-component';
 import { DEPTH } from '../../common/depth';
 import { Furnace } from '../../game-objects/machines/furnace';
 import { Conveyer } from '../../game-objects/machines/conveyer';
+import { Drill } from '../../game-objects/machines/drill';
 
 type CraftingSlot = {
   x: number;
@@ -20,7 +21,7 @@ type CraftableEntry = {
   craftDisplayKey: string;
 };
 
-const CRAFTABLE_MACHINES = [Furnace, Conveyer] as const;
+const CRAFTABLE_MACHINES = [Furnace, Conveyer, Drill] as const;
 
 const CRAFTABLE_ITEMS: CraftableEntry[] = [
   {
