@@ -5,8 +5,11 @@ import { FUEL_ITEMS } from "./processes";
 import { DIRECTIONS, OPPOSITE } from "../../common/const";
 import { registry } from "../../systems/machine-registry";
 import { oreRegistry } from "../../systems/ore-registry";
+import { Ore } from "../ore";
 
 export class Drill extends RotatableMachine {
+
+    static readonly rotationSteps = 2;
 
     static readonly craftRecipe: Recipe = [
         { itemKey: 'WOOD_ITEM', amount: 2, },
@@ -21,35 +24,45 @@ export class Drill extends RotatableMachine {
 
     get resourceKey(): string { return 'DRILL'; }
 
+    #scene!: Phaser.Scene;
     #miningProcess = 0;
     #currOutput: string | undefined;
 
     #fuelSlot: StackData = { itemKey: null, amount: 0 };
     #outputSlot: StackData = { itemKey: null, amount: 0 };
-    #footprintTiles = [this.x, this.x + 64];
+    #footprintTiles: number[];
+    #oreTile: number;
 
     constructor(config: RotatableConfig) {
         super(config, 100, 'DRILL', true);
         this.setOrigin(Drill.displayOrigin.x, Drill.displayOrigin.y);
-        this.setAngle(this.facing === 'up' ? -90 :
-                      this.facing === 'down' ? 90 :
-                      this.facing === 'left' ? 180 : 0);
+        this.setFlipX(this.facing === 'down');
         this.setBodySize(2*64, 64);
         this.body?.setOffset(64, 32)
         this.setDepth(config.position.y);
 
+        this.#scene = config.scene;
         this.stacks.push(this.#fuelSlot);
         this.stacks.push(this.#outputSlot);
 
+        if (this.facing === 'down') {
+            this.#footprintTiles = [this.x, this.x - 64];
+            this.#oreTile = this.x + 64;
+        } else {
+            this.#footprintTiles = [this.x, this.x + 64];
+            this.#oreTile = this.x - 64;
+        }
+
         this.removeInteractive();
-        const selection = new Phaser.Geom.Rectangle(64, 64, 2*64, 64);
+        const x = this.facing === 'down' ? 0 : 64;
+        const selection = new Phaser.Geom.Rectangle(x, 64, 2*64, 64);
         this.hitRect = selection;
         this.setInteractive(selection, Phaser.Geom.Rectangle.Contains);
 
         // Register both tiles of the 2×1 footprint in MachineRegistry
         for (const tileX of this.#footprintTiles) {
             registry.registerAt(this, tileX, this.y);
-            config.scene.add.rectangle(tileX, this.y, 64, 64, 0x00ff00, 0.3).setDepth(9999);
+            this.#scene.add.rectangle(tileX, this.y, 64, 64, 0x00ff00, 0.3).setDepth(9999);
         }
 
         // Check for neighboring ore and set output
@@ -90,18 +103,15 @@ export class Drill extends RotatableMachine {
     }
 
     private checkOre(): boolean {
-        const tileX = Math.floor(this.x / 64) - 1;
-        const tileY = Math.floor(this.y / 64);
-        const ore = oreRegistry.getAt(tileX, tileY);
-        const found = ore && !ore.isDead;
-        return !!found;
+        return !!this.getOreFromRegistry();;
     }
 
     #getKey(): string | undefined {
-        const tileX = Math.floor(this.x / 64) - 1;
-        const tileY = Math.floor(this.y / 64);
-        const ore = oreRegistry.getAt(tileX, tileY);
-        return ore && !ore.isDead ? ore.resourceKey : undefined;
+        return this.getOreFromRegistry().resourceKey;
+    }
+
+    private getOreFromRegistry(): Ore {
+        return oreRegistry.getAt(Math.floor(this.#oreTile / 64), Math.floor(this.y / 64))!;
     }
 
     #pushOutputToNeighbor(): void {

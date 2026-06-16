@@ -29,6 +29,8 @@ const entities: [EntityClass, { x: number; y: number }][] = [
   [CopperStone,   { x: 32+3, y: 12 }],
   [CopperStone,   { x: 32+1, y: 12 }],
   [CopperStone,   { x: 32+2, y: 11 }],
+  [CoalStone,     { x: 32+8, y: 5 }],
+  [CoalStone,     { x: 32+11, y: 7 }],
 
   // 10
 
@@ -58,9 +60,9 @@ const entities: [EntityClass, { x: number; y: number }][] = [
   [Tree,          { x: 12, y: 32+3 }],
   [Tree,          { x: 4, y: 32+3 }],
 
-  [IronStone,     { x: 27, y: 27 }],
+  [IronStone,     { x: 29, y: 27 }],
   [CopperStone,   { x: 31, y: 23 }],
-  [CoalStone,     { x: 29, y: 25 }],
+  [CoalStone,     { x: 31, y: 25 }],
   
 ];
 

@@ -46,15 +46,21 @@ export class PlacementSystem {
 
     rotate(): void {
         if (!this.#active || !this.#hasRotation) return;
-        this.#currentRotation = (this.#currentRotation + 1) % DIRECTIONS.length;
+        const steps = (this.#factory as unknown as { rotationSteps?: number }).rotationSteps ?? 4;
+        this.#currentRotation = (this.#currentRotation + 1) % steps;
         this.#updateGhostRotation();
     }
 
     #updateGhostRotation(): void {
         if (!this.#ghost) return;
-        this.#ghost.setAngle(DIRECTIONS[this.#currentRotation] === 'up' ? -90 :
-                             DIRECTIONS[this.#currentRotation] === 'down' ? 90 :
-                             DIRECTIONS[this.#currentRotation] === 'left' ? 180 : 0);
+        const steps = (this.#factory as unknown as { rotationSteps?: number }).rotationSteps ?? 4;
+        if (steps === 2) {
+            this.#ghost.setFlipX(this.#currentRotation === 1);
+        } else {
+            this.#ghost.setAngle(DIRECTIONS[this.#currentRotation] === 'up' ? -90 :
+                                 DIRECTIONS[this.#currentRotation] === 'down' ? 90 :
+                                 DIRECTIONS[this.#currentRotation] === 'left' ? 180 : 0);
+        }
     }
 
     update(justClicked: boolean): void{
