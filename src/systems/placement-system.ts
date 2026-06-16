@@ -9,6 +9,7 @@ type PlaceableConstructor = new(config: InteractiblesConfig) => Interactibles;
 export class PlacementSystem {
     #scene: Phaser.Scene;
     #group: Phaser.Physics.Arcade.StaticGroup;
+    #player: Phaser.Physics.Arcade.Sprite;
     #ghost: Phaser.GameObjects.Sprite | null = null;
     #active = false;
     #factory!: PlaceableConstructor;
@@ -17,9 +18,10 @@ export class PlacementSystem {
     #hasRotation = false;
     onPlacement?: (obj: Interactibles) => void;
 
-    constructor(scene: Phaser.Scene, group: Phaser.Physics.Arcade.StaticGroup){
+    constructor(scene: Phaser.Scene, group: Phaser.Physics.Arcade.StaticGroup, player: Phaser.Physics.Arcade.Sprite){
         this.#scene = scene;
         this.#group = group;
+        this.#player = player;
     }
 
     get isActive() { return this.#active; }
@@ -80,6 +82,11 @@ export class PlacementSystem {
             const sprite = obj as Phaser.GameObjects.Sprite;
             if (tileKey(sprite.x, sprite.y) === key) canPlace = false;
         });
+        
+        const playerBody = this.#player.body as Phaser.Physics.Arcade.Body;
+        const playerRect = new Phaser.Geom.Rectangle(playerBody.x, playerBody.y, playerBody.width, playerBody.height);
+        const tileRect = new Phaser.Geom.Rectangle(snappedX - TILE / 2, snappedY - TILE / 2, TILE, TILE);
+        if (Phaser.Geom.Rectangle.Overlaps(tileRect, playerRect)) canPlace = false;
 
         this.#ghost.setTint(canPlace ? 0x00ff00 : 0xff0000);
 
