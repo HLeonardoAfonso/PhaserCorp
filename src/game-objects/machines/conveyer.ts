@@ -23,6 +23,9 @@ export class Conveyer extends RotatableMachine {
     get resourceKey(): string { return 'MACHINE_CONVEYOR'; }
 
     #tickAccumulator = 0;
+    #inputItem: Phaser.GameObjects.Image;
+    #innerItem: Phaser.GameObjects.Image;
+    #outputItem: Phaser.GameObjects.Image;
 
     constructor(config: RotatableConfig) {
         super(config, 100, 'CONVEYOR', false);
@@ -39,6 +42,19 @@ export class Conveyer extends RotatableMachine {
         const rect = new Phaser.Geom.Rectangle(0, 0, 64, 64);
         this.hitRect = rect;
         this.setInteractive(rect, Phaser.Geom.Rectangle.Contains);
+
+        // Create item display images (50% scale: 64→32)
+        this.#inputItem = this.#createItemDisplay(-16);
+        this.#innerItem = this.#createItemDisplay(0);
+        this.#outputItem = this.#createItemDisplay(16);
+    }
+
+    #createItemDisplay(xOffset: number): Phaser.GameObjects.Image {
+        return this.scene.add.image(this.x + xOffset, this.y, '__DEFAULT')
+            .setOrigin(0.5, 0.5)
+            .setScale(0.5)
+            .setDepth(this.depth + 1)
+            .setVisible(false);
     }
 
     update(delta: number): void {
@@ -58,6 +74,20 @@ export class Conveyer extends RotatableMachine {
 
             // 3: push INPUT → INNER
             this.#moveStack(Conveyer.INPUT, Conveyer.INNER);
+        }
+
+        // Sync display images to reflect current stack state
+        this.#syncDisplay(Conveyer.INPUT, this.#inputItem);
+        this.#syncDisplay(Conveyer.INNER, this.#innerItem);
+        this.#syncDisplay(Conveyer.OUTPUT, this.#outputItem);
+    }
+
+    #syncDisplay(slotIndex: number, image: Phaser.GameObjects.Image): void {
+        const stack = this.stacks[slotIndex];
+        if (stack?.itemKey) {
+            image.setTexture(stack.itemKey).setVisible(true);
+        } else {
+            image.setVisible(false);
         }
     }
 
@@ -104,6 +134,13 @@ export class Conveyer extends RotatableMachine {
 
     private isSlotEmpty(slotIndex: number): boolean {
         return this.stacks[slotIndex].itemKey === null;
+    }
+
+    destroy(): void {
+        this.#inputItem?.destroy();
+        this.#innerItem?.destroy();
+        this.#outputItem?.destroy();
+        super.destroy();
     }
 
     static get placementRect(): Phaser.Geom.Rectangle {

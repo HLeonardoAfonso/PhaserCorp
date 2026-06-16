@@ -20,7 +20,7 @@ export class Drill extends RotatableMachine {
     static readonly craftDisplayKey = 'DRILL';
     static readonly displayOrigin = { x: 0.5, y: 0.75 };
 
-    static readonly MINE_TIME = 500;
+    static readonly MINE_TIME = 1000;
 
     get resourceKey(): string { return 'DRILL'; }
 
@@ -94,9 +94,9 @@ export class Drill extends RotatableMachine {
 
             if (this.isOutputEmpty()) {
                 this.#outputSlot.itemKey = this.#currOutput!;
-                this.#outputSlot.amount = 2;
+                this.#outputSlot.amount = 4;
             } else {
-                this.#outputSlot.amount += 2;
+                this.#outputSlot.amount += 4;
             }
             this.#miningProcess = 0;
         }

@@ -37,6 +37,25 @@ const entities: [EntityClass, { x: number; y: number }][] = [
   [Tree,          { x: 10, y: 16+2 }],
   [Tree,          { x: 4, y: 16+10 }],
   [Tree,          { x: 13, y: 16+3 }],
+  [Tree,          { x: 10, y: 16+15 }],
+  [Tree,          { x: 11, y: 16+7 }],
+  [Tree,          { x: 12, y: 16+8 }],
+  [Tree,          { x: 13, y: 16+7 }],
+  [Tree,          { x: 11, y: 16+8 }],
+
+  [CoalStone,     { x: 5, y: 16+6 }],
+  [CoalStone,     { x: 5, y: 16+7 }],
+  [CoalStone,     { x: 5, y: 16+8 }],
+  [CoalStone,     { x: 3, y: 16+9 }],
+  [CoalStone,     { x: 6, y: 16+4 }],
+
+  [IronStone,     { x: 13, y: 16+12 }],
+  [IronStone,     { x: 10, y: 16+5 }],
+  [IronStone,     { x: 10, y: 16+14 }],
+  [IronStone,     { x: 12, y: 16+7 }],
+
+  [CopperStone,   { x: 15, y: 16+3 }],
+  [CopperStone,   { x: 11, y: 16+2 }],
 
   // 11
 
@@ -59,10 +78,19 @@ const entities: [EntityClass, { x: number; y: number }][] = [
   [Tree,          { x: 10, y: 32+2 }],
   [Tree,          { x: 12, y: 32+3 }],
   [Tree,          { x: 4, y: 32+3 }],
+  [Tree,          { x: 13, y: 32+6 }],
+  [Tree,          { x: 7, y: 32+7 }],
+  [Tree,          { x: 10, y: 32+10 }],
 
-  [IronStone,     { x: 29, y: 27 }],
-  [CopperStone,   { x: 31, y: 23 }],
-  [CoalStone,     { x: 31, y: 25 }],
+  [IronStone,     { x: 5, y: 32+8 }],
+  [IronStone,     { x: 6, y: 32+9 }],
+  [IronStone,     { x: 5, y: 32+7 }],
+  [IronStone,     { x: 10, y: 32+7 }],
+  [IronStone,     { x: 10, y: 32+6 }],
+
+  // 21
+
+  // 22
   
 ];
 

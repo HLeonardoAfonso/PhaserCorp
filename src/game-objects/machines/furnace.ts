@@ -14,7 +14,7 @@ export class Furnace extends Machine {
     static readonly craftDisplayKey = 'FURNACE';
     static readonly displayOrigin = { x: 0.5, y: 0.75 };
 
-    static readonly SMELT_TIME = 500;
+    static readonly SMELT_TIME = 1000;
 
     get resourceKey(): string { return 'MACHINE_FURNACE'; }
 
