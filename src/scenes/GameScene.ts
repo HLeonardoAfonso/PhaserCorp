@@ -340,6 +340,7 @@ export class GameScene extends Phaser.Scene {
         if (this.#inventory.isOpen) {
           this.#inventory.toggle();
         }
+        Interactibles.clearSelected();
       } else {
         this.#inventory.toggle();
         this.#crafting.toggle();
