@@ -8,10 +8,7 @@ import { Inventory } from '../components/game-object/inventory-component';
 import { createAnimations } from '../construction/animations';
 import { createWorld, createRockLayer, createWaterEffects, createRockColliders } from '../construction/world-render';
 import { WORLD } from '../construction/world';
-import { Furnace } from '../game-objects/machines/furnace';
 import { Conveyer } from '../game-objects/machines/conveyer';
-import { Drill } from '../game-objects/machines/drill';
-import { Crafter } from '../game-objects/machines/crafter';
 import { spawnInteractibles } from '../game-objects/spawn';
 import { Shop } from '../game-objects/shop';
 import { Crafting } from '../components/game-object/crafting-component';
@@ -133,6 +130,12 @@ export class GameScene extends Phaser.Scene {
       }
     };
 
+    // Consume one of the placed item per placement and report how many remain,
+    this.#placement.onConsume = (itemKey) => {
+      this.#inventory.removeItems(itemKey, 1);
+      return this.#inventory.countAllOf(itemKey);
+    };
+
     // populate the world with entities
     spawnInteractibles(this, this.#interactibles, this.physics.world.drawDebug);
 
@@ -194,17 +197,8 @@ export class GameScene extends Phaser.Scene {
       this.#wasPointerDown = isDown;
 
     if (!this.#inventory.isOpen) {
-      if (this.#controls.isPKeyJustDown){
-        this.#placement.toggle(Furnace, 'FURNACE');
-      }
-      if (this.#controls.isOKeyJustDown){
-        this.#placement.toggle(Conveyer, 'CONVEYOR');
-      }
-      if (this.#controls.isIKeyJustDown){
-        this.#placement.toggle(Drill, 'DRILL');
-      }
-      if (this.#controls.isLKeyJustDown){
-        this.#placement.toggle(Crafter, 'CRAFTER');
+      if (this.#controls.isXKeyJustDown){
+        this.#placement.cancel();
       }
       if (this.#controls.isRKeyJustDown){
         this.#placement.rotate();
@@ -349,6 +343,18 @@ export class GameScene extends Phaser.Scene {
       } else {
         this.#inventory.toggle();
         this.#crafting.toggle();
+
+        if (this.#inventory.isOpen) {
+        this.#inventory.onSlotClick = (itemKey) => {
+            if (this.#placement.startByItem(itemKey)) {
+                if (this.#inventory.isOpen) this.#inventory.toggle();
+                if (this.#crafting.isOpen)  this.#crafting.toggle();
+                this.#inventory.onSlotClick = null;
+            }
+        };
+        } else {
+          this.#inventory.onSlotClick = null;
+        }
       }
     }
   }
