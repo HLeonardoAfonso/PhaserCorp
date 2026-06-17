@@ -48,6 +48,7 @@ export class PlacementSystem {
 
     onPlacement?: (obj: Interactibles) => void;
     onConsume?: (itemKey: string) => number;
+    isTileBlocked?: (tileX: number, tileY: number) => boolean;
 
     constructor(scene: Phaser.Scene, group: Phaser.Physics.Arcade.StaticGroup, player: Phaser.Physics.Arcade.Sprite) {
         this.#scene = scene;
@@ -141,17 +142,22 @@ export class PlacementSystem {
         };
     }
 
-    /** A tile is placeable when it's empty and doesn't overlap the player. */
+    /** Verificação do placement da máquina */
     #canPlaceAt(x: number, y: number): boolean {
         const tileX = Math.floor(x / TILE);
         const tileY = Math.floor(y / TILE);
+        
+        //Impedir colocar em terreno como agua ou montanha
+        if (this.isTileBlocked?.(tileX, tileY)) return false;
 
+        //Impedir colocar em recursos como arvores ou minerios
         const occupied = this.#group.getChildren().some(obj => {
             const sprite = obj as Phaser.GameObjects.Sprite;
             return Math.floor(sprite.x / TILE) === tileX && Math.floor(sprite.y / TILE) === tileY;
         });
         if (occupied) return false;
 
+        //Impedir de colocar dentro do player
         const body = this.#player.body as Phaser.Physics.Arcade.Body;
         const playerRect = new Phaser.Geom.Rectangle(body.x, body.y, body.width, body.height);
         const tileRect = new Phaser.Geom.Rectangle(x - TILE / 2, y - TILE / 2, TILE, TILE);

@@ -20,6 +20,7 @@ import { Ribbon } from '../components/game-object/ribbon-component';
 import { ShopInterface } from '../components/game-object/shop-interface-component';
 import { PRICES } from '../game-objects/machines/processes';
 import type { Ribbon as RibbonType } from '../components/game-object/ribbon-component';
+import { TILES, WATER_TILES } from '../construction/tile-config';
 
 export class GameScene extends Phaser.Scene {
 
@@ -128,6 +129,15 @@ export class GameScene extends Phaser.Scene {
           this.#interactiblesMinusConveyors.add(obj);
         }
       }
+    };
+    this.#placement.isTileBlocked = (tileX, tileY) => {
+      const ground = MAP_DATA[tileY]?.[tileX];
+      if (ground === undefined) return true;
+      if (ground === TILES.WATER) return true; //Tiles de agua    
+
+      const rock = rockData[tileY]?.[tileX];
+      if (rock !== undefined && rock !== -1) return true; //Terreno elevado
+      return false;
     };
 
     // Consume one of the placed item per placement and report how many remain,
