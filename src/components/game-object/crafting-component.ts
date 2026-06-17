@@ -7,6 +7,8 @@ import { DEPTH } from '../../common/depth';
 import { Furnace } from '../../game-objects/machines/furnace';
 import { Conveyer } from '../../game-objects/machines/conveyer';
 import { Drill } from '../../game-objects/machines/drill';
+import { Crate } from '../../game-objects/machines/crate';
+import { Crafter } from '../../game-objects/machines/crafter';
 
 type CraftingSlot = {
   x: number;
@@ -17,22 +19,19 @@ type CraftingSlot = {
 
 type CraftableEntry = {
   craftRecipe: Recipe;
-  craftItemKey: string;
-  craftDisplayKey: string;
+  craftKey: string;
 };
 
-const CRAFTABLE_MACHINES = [Furnace, Conveyer, Drill] as const;
+const CRAFTABLE_MACHINES = [Furnace, Conveyer, Drill, Crate, Crafter] as const;
 
 const CRAFTABLE_ITEMS: CraftableEntry[] = [
   {
     craftRecipe: [{ itemKey: 'IRON_PLATE', amount: 1 }],
-    craftItemKey: 'IRON_GEAR',
-    craftDisplayKey: 'IRON_GEAR',
+    craftKey: 'IRON_GEAR',
   },
   {
     craftRecipe: [{ itemKey: 'COPPER_PLATE', amount: 1 }],
-    craftItemKey: 'COPPER_WIRE',
-    craftDisplayKey: 'COPPER_WIRE',
+    craftKey: 'COPPER_WIRE',
   },
 ];
 
@@ -49,8 +48,7 @@ export class Crafting {
   readonly #entries: CraftableEntry[] = [
     ...CRAFTABLE_MACHINES.map(cls => ({
       craftRecipe: cls.craftRecipe,
-      craftItemKey: cls.craftItemKey,
-      craftDisplayKey: cls.craftDisplayKey,
+      craftKey: cls.craftKey,
     })),
     ...CRAFTABLE_ITEMS,
   ];
@@ -85,7 +83,7 @@ export class Crafting {
   #onCraftableClick(index: number): void {
     const entry = this.#entries[index];
     const recipe = entry.craftRecipe;
-    const itemKey = entry.craftItemKey;
+    const itemKey = entry.craftKey;
 
     // Check if player has enough of each ingredient
     for (const ingredient of recipe) {
@@ -109,7 +107,7 @@ export class Crafting {
     for (let i = 0; i < this.#entries.length && i < this.#slots.length; i++) {
       const entry = this.#entries[i];
       const slot = this.#slots[i];
-      const image = scene.add.image(slot.x, slot.y, entry.craftDisplayKey)
+      const image = scene.add.image(slot.x, slot.y, entry.craftKey)
         .setScrollFactor(0)
         .setDepth(DEPTH.SLOT_IMAGE)
         .setVisible(this.#table.visible)

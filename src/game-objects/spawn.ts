@@ -133,17 +133,11 @@ const entities: [EntityClass, { x: number; y: number }][] = [
 export function spawnInteractibles(
   scene: Phaser.Scene,
   interactibles: Phaser.Physics.Arcade.StaticGroup,
-  debug: boolean
+  _debug: boolean
 ): void {
   for (const [EntityClass, position] of entities) {
 
-    // create entities
     const correctPosition = { x: (position.x * 64) + 32, y: (position.y * 64) + 32 }
-    const entity = new EntityClass({ scene, position: correctPosition });
-    // add debug square
-    if (debug) scene.input.enableDebug(entity);
-    // add entities to intecatables group
-    interactibles.add(entity);
-
+    interactibles.add(new EntityClass({ scene, position: correctPosition }));
   }
 }

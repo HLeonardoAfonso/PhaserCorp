@@ -12,8 +12,7 @@ export class Crafter extends Machine {
         { itemKey: 'COPPER_WIRE', amount: 2, },
         { itemKey: 'WOOD_ITEM', amount: 2, }
     ];    
-    static readonly craftItemKey = 'CRAFTER';
-    static readonly craftDisplayKey = 'CRAFTER';
+    static readonly craftKey = 'CRAFTER';
     static readonly displayOrigin = { x: 0.5, y: 0.75 };
 
     static readonly CRAFT_TIME = 500;

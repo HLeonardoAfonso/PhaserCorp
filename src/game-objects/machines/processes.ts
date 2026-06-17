@@ -16,6 +16,14 @@ export const ORE_ITEMS: string[] = [
     'IRON_ITEM', 'COPPER_ITEM'
 ]
 
+export const MACHINE_TEXTURE_KEYS = new Set([
+  'FURNACE',
+  'CONVEYOR',
+  'DRILL',
+  'CRAFTER',
+  'CRATE',
+]);
+
 export const PRICES = new Map<string, number>([
     ['COAL_ITEM', 1],
     ['WOOD_ITEM', 1],

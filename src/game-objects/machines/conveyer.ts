@@ -11,8 +11,7 @@ export class Conveyer extends RotatableMachine {
         { itemKey: 'COPPER_WIRE', amount: 2, }, 
         { itemKey: 'IRON_GEAR', amount: 2 }, 
     ];
-    static readonly craftItemKey = 'MACHINE_CONVEYOR';
-    static readonly craftDisplayKey = 'CONVEYOR';
+    static readonly craftKey = 'CONVEYOR';
 
     static readonly INPUT  = 0;
     static readonly INNER  = 1;

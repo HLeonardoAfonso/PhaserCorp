@@ -33,6 +33,7 @@ export abstract class Interactibles extends Phaser.Physics.Arcade.Sprite {
 
         scene.add.existing(this);
         scene.physics.add.existing(this, true); //Para ter collider
+        this.setDebugVisible(false); 
         this.#health = health;
         this.setInteractive();
         this.on('pointerover', () => {
@@ -54,6 +55,12 @@ export abstract class Interactibles extends Phaser.Physics.Arcade.Sprite {
     takeDamage(amount: number): void {
         this.#health -= amount;
     }
-
+        
+    setDebugVisible(visible: boolean): void {
+        if (this.body) {
+            this.body.debugShowBody = visible;
+        }
+    }
+    
     abstract playIdleAnimation(): void;
 }

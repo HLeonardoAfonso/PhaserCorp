@@ -16,8 +16,7 @@ export class Drill extends RotatableMachine {
         { itemKey: 'COPPER_WIRE', amount: 2, }, 
         { itemKey: 'IRON_GEAR', amount: 2 }, 
     ];
-    static readonly craftItemKey = 'DRILL';
-    static readonly craftDisplayKey = 'DRILL';
+    static readonly craftKey = 'DRILL';
     static readonly displayOrigin = { x: 0.5, y: 0.75 };
 
     static readonly MINE_TIME = 1000;
@@ -38,7 +37,6 @@ export class Drill extends RotatableMachine {
         this.setOrigin(Drill.displayOrigin.x, Drill.displayOrigin.y);
         this.setFlipX(this.facing === 'down');
         this.setBodySize(2*64, 64);
-        this.body?.setOffset(64, 32)
         this.setDepth(config.position.y);
 
         this.#scene = config.scene;
@@ -48,9 +46,11 @@ export class Drill extends RotatableMachine {
         if (this.facing === 'down') {
             this.#footprintTiles = [this.x, this.x - 64];
             this.#oreTile = this.x + 64;
+            this.body?.setOffset(0, 32)
         } else {
             this.#footprintTiles = [this.x, this.x + 64];
             this.#oreTile = this.x - 64;
+            this.body?.setOffset(64, 32)
         }
 
         this.removeInteractive();

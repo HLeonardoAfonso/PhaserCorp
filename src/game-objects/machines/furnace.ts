@@ -10,8 +10,7 @@ export class Furnace extends Machine {
     static readonly craftRecipe: Recipe = [
         { itemKey: 'IRON_ITEM', amount: 2, }, 
     ];    
-    static readonly craftItemKey = 'MACHINE_FURNACE';
-    static readonly craftDisplayKey = 'FURNACE';
+    static readonly craftKey = 'FURNACE';
     static readonly displayOrigin = { x: 0.5, y: 0.75 };
 
     static readonly SMELT_TIME = 1000;

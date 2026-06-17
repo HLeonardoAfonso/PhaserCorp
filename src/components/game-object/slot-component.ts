@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { DEPTH } from '../../common/depth';
+import { MACHINE_TEXTURE_KEYS } from '../../game-objects/machines/processes';
 
 export class Slot {
 
@@ -55,7 +56,8 @@ export class Slot {
         this.#image = this.#scene.add.image(this.x, this.y, itemKey)
             .setScrollFactor(0)
             .setDepth(DEPTH.SLOT_IMAGE)
-            .setVisible(this.#parentVisible);
+            .setVisible(this.#parentVisible)
+            .setScale(MACHINE_TEXTURE_KEYS.has(itemKey) ? 0.5 : 1);
 
         this.#amountText = this.#scene.add.text(this.x + 34, this.y + 36, '1', {
             fontSize: '16px',

@@ -12,6 +12,7 @@ import { Furnace } from '../game-objects/machines/furnace';
 import { Conveyer } from '../game-objects/machines/conveyer';
 import { Drill } from '../game-objects/machines/drill';
 import { Crafter } from '../game-objects/machines/crafter';
+import { Crate } from '../game-objects/machines/crate';
 import { spawnInteractibles } from '../game-objects/spawn';
 import { Shop } from '../game-objects/shop';
 import { Crafting } from '../components/game-object/crafting-component';
@@ -129,6 +130,7 @@ export class GameScene extends Phaser.Scene {
         this.#machines.push(obj);
         if (!(obj instanceof Conveyer)) {
           this.#interactiblesMinusConveyors.add(obj);
+          obj.setDebugVisible(true);
         }
       }
     };
@@ -153,6 +155,13 @@ export class GameScene extends Phaser.Scene {
     this.physics.add.collider(this.#player, this.#interactiblesMinusConveyors);
     this.physics.add.collider(this.#player, rockColliders);
     this.physics.add.collider(this.#player, waterColliders);
+
+    // enable debug visualization only for objects that have colliders
+    this.#interactiblesMinusConveyors.getChildren().forEach(obj => {
+        if (obj instanceof Interactibles) {
+            obj.setDebugVisible(true);
+        }
+    });
     
     this.input.on('gameobjectdown', (_pointer: Phaser.Input.Pointer, obj: Phaser.GameObjects.GameObject) => {
       if (obj instanceof Interactibles && this.#player.nearInteractibles.has(obj)) {
@@ -205,6 +214,9 @@ export class GameScene extends Phaser.Scene {
       }
       if (this.#controls.isLKeyJustDown){
         this.#placement.toggle(Crafter, 'CRAFTER');
+      }
+      if (this.#controls.isKKeyJustDown){
+        this.#placement.toggle(Crate, 'CRATE');
       }
       if (this.#controls.isRKeyJustDown){
         this.#placement.rotate();
