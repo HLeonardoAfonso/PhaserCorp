@@ -43,14 +43,25 @@ export class Conveyer extends RotatableMachine {
         this.hitRect = rect;
         this.setInteractive(rect, Phaser.Geom.Rectangle.Contains);
 
-        // Create item display images (50% scale: 64→32)
-        this.#inputItem = this.#createItemDisplay(-16);
-        this.#innerItem = this.#createItemDisplay(0);
-        this.#outputItem = this.#createItemDisplay(16);
+        // Create item display images positioned based on facing direction (50% scale: 64→32)
+        const [inputOff, outputOff] = this.#slotOffsets();
+        this.#inputItem = this.#createItemDisplay(inputOff[0], inputOff[1]);
+        this.#innerItem = this.#createItemDisplay(0, 0);
+        this.#outputItem = this.#createItemDisplay(outputOff[0], outputOff[1]);
     }
 
-    #createItemDisplay(xOffset: number): Phaser.GameObjects.Image {
-        return this.scene.add.image(this.x + xOffset, this.y, '__DEFAULT')
+    #slotOffsets(): [[number, number], [number, number]] {
+        switch (this.facing) {
+            case 'up':    return [[0, 16], [0, -16]];
+            case 'down':  return [[0, -16], [0, 16]];
+            case 'left':  return [[16, 0], [-16, 0]];
+            case 'right':
+            default:      return [[-16, 0], [16, 0]];
+        }
+    }
+
+    #createItemDisplay(xOffset: number, yOffset: number): Phaser.GameObjects.Image {
+        return this.scene.add.image(this.x + xOffset, this.y + yOffset, '__DEFAULT')
             .setOrigin(0.5, 0.5)
             .setScale(0.5)
             .setDepth(this.depth + 1)

@@ -44,7 +44,6 @@ const entities: [EntityClass, { x: number; y: number }][] = [
   [Tree,          { x: 11, y: 16+8 }],
 
   [CoalStone,     { x: 5, y: 16+6 }],
-  [CoalStone,     { x: 5, y: 16+7 }],
   [CoalStone,     { x: 5, y: 16+8 }],
   [CoalStone,     { x: 3, y: 16+9 }],
   [CoalStone,     { x: 6, y: 16+4 }],
@@ -67,11 +66,32 @@ const entities: [EntityClass, { x: number; y: number }][] = [
   [Tree,          { x: 16+3, y: 16+12 }],
   [Tree,          { x: 16+1, y: 16+11 }],
 
+  [Tree,          { x: 16+14, y: 16+15 }],
+  [Tree,          { x: 16+13, y: 16+14 }],
+  [Tree,          { x: 16+12, y: 16+13 }],
+  [Tree,          { x: 16+10, y: 16+13 }],
+  [Tree,          { x: 16+15, y: 16+14 }],
+  [Tree,          { x: 16+14, y: 16+13 }],
+  [Tree,          { x: 16+13, y: 16+12 }],
+
+  [Tree,          { x: 16+12, y: 16+14 }],
+  [Tree,          { x: 16+16, y: 16+12 }],
+  [Tree,          { x: 16+15, y: 16+13 }],
+
+  [CoalStone,     { x: 16+13, y: 16+4 }],
+
   // 12
 
   [Tree,          { x: 32+3, y: 16+5 }],
   [Tree,          { x: 32+10, y: 16 }],
   [Tree,          { x: 32+7, y: 16+13 }],
+  [Tree,          { x: 32+10, y: 16+5 }],
+  [Tree,          { x: 32+13, y: 16+3 }],
+  [Tree,          { x: 32+8, y: 16+12 }],
+
+  [CoalStone,     { x: 32+10, y: 16+6 }],
+  [IronStone,     { x: 32+12, y: 16+1 }],
+  [CopperStone,   { x: 32+9, y: 16+12 }],
 
   // 20
 
@@ -90,7 +110,23 @@ const entities: [EntityClass, { x: number; y: number }][] = [
 
   // 21
 
+  [Tree,          { x: 16+10, y: 32+5 }],
+  [Tree,          { x: 16+13, y: 32+3 }],
+  [Tree,          { x: 16+8, y: 32+12 }],
+
+  [CoalStone,   { x: 16+4, y: 32+12 }],
+
   // 22
+
+  [Tree,          { x: 32+11, y: 32+6 }],
+  [Tree,          { x: 32+12, y: 32+2 }],
+  [Tree,          { x: 32+7, y: 32+13 }],
+
+  [IronStone,     { x: 32+7, y: 32+8 }],
+  [IronStone,     { x: 32+7, y: 32+12 }],
+
+  [CopperStone,   { x: 32+4, y: 32+12 }],
+  [CoalStone,     { x: 32+11, y: 32+2 }],
   
 ];
 

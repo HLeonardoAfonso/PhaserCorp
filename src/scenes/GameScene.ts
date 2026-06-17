@@ -110,7 +110,7 @@ export class GameScene extends Phaser.Scene {
 
     this.#player = new Player({
       scene: this,
-      position: { x: (28*64)+32, y: (28*64)+32 },
+      position: { x: (26*64), y: (31*64) },
       assetKey: 'PLAYER_IDLE',
       frame: 0,
       controls: this.#controls,

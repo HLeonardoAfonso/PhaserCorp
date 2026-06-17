@@ -101,9 +101,6 @@ export class PlacementSystem {
             this.#group.add(placedObj);
             this.#scene.sound.play('PLACING_SOUND');
             this.onPlacement?.(placedObj);
-            this.#ghost.destroy();
-            this.#ghost = null;
-            this.#active = false;
         }
     }
 }

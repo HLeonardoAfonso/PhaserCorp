@@ -6,6 +6,12 @@ export class PreloadScene extends Phaser.Scene {
   }
 
   public preload(): void {
+
+    // Menu assets
+    this.load.image('MENU_BANNER', 'assets/menu/Banner_Menu.png');
+    this.load.image('MENU_BUTTON', 'assets/menu/Button.png');
+    this.load.image('MENU_WORLD_ICON', 'assets/menu/Icon_World.png');
+
     this.load.image('SEL_TL', 'assets/cursors/select_tl.png');
     this.load.image('SEL_TR', 'assets/cursors/select_tr.png');
     this.load.image('SEL_BL', 'assets/cursors/select_bl.png');
@@ -113,6 +119,6 @@ export class PreloadScene extends Phaser.Scene {
   }
 
   public create(): void {
-    this.scene.start('GAME_SCENE');
+    this.scene.start('MENU_SCENE');
   }
 }
