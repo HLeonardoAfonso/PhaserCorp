@@ -4,6 +4,8 @@ import { oreRegistry } from "../systems/ore-registry";
 export abstract class Ore extends Interactibles {
     abstract get resourceKey(): string;
 
+    static onResourceMined: ((resourceKey: string) => void) | null = null;
+
     constructor(config: InteractiblesConfig, health: number, assetKey: string) {
         super(config, health, assetKey);
         this.setDepth(config.position.y);
@@ -11,6 +13,13 @@ export abstract class Ore extends Interactibles {
     }
 
     playIdleAnimation(): void {
+    }
+
+    override takeDamage(amount: number): void {
+        if (this.isDead) return;
+        //Dar um recurso de cada vez ao player por hit
+        Ore.onResourceMined?.(this.resourceKey);
+        super.takeDamage(amount);
     }
 
     update(): void {

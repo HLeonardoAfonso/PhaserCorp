@@ -20,7 +20,8 @@ import { Ribbon } from '../components/game-object/ribbon-component';
 import { ShopInterface } from '../components/game-object/shop-interface-component';
 import { PRICES } from '../game-objects/machines/processes';
 import type { Ribbon as RibbonType } from '../components/game-object/ribbon-component';
-import { TILES, WATER_TILES } from '../construction/tile-config';
+import { TILES } from '../construction/tile-config';
+import { Ore } from '../game-objects/ore';
 
 export class GameScene extends Phaser.Scene {
 
@@ -103,7 +104,7 @@ export class GameScene extends Phaser.Scene {
     this.#ribbon = new Ribbon(this);
     this.#shopInterface = new ShopInterface(this);
     Interactibles.onEntityDied = (key) => this.#inventory.addItems(key, 32);
-
+    Ore.onResourceMined = (key) => this.#inventory.addItems(key, 1);
     this.physics.world.setBounds(0, 0, MAP_WIDTH, MAP_HEIGHT);
 
     this.#player = new Player({

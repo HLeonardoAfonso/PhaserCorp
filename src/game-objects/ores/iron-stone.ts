@@ -6,7 +6,7 @@ export class IronStone extends Ore {
     get resourceKey(): string { return 'IRON_ITEM'; }
 
     constructor(config: InteractiblesConfig) {
-        super(config, 100, 'IRON_STONE');
+        super(config, 5000, 'IRON_STONE');
         this.setBodySize(90, 64);
         this.removeInteractive();
         const rect = new Phaser.Geom.Rectangle(20, 35, 90, 64);

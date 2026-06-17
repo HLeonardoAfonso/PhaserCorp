@@ -6,7 +6,7 @@ export class GoldStone extends Ore {
     get resourceKey(): string { return 'GOLD_ITEM'; }
 
     constructor(config: InteractiblesConfig) {
-        super(config, 100, 'ORE');
+        super(config, 5000, 'ORE');
         this.playIdleAnimation();
         this.setBodySize(45, 45);
         this.removeInteractive();
