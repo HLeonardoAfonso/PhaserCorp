@@ -104,7 +104,7 @@ export abstract class Machine extends Interactibles {
         if (this.isDead) {
             Interactibles.clearSelected();
             Interactibles.clearHovered();
-            Interactibles.onEntityDied?.(this.resourceKey);
+            Interactibles.onEntityDied?.(this.resourceKey, this.dropAmount);
             this.removeInteractive();
             this.destroy();
         }

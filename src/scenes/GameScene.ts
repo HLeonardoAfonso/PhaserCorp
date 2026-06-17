@@ -103,8 +103,7 @@ export class GameScene extends Phaser.Scene {
     this.#machineInterface = new FurnaceInterface(this, this.physics.world.drawDebug);
     this.#ribbon = new Ribbon(this);
     this.#shopInterface = new ShopInterface(this);
-    Interactibles.onEntityDied = (key) => this.#inventory.addItems(key, 32);
-    Ore.onResourceMined = (key) => this.#inventory.addItems(key, 1);
+    Interactibles.onEntityDied = (key, amount) => this.#inventory.addItems(key, amount);
     this.physics.world.setBounds(0, 0, MAP_WIDTH, MAP_HEIGHT);
 
     this.#player = new Player({

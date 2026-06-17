@@ -19,13 +19,14 @@ export abstract class Interactibles extends Phaser.Physics.Arcade.Sprite {
         Interactibles.#currentSelected = interactible; 
     }
 
-    static onEntityDied: ((resourceKey: string) => void) | null = null;
+    static onEntityDied: ((resourceKey: string, amount: number) => void) | null = null;
     
     #health: number;
     #hovered = false;
     #hitRect!: Phaser.Geom.Rectangle;
 
     abstract get resourceKey(): string;
+    get dropAmount(): number { return 1; }
 
     constructor(config: InteractiblesConfig, health: number, assetKey: string) {
         const { scene, position, frame } = config;

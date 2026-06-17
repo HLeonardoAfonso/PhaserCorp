@@ -2,6 +2,7 @@ import { Interactibles, type InteractiblesConfig } from "./interactibles";
 import { oreRegistry } from "../systems/ore-registry";
 
 export abstract class Ore extends Interactibles {
+    
     abstract get resourceKey(): string;
 
     static onResourceMined: ((resourceKey: string) => void) | null = null;
@@ -26,7 +27,6 @@ export abstract class Ore extends Interactibles {
         if (this.isDead) {
             Interactibles.clearSelected();
             Interactibles.clearHovered();
-            Interactibles.onEntityDied?.(this.resourceKey);
             oreRegistry.unregister(this);
             this.removeInteractive();
             this.destroy();
