@@ -1,3 +1,6 @@
 {
-  "menu.startNewGame": "Iniciar Novo Jogo"
+  "menu.startNewGame": "Iniciar Novo Jogo",
+  "game.placement.cancelHint": "Pressione X para cancelar",
+  "game.demolish.hint": "Modo demolição"
+
 }

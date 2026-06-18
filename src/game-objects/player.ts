@@ -2,6 +2,7 @@ import type { Position } from "../common/types";
 import { ControlsComponent } from "../components/game-object/controls-component";
 import type { InputComponent } from "../components/input/input-components";
 import { StateMachine } from "../components/state-machine/state-machine";
+import { ActState } from "../components/state-machine/states/act-state";
 import { IdleState } from "../components/state-machine/states/idle-state";
 import type { Interactibles } from "./interactibles";
 
@@ -49,6 +50,12 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     get nearInteractibles() { return this.#nearInteractibles; }
 
     clearNearInteractibles(): void { this.#nearInteractibles.clear(); }
+
+    act(animKey: string, damage: number, impactFrame: number): void {
+    this.#stateMachine.setState(
+        new ActState(this, this.#stateMachine, this.#controlsComponent, animKey, damage, impactFrame),
+    );
+    }
 
     addNearInteractibles(interactibles: Interactibles): void {
         this.#nearInteractibles.add(interactibles);

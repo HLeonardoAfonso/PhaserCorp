@@ -8,12 +8,15 @@ export class KeyboardComponent extends InputComponent {
     #sKey: Phaser.Input.Keyboard.Key;
     #dKey: Phaser.Input.Keyboard.Key;
     #eKey: Phaser.Input.Keyboard.Key;
-    #pKey: Phaser.Input.Keyboard.Key;
     #rKey: Phaser.Input.Keyboard.Key;
+
     #oKey: Phaser.Input.Keyboard.Key;
     #iKey: Phaser.Input.Keyboard.Key;
     #lKey: Phaser.Input.Keyboard.Key;
     #kKey: Phaser.Input.Keyboard.Key;
+
+    #xKey: Phaser.Input.Keyboard.Key;
+    #zKey: Phaser.Input.Keyboard.Key;
 
     constructor(keyboardPlugin: Phaser.Input.Keyboard.KeyboardPlugin) {
         super();
@@ -24,13 +27,14 @@ export class KeyboardComponent extends InputComponent {
         this.#sKey = keyboardPlugin.addKey(Phaser.Input.Keyboard.KeyCodes.S);
         this.#dKey = keyboardPlugin.addKey(Phaser.Input.Keyboard.KeyCodes.D);
 
-        this.#pKey = keyboardPlugin.addKey(Phaser.Input.Keyboard.KeyCodes.P);
         this.#eKey = keyboardPlugin.addKey(Phaser.Input.Keyboard.KeyCodes.E);
         this.#rKey = keyboardPlugin.addKey(Phaser.Input.Keyboard.KeyCodes.R);
         this.#oKey = keyboardPlugin.addKey(Phaser.Input.Keyboard.KeyCodes.O);
         this.#iKey = keyboardPlugin.addKey(Phaser.Input.Keyboard.KeyCodes.I);
         this.#lKey = keyboardPlugin.addKey(Phaser.Input.Keyboard.KeyCodes.L);
         this.#kKey = keyboardPlugin.addKey(Phaser.Input.Keyboard.KeyCodes.K);
+        this.#xKey = keyboardPlugin.addKey(Phaser.Input.Keyboard.KeyCodes.X);
+        this.#zKey = keyboardPlugin.addKey(Phaser.Input.Keyboard.KeyCodes.Z);
     }
 
     get isUpDown(): boolean { return this.#cursorKeys.up.isDown || this.#wKey.isDown; }
@@ -44,11 +48,12 @@ export class KeyboardComponent extends InputComponent {
     get isEnterKeyJustDown(): boolean { return Phaser.Input.Keyboard.JustDown(this.#enterKey); }
 
     get isEKeyJustDown(): boolean { return Phaser.Input.Keyboard.JustDown(this.#eKey); }
-    get isPKeyJustDown(): boolean { return Phaser.Input.Keyboard.JustDown(this.#pKey); }
     get isRKeyJustDown(): boolean { return Phaser.Input.Keyboard.JustDown(this.#rKey); }
     get isOKeyJustDown(): boolean { return Phaser.Input.Keyboard.JustDown(this.#oKey); }
     get isIKeyJustDown(): boolean { return Phaser.Input.Keyboard.JustDown(this.#iKey); }
     get isLKeyJustDown(): boolean { return Phaser.Input.Keyboard.JustDown(this.#lKey); }
     get isKKeyJustDown(): boolean { return Phaser.Input.Keyboard.JustDown(this.#kKey); }
 
+    get isXKeyJustDown(): boolean { return Phaser.Input.Keyboard.JustDown(this.#xKey); }
+    get isZKeyJustDown(): boolean { return Phaser.Input.Keyboard.JustDown(this.#zKey); }
 }

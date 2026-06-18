@@ -8,10 +8,7 @@ import { Inventory } from '../components/game-object/inventory-component';
 import { createAnimations } from '../construction/animations';
 import { createWorld, createRockLayer, createWaterEffects, createRockColliders } from '../construction/world-render';
 import { WORLD } from '../construction/world';
-import { Furnace } from '../game-objects/machines/furnace';
 import { Conveyer } from '../game-objects/machines/conveyer';
-import { Drill } from '../game-objects/machines/drill';
-import { Crafter } from '../game-objects/machines/crafter';
 import { Crate } from '../game-objects/machines/crate';
 import { spawnInteractibles } from '../game-objects/spawn';
 import { Shop } from '../game-objects/shop';
@@ -24,6 +21,9 @@ import { Ribbon } from '../components/game-object/ribbon-component';
 import { ShopInterface } from '../components/game-object/shop-interface-component';
 import { PRICES } from '../game-objects/machines/processes';
 import type { Ribbon as RibbonType } from '../components/game-object/ribbon-component';
+import { TILES } from '../construction/tile-config';
+import { i18n } from '../locales/i18n';
+import { Ore } from '../game-objects/ore';
 
 export class GameScene extends Phaser.Scene {
 
@@ -41,6 +41,9 @@ export class GameScene extends Phaser.Scene {
   #wasPointerDown = false;
   #placement!: PlacementSystem;
   #machines: Machine[] = [];
+  #placementHint!: Phaser.GameObjects.Text;
+  #demolishHint!: Phaser.GameObjects.Text;
+  #demolishMode = false;
 
   constructor() {
     super({ key: 'GAME_SCENE' });
@@ -105,8 +108,8 @@ export class GameScene extends Phaser.Scene {
     this.#machineInterface = new FurnaceInterface(this, this.physics.world.drawDebug);
     this.#ribbon = new Ribbon(this);
     this.#shopInterface = new ShopInterface(this);
-    Interactibles.onEntityDied = (key) => this.#inventory.addItems(key, 32);
-
+    Interactibles.onEntityDied = (key, amount) => this.#inventory.addItems(key, amount);
+    Ore.onResourceMined = (key) => this.#inventory.addItems(key, 1);
     this.physics.world.setBounds(0, 0, MAP_WIDTH, MAP_HEIGHT);
 
     this.#player = new Player({
@@ -133,6 +136,21 @@ export class GameScene extends Phaser.Scene {
           obj.setDebugVisible(true);
         }
       }
+    };
+    this.#placement.isTileBlocked = (tileX, tileY) => {
+      const ground = MAP_DATA[tileY]?.[tileX];
+      if (ground === undefined) return true;
+      if (ground === TILES.WATER) return true; //Tiles de agua    
+
+      const rock = rockData[tileY]?.[tileX];
+      if (rock !== undefined && rock !== -1) return true; //Terreno elevado
+      return false;
+    };
+
+    // Consume one of the placed item per placement and report how many remain,
+    this.#placement.onConsume = (itemKey) => {
+      this.#inventory.removeItems(itemKey, 1);
+      return this.#inventory.countAllOf(itemKey);
     };
 
     // populate the world with entities
@@ -168,16 +186,43 @@ export class GameScene extends Phaser.Scene {
           Interactibles.setSelected(obj);
       }
     });
+
+    this.#placementHint = this.add.text(
+      20,
+      this.cameras.main.height - 20,
+      i18n.t('game.placement.cancelHint'),
+      { fontSize: '25px', color: '#ff0000', stroke: '#000000', strokeThickness: 2 },
+    )
+    .setOrigin(0, 1)
+    .setScrollFactor(0)
+    .setDepth(DEPTH.RIBBON_TEXT)
+    .setVisible(false);
+
+    this.#demolishHint = this.add.text(
+      20,
+      this.cameras.main.height - 60,                 // sits above the placement hint
+      i18n.t('game.demolish.hint'),
+      { fontSize: '25px', color: '#ff8800', stroke: '#000000', strokeThickness: 2 },
+    )
+    .setOrigin(0, 1)
+    .setScrollFactor(0)
+    .setDepth(DEPTH.RIBBON_TEXT)
+    .setVisible(false);
   }
 
   update(_time: number, delta: number) {
+    this.#placementHint.setVisible(this.#placement.isActive);
+    this.#demolishHint.setVisible(this.#demolishMode);
 
+    if (this.#controls.isZKeyJustDown) {
+      this.#demolishMode = !this.#demolishMode;
+      this.data.set('demolishMode', this.#demolishMode);
+    }
 
-    // --- needs change ----
-    // Update all machines sorted top->bottom, left->right
     for (let i = this.#machines.length - 1; i >= 0; i--) {
       const m = this.#machines[i];
       if (m.isDead) {
+        m.cleanupIfDead();
         this.#machines.splice(i, 1);
       } else {
         m.update(delta);
@@ -203,17 +248,8 @@ export class GameScene extends Phaser.Scene {
       this.#wasPointerDown = isDown;
 
     if (!this.#inventory.isOpen) {
-      if (this.#controls.isPKeyJustDown){
-        this.#placement.toggle(Furnace, 'FURNACE');
-      }
-      if (this.#controls.isOKeyJustDown){
-        this.#placement.toggle(Conveyer, 'CONVEYOR');
-      }
-      if (this.#controls.isIKeyJustDown){
-        this.#placement.toggle(Drill, 'DRILL');
-      }
-      if (this.#controls.isLKeyJustDown){
-        this.#placement.toggle(Crafter, 'CRAFTER');
+      if (this.#controls.isXKeyJustDown){
+        this.#placement.cancel();
       }
       if (this.#controls.isKKeyJustDown){
         this.#placement.toggle(Crate, 'CRATE');
@@ -226,7 +262,11 @@ export class GameScene extends Phaser.Scene {
       if (justClicked && !this.#placement.isActive) {
         const hovered = Interactibles.currentHovered;
         if (hovered && !hovered.isDead && this.#player.nearInteractibles.has(hovered)) {
-          if (hovered instanceof Machine && hovered.interfacable && !(hovered instanceof Shop)) {
+          if (this.#demolishMode && hovered instanceof Machine && !(hovered instanceof Shop)) {
+            Interactibles.setSelected(hovered);
+            this.#player.act('ACT_HAMMER', 25, 1);
+            return;
+          } else if (hovered instanceof Machine && hovered.interfacable && !(hovered instanceof Shop)) {
             // Bind the interface to the selected furnace so its stacks
             // are owned by the machine instance itself.
             this.#machineInterface.bind(hovered);
@@ -358,9 +398,22 @@ export class GameScene extends Phaser.Scene {
         if (this.#inventory.isOpen) {
           this.#inventory.toggle();
         }
+        Interactibles.clearSelected();
       } else {
         this.#inventory.toggle();
         this.#crafting.toggle();
+
+        if (this.#inventory.isOpen) {
+        this.#inventory.onSlotClick = (itemKey) => {
+            if (this.#placement.startByItem(itemKey)) {
+                if (this.#inventory.isOpen) this.#inventory.toggle();
+                if (this.#crafting.isOpen)  this.#crafting.toggle();
+                this.#inventory.onSlotClick = null;
+            }
+        };
+        } else {
+          this.#inventory.onSlotClick = null;
+        }
       }
     }
   }
