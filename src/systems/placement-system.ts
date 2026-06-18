@@ -3,6 +3,7 @@ import type { Direction } from '../common/types';
 import { DIRECTIONS } from '../common/const';
 import { RotatableMachine } from '../game-objects/machines/rotatable-machine';
 import { Interactibles, type InteractiblesConfig } from '../game-objects/interactibles';
+import { Machine } from '../game-objects/machine';
 import { Furnace } from '../game-objects/machines/furnace';
 import { Conveyer } from '../game-objects/machines/conveyer';
 import { Drill } from '../game-objects/machines/drill';
@@ -58,6 +59,13 @@ export class PlacementSystem {
 
     static placeableFor(itemKey: string): PlaceableDef | undefined { return PLACEABLES.get(itemKey); }
     static isPlaceable(itemKey: string): boolean { return PLACEABLES.has(itemKey); }
+
+    static create(scene: Phaser.Scene, typeKey: string, position: { x: number; y: number }, facing: Direction): Machine | null {
+        const def = PlacementSystem.placeableFor(typeKey);
+        if (!def) return null;
+        const config: InteractiblesConfig & { facing?: Direction } = { scene, position, facing };
+        return new def.factory(config) as unknown as Machine;
+    }
 
     get isActive(): boolean { return this.#active; }
 

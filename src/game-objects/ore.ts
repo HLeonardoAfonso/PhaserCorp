@@ -30,6 +30,7 @@ export abstract class Ore extends Interactibles {
             oreRegistry.unregister(this);
             this.removeInteractive();
             this.destroy();
+            
         }
     }
 }
