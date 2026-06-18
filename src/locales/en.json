@@ -1,3 +1,4 @@
 {
-  "menu.startNewGame": "Start New Game"
+  "menu.startNewGame": "Start New Game",
+  "game.placement.cancelHint": "Press X to cancel"
 }

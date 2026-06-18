@@ -1,3 +1,4 @@
 {
-  "menu.startNewGame": "Nouvelle Partie"
+  "menu.startNewGame": "Nouvelle Partie",
+  "game.placement.cancelHint": "Appuyez sur X pour annuler"
 }

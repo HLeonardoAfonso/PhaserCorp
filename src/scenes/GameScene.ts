@@ -21,6 +21,7 @@ import { ShopInterface } from '../components/game-object/shop-interface-componen
 import { PRICES } from '../game-objects/machines/processes';
 import type { Ribbon as RibbonType } from '../components/game-object/ribbon-component';
 import { TILES } from '../construction/tile-config';
+import { i18n } from '../locales/i18n';
 import { Ore } from '../game-objects/ore';
 
 export class GameScene extends Phaser.Scene {
@@ -39,6 +40,7 @@ export class GameScene extends Phaser.Scene {
   #wasPointerDown = false;
   #placement!: PlacementSystem;
   #machines: Machine[] = [];
+  #placementHint!: Phaser.GameObjects.Text;
 
   constructor() {
     super({ key: 'GAME_SCENE' });
@@ -104,6 +106,7 @@ export class GameScene extends Phaser.Scene {
     this.#ribbon = new Ribbon(this);
     this.#shopInterface = new ShopInterface(this);
     Interactibles.onEntityDied = (key, amount) => this.#inventory.addItems(key, amount);
+    Ore.onResourceMined = (key) => this.#inventory.addItems(key, 1);
     this.physics.world.setBounds(0, 0, MAP_WIDTH, MAP_HEIGHT);
 
     this.#player = new Player({
@@ -172,10 +175,21 @@ export class GameScene extends Phaser.Scene {
           Interactibles.setSelected(obj);
       }
     });
+
+    this.#placementHint = this.add.text(
+      20,
+      this.cameras.main.height - 20,
+      i18n.t('game.placement.cancelHint'),
+      { fontSize: '25px', color: '#ff0000', stroke: '#000000', strokeThickness: 2 },
+    )
+      .setOrigin(0, 1)
+      .setScrollFactor(0)
+      .setDepth(DEPTH.RIBBON_TEXT)
+      .setVisible(false);
   }
 
   update(_time: number, delta: number) {
-
+    this.#placementHint.setVisible(this.#placement.isActive);
 
     // --- needs change ----
     // Update all machines sorted top->bottom, left->right
