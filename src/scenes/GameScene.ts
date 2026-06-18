@@ -41,6 +41,7 @@ export class GameScene extends Phaser.Scene {
   #placement!: PlacementSystem;
   #machines: Machine[] = [];
   #placementHint!: Phaser.GameObjects.Text;
+  #demolishHint!: Phaser.GameObjects.Text;
   #demolishMode = false;
 
   constructor() {
@@ -183,14 +184,26 @@ export class GameScene extends Phaser.Scene {
       i18n.t('game.placement.cancelHint'),
       { fontSize: '25px', color: '#ff0000', stroke: '#000000', strokeThickness: 2 },
     )
-      .setOrigin(0, 1)
-      .setScrollFactor(0)
-      .setDepth(DEPTH.RIBBON_TEXT)
-      .setVisible(false);
+    .setOrigin(0, 1)
+    .setScrollFactor(0)
+    .setDepth(DEPTH.RIBBON_TEXT)
+    .setVisible(false);
+
+    this.#demolishHint = this.add.text(
+      20,
+      this.cameras.main.height - 60,                 // sits above the placement hint
+      i18n.t('game.demolish.hint'),
+      { fontSize: '25px', color: '#ff8800', stroke: '#000000', strokeThickness: 2 },
+    )
+    .setOrigin(0, 1)
+    .setScrollFactor(0)
+    .setDepth(DEPTH.RIBBON_TEXT)
+    .setVisible(false);
   }
 
   update(_time: number, delta: number) {
     this.#placementHint.setVisible(this.#placement.isActive);
+    this.#demolishHint.setVisible(this.#demolishMode);
 
     if (this.#controls.isZKeyJustDown) {
       this.#demolishMode = !this.#demolishMode;

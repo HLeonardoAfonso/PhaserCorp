@@ -1,4 +1,5 @@
 {
   "menu.startNewGame": "Start New Game",
-  "game.placement.cancelHint": "Press X to cancel"
+  "game.placement.cancelHint": "Press X to cancel",
+  "game.demolish.hint": "Demolish mode: on"
 }

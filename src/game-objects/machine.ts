@@ -104,6 +104,15 @@ export abstract class Machine extends Interactibles {
     Interactibles.clearSelected();
     Interactibles.clearHovered();
     Interactibles.onEntityDied?.(this.resourceKey, this.dropAmount);
+
+    for (const stack of this.stacks) {
+        if (stack.itemKey && stack.amount > 0) {
+            Interactibles.onEntityDied?.(stack.itemKey, stack.amount);
+            stack.itemKey = null;
+            stack.amount = 0;
+        }
+    }
+
     this.removeInteractive();
     this.destroy();
     }
