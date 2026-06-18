@@ -8,9 +8,9 @@ import { registry } from "../../systems/machine-registry";
 export class Crafter extends Machine {
     
     static readonly craftRecipe: Recipe = [
-        { itemKey: 'IRON_GEAR', amount: 2, },
-        { itemKey: 'COPPER_WIRE', amount: 2, },
-        { itemKey: 'WOOD_ITEM', amount: 2, }
+        { itemKey: 'IRON_GEAR', amount: 5, },
+        { itemKey: 'COPPER_WIRE', amount: 9, },
+        { itemKey: 'WOOD_ITEM', amount: 3, }
     ];    
     static readonly craftKey = 'CRAFTER';
     static readonly displayOrigin = { x: 0.5, y: 0.75 };

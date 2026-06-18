@@ -7,9 +7,8 @@ import { registry } from "../../systems/machine-registry";
 export class Conveyer extends RotatableMachine {
 
     static readonly craftRecipe: Recipe = [
-        { itemKey: 'WOOD_ITEM', amount: 2, },
-        { itemKey: 'COPPER_WIRE', amount: 2, }, 
-        { itemKey: 'IRON_GEAR', amount: 2 }, 
+        { itemKey: 'IRON_GEAR', amount: 1, },
+        { itemKey: 'WOOD_ITEM', amount: 1, }, 
     ];
     static readonly craftKey = 'CONVEYOR';
 
@@ -19,7 +18,7 @@ export class Conveyer extends RotatableMachine {
 
     static readonly TICK_INTERVAL = 500;
 
-    get resourceKey(): string { return 'MACHINE_CONVEYOR'; }
+    get resourceKey(): string { return 'CONVEYOR'; }
 
     #tickAccumulator = 0;
     #inputItem: Phaser.GameObjects.Image;

@@ -6,6 +6,7 @@ export class RecipeOverlay {
     #scene: Phaser.Scene;
     #sprites: Phaser.GameObjects.Sprite[][] = [];
     #recipeImages: Phaser.GameObjects.Image[] = [];
+    #amountTexts: Phaser.GameObjects.Text[] = [];
     #isHovering = false;
 
     constructor(scene: Phaser.Scene) {
@@ -55,6 +56,18 @@ export class RecipeOverlay {
                 .setDepth(DEPTH.RECIPE_IMAGE)
                 .setVisible(this.#isHovering);
             this.#recipeImages.push(img);
+
+            const text = this.#scene.add.text(0, 0, `${item.amount}`, {
+                fontSize: '16px',
+                color: '#ffffff',
+                stroke: '#000000',
+                strokeThickness: 3,
+            })
+                .setOrigin(1, 1)
+                .setScrollFactor(0)
+                .setDepth(DEPTH.RECIPE_IMAGE)
+                .setVisible(this.#isHovering);
+            this.#amountTexts.push(text);
         });
     }
 
@@ -76,6 +89,11 @@ export class RecipeOverlay {
                 const x = pointer.x + 20 + (i + 0.5) * 48;
                 img.setPosition(x, baseY);
             });
+            this.#amountTexts.forEach((text, i) => {
+                const x = pointer.x + 20 + (i + 0.5) * 48 + 22;
+                const y = pointer.y - 80 + 32 + 20;
+                text.setPosition(x, y);
+            });
         }
     }
 
@@ -90,6 +108,7 @@ export class RecipeOverlay {
         this.#follow(pointer);
         this.#sprites.forEach(row => row.forEach(s => s.setVisible(true)));
         this.#recipeImages.forEach(img => img.setVisible(true));
+        this.#amountTexts.forEach(text => text.setVisible(true));
     }
 
     hide(): void {
@@ -97,5 +116,7 @@ export class RecipeOverlay {
         this.#destroyFrameSprites();
         this.#recipeImages.forEach(img => img.destroy());
         this.#recipeImages = [];
+        this.#amountTexts.forEach(text => text.destroy());
+        this.#amountTexts = [];
     }
 }

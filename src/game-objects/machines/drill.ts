@@ -12,9 +12,9 @@ export class Drill extends RotatableMachine {
     static readonly rotationSteps = 2;
 
     static readonly craftRecipe: Recipe = [
-        { itemKey: 'WOOD_ITEM', amount: 2, },
-        { itemKey: 'COPPER_WIRE', amount: 2, }, 
-        { itemKey: 'IRON_GEAR', amount: 2 }, 
+        { itemKey: 'IRON_GEAR', amount: 3, },
+        { itemKey: 'IRON_PLATE', amount: 5, }, 
+        { itemKey: 'WOOD_ITEM', amount: 5 }, 
     ];
     static readonly craftKey = 'DRILL';
     static readonly displayOrigin = { x: 0.5, y: 0.75 };
@@ -62,7 +62,9 @@ export class Drill extends RotatableMachine {
         // Register both tiles of the 2×1 footprint in MachineRegistry
         for (const tileX of this.#footprintTiles) {
             registry.registerAt(this, tileX, this.y);
-            this.#scene.add.rectangle(tileX, this.y, 64, 64, 0x00ff00, 0.3).setDepth(9999);
+            if (this.#scene.physics.world.drawDebug){
+                this.#scene.add.rectangle(tileX, this.y, 64, 64, 0x00ff00, 0.3).setDepth(9999);
+            }
         }
 
         // Check for neighboring ore and set output

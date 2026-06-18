@@ -9,13 +9,13 @@ import { createAnimations } from '../construction/animations';
 import { createWorld, createRockLayer, createWaterEffects, createRockColliders } from '../construction/world-render';
 import { WORLD } from '../construction/world';
 import { Conveyer } from '../game-objects/machines/conveyer';
-import { Crate } from '../game-objects/machines/crate';
 import { spawnInteractibles } from '../game-objects/spawn';
 import { Shop } from '../game-objects/shop';
 import { Crafting } from '../components/game-object/crafting-component';
 import { FurnaceInterface } from '../components/game-object/furnace-interface-component';
 import { Machine } from '../game-objects/machine';
 import { PlacementSystem } from '../systems/placement-system';
+import { DebugPlacement } from '../systems/debug-placement';
 import { DEPTH } from '../common/depth';
 import { Ribbon } from '../components/game-object/ribbon-component';
 import { ShopInterface } from '../components/game-object/shop-interface-component';
@@ -30,13 +30,15 @@ export class GameScene extends Phaser.Scene {
   #player!: Player;
   #interactibles!: Phaser.Physics.Arcade.StaticGroup
   #interactiblesMinusConveyors!: Phaser.Physics.Arcade.StaticGroup
+
   #controls!: KeyboardComponent
+
   #inventory!: Inventory;
   #crafting!: Crafting;
   #machineInterface!: FurnaceInterface;
   #shopInterface!: ShopInterface;
-  #selectionCorners!: { tl: Phaser.GameObjects.Image, tr: Phaser.GameObjects.Image, bl: Phaser.GameObjects.Image, br: Phaser.GameObjects.Image };
   #ribbon!: RibbonType;
+  #selectionCorners!: { tl: Phaser.GameObjects.Image, tr: Phaser.GameObjects.Image, bl: Phaser.GameObjects.Image, br: Phaser.GameObjects.Image };
   #shop!: Shop;
   #wasPointerDown = false;
   #placement!: PlacementSystem;
@@ -44,6 +46,7 @@ export class GameScene extends Phaser.Scene {
   #placementHint!: Phaser.GameObjects.Text;
   #demolishHint!: Phaser.GameObjects.Text;
   #demolishMode = false;
+  #debugPlacement!: DebugPlacement;
 
   constructor() {
     super({ key: 'GAME_SCENE' });
@@ -114,7 +117,7 @@ export class GameScene extends Phaser.Scene {
 
     this.#player = new Player({
       scene: this,
-      position: { x: (26*64), y: (31*64) },
+      position: { x: (22*64), y: (27*64) },
       assetKey: 'PLAYER_IDLE',
       frame: 0,
       controls: this.#controls,
@@ -128,6 +131,9 @@ export class GameScene extends Phaser.Scene {
     //Refresh do grupo interactibles através de um evento (desaparecer ore)
     this.#interactibles = this.physics.add.staticGroup();
     this.#placement = new PlacementSystem(this, this.#interactibles, this.#player);
+    
+    this.#debugPlacement = new DebugPlacement(this.#placement, this.input.keyboard);
+
     this.#placement.onPlacement = (obj) => {
       if (obj instanceof Machine) {
         this.#machines.push(obj);
@@ -219,6 +225,8 @@ export class GameScene extends Phaser.Scene {
       this.data.set('demolishMode', this.#demolishMode);
     }
 
+    this.#debugPlacement.handleInput();
+
     for (let i = this.#machines.length - 1; i >= 0; i--) {
       const m = this.#machines[i];
       if (m.isDead) {
@@ -250,9 +258,6 @@ export class GameScene extends Phaser.Scene {
     if (!this.#inventory.isOpen) {
       if (this.#controls.isXKeyJustDown){
         this.#placement.cancel();
-      }
-      if (this.#controls.isKKeyJustDown){
-        this.#placement.toggle(Crate, 'CRATE');
       }
       if (this.#controls.isRKeyJustDown){
         this.#placement.rotate();

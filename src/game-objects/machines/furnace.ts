@@ -8,14 +8,14 @@ import { registry } from "../../systems/machine-registry";
 export class Furnace extends Machine {
     
     static readonly craftRecipe: Recipe = [
-        { itemKey: 'IRON_ITEM', amount: 2, }, 
+        { itemKey: 'IRON_ITEM', amount: 5, }, 
     ];    
     static readonly craftKey = 'FURNACE';
     static readonly displayOrigin = { x: 0.5, y: 0.75 };
 
     static readonly SMELT_TIME = 1000;
 
-    get resourceKey(): string { return 'MACHINE_FURNACE'; }
+    get resourceKey(): string { return 'FURNACE'; }
 
     #smeltingProgress = 0;
     #currSmeltOutput: string | undefined;

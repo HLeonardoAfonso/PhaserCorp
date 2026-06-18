@@ -29,8 +29,8 @@ export interface PlaceableDef {
 /** inventory itemKey (craftItemKey) -> how to place it */
 const PLACEABLES: ReadonlyMap<string, PlaceableDef> = new Map(
     [Furnace, Conveyer, Drill, Crafter].map(cls => [
-        cls.craftItemKey,
-        { factory: cls as unknown as PlaceableConstructor, assetKey: cls.craftDisplayKey },
+        cls.craftKey,
+        { factory: cls as unknown as PlaceableConstructor, assetKey: cls.craftKey },
     ])
 );
 
