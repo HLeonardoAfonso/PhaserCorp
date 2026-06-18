@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { i18n } from '../locales/i18n';
+import { SaveManager } from '../systems/save-manager';
 
 const TILE = 48; // same spacing as RecipeOverlay uses for paper columns
 
@@ -15,12 +16,26 @@ type FlagLayout = {
 export class MenuScene extends Phaser.Scene {
 
   #startText!: Phaser.GameObjects.Text;
+  #loadText!: Phaser.GameObjects.Text;
   #flagTexts: Phaser.GameObjects.Text[] = [];
   #flagUnderlay: Phaser.GameObjects.Sprite[] = [];
   #langPickerOpen = false;
 
   constructor() {
     super({ key: 'MENU_SCENE' });
+  }
+
+  #addButton(y: number, key: string): Phaser.GameObjects.Image {
+    const btn = this.add.image(this.cameras.main.width / 2, y, 'MENU_BUTTON');
+    btn.setOrigin(0.5);
+    btn.setInteractive({ useHandCursor: true });
+    this.add.text(this.cameras.main.width / 2, y, i18n.t(key), {
+      fontSize: '28px',
+      color: '#ffffff',
+      stroke: '#000000',
+      strokeThickness: 3,
+    }).setOrigin(0.5);
+    return btn;
   }
 
   public create(): void {
@@ -30,19 +45,17 @@ export class MenuScene extends Phaser.Scene {
     const banner = this.add.image(width / 2, height / 2, 'MENU_BANNER');
     banner.setOrigin(0.5);
 
-    const button = this.add.image(width / 2, height / 2, 'MENU_BUTTON');
-    button.setOrigin(0.5);
-    button.setInteractive({ useHandCursor: true });
+    const startButton = this.#addButton(height / 2, 'menu.startNewGame');
+    const loadButton = this.#addButton(height / 2 + 90, 'menu.loadGame');
 
-    this.#startText = this.add.text(width / 2, height / 2, i18n.t('menu.startNewGame'), {
-      fontSize: '28px',
-      color: '#ffffff',
-      stroke: '#000000',
-      strokeThickness: 3,
-    }).setOrigin(0.5);
+    this.#startText = this.children.list[this.children.list.length - 1] as Phaser.GameObjects.Text;
+    this.#loadText = this.children.list[this.children.list.length - 1] as Phaser.GameObjects.Text;
 
-    button.on('pointerdown', () => {
-      this.scene.start('GAME_SCENE');
+    startButton.on('pointerdown', () => { this.scene.start('GAME_SCENE') }); 
+    loadButton.on('pointerdown', () => {
+      if (SaveManager.hasSavedGame()) {
+        this.scene.start('GAME_SCENE', { loadFromSave: true });
+      }
     });
 
     // --- World icon (lower-left of banner) ---
@@ -73,6 +86,7 @@ export class MenuScene extends Phaser.Scene {
     // Rebuild button text on language change
     i18n.emitter.on('languagechange', () => {
       this.#startText.setText(i18n.t('menu.startNewGame'));
+      this.#loadText.setText(i18n.t('menu.loadGame'));
       this.#rebuildFlags(layout);
     });
 

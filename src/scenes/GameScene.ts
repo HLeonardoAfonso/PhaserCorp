@@ -6,6 +6,7 @@ import { Tree } from '../game-objects/tree';
 import { Cursors } from '../common/cursor';
 import { Inventory } from '../components/game-object/inventory-component';
 import { createAnimations } from '../construction/animations';
+import { createHints } from '../construction/hints';
 import { createWorld, createRockLayer, createWaterEffects, createRockColliders } from '../construction/world-render';
 import { WORLD } from '../construction/world';
 import { Conveyer } from '../game-objects/machines/conveyer';
@@ -22,8 +23,14 @@ import { ShopInterface } from '../components/game-object/shop-interface-componen
 import { PRICES } from '../game-objects/machines/processes';
 import type { Ribbon as RibbonType } from '../components/game-object/ribbon-component';
 import { TILES } from '../construction/tile-config';
-import { i18n } from '../locales/i18n';
 import { Ore } from '../game-objects/ore';
+import { loadGame } from '../systems/load-game';
+import { SaveManager } from '../systems/save-manager';
+
+const SHOP_POSITION = { x: (23 * 64) + 32, y: (23 * 64) + 32 };
+const PLAYER_POSITION = { x: (22*64), y: (27*64) };
+const TILE_SIZE = 64;
+const CHUNK_SIZE = 16;
 
 export class GameScene extends Phaser.Scene {
 
@@ -61,8 +68,8 @@ export class GameScene extends Phaser.Scene {
       br: this.add.image(0, 0, 'SEL_BR').setOrigin(0.5, 0.5).setDepth(DEPTH.SELECTION_CORNERS).setVisible(false),
     };
 
-    const MAP_WIDTH = WORLD.length * 16 * 64;
-    const MAP_HEIGHT = WORLD[0].length * 16 * 64;
+    const MAP_WIDTH = WORLD.length * CHUNK_SIZE * TILE_SIZE;
+    const MAP_HEIGHT = WORLD[0].length * CHUNK_SIZE * TILE_SIZE;
 
     createAnimations(this);
     const MAP_DATA = createWorld(WORLD);
@@ -70,10 +77,10 @@ export class GameScene extends Phaser.Scene {
     //Build tilemap
     const map = this.make.tilemap({
       data: MAP_DATA,
-      tileWidth: 64,
-      tileHeight: 64,
+      tileWidth: TILE_SIZE,
+      tileHeight: TILE_SIZE,
     });
-    const tileset = map.addTilesetImage('tileset', 'TILESET_COLOR1', 64, 64, 0, 0);
+    const tileset = map.addTilesetImage('tileset', 'TILESET_COLOR1', TILE_SIZE, TILE_SIZE, 0, 0);
     if (!tileset) {
       console.warn('Failed to add tileset image');
       return;
@@ -87,10 +94,10 @@ export class GameScene extends Phaser.Scene {
     const rockData = createRockLayer(WORLD);
     const rockLayer = this.make.tilemap({
       data: rockData,
-      tileWidth: 64,
-      tileHeight: 64,
+      tileWidth: TILE_SIZE,
+      tileHeight: TILE_SIZE,
     });
-    const rockTileset = rockLayer.addTilesetImage('tileset', 'TILESET_COLOR1', 64, 64, 0, 0);
+    const rockTileset = rockLayer.addTilesetImage('tileset', 'TILESET_COLOR1', TILE_SIZE, TILE_SIZE, 0, 0);
     if (rockTileset) {
       const rockGroundLayer = rockLayer.createLayer(0, rockTileset, 0, 0);
       if (rockGroundLayer) {
@@ -117,7 +124,7 @@ export class GameScene extends Phaser.Scene {
 
     this.#player = new Player({
       scene: this,
-      position: { x: (22*64), y: (27*64) },
+      position: PLAYER_POSITION,
       assetKey: 'PLAYER_IDLE',
       frame: 0,
       controls: this.#controls,
@@ -163,7 +170,7 @@ export class GameScene extends Phaser.Scene {
     spawnInteractibles(this, this.#interactibles, this.physics.world.drawDebug);
 
     // instanciate shop
-    this.#shop = new Shop({ scene: this, position: { x: (23*64)+32, y: (23*64)+32 } });
+    this.#shop = new Shop({ scene: this, position: SHOP_POSITION });
     this.#machines.push(this.#shop);
     this.#interactibles.add(this.#shop);
 
@@ -182,38 +189,25 @@ export class GameScene extends Phaser.Scene {
 
     // enable debug visualization only for objects that have colliders
     this.#interactiblesMinusConveyors.getChildren().forEach(obj => {
-        if (obj instanceof Interactibles) {
-            obj.setDebugVisible(true);
-        }
+      if (obj instanceof Interactibles) {
+        obj.setDebugVisible(true);
+      }
     });
     
     this.input.on('gameobjectdown', (_pointer: Phaser.Input.Pointer, obj: Phaser.GameObjects.GameObject) => {
       if (obj instanceof Interactibles && this.#player.nearInteractibles.has(obj)) {
-          Interactibles.setSelected(obj);
+        Interactibles.setSelected(obj);
       }
     });
 
-    this.#placementHint = this.add.text(
-      20,
-      this.cameras.main.height - 20,
-      i18n.t('game.placement.cancelHint'),
-      { fontSize: '25px', color: '#ff0000', stroke: '#000000', strokeThickness: 2 },
-    )
-    .setOrigin(0, 1)
-    .setScrollFactor(0)
-    .setDepth(DEPTH.RIBBON_TEXT)
-    .setVisible(false);
+    // Load saved game
+    if ((this.scene.settings.data as { loadFromSave?: boolean })?.loadFromSave === true) {
+      loadGame(this.#shop, this.#player, this.#inventory);
+    }
 
-    this.#demolishHint = this.add.text(
-      20,
-      this.cameras.main.height - 60,                 // sits above the placement hint
-      i18n.t('game.demolish.hint'),
-      { fontSize: '25px', color: '#ff8800', stroke: '#000000', strokeThickness: 2 },
-    )
-    .setOrigin(0, 1)
-    .setScrollFactor(0)
-    .setDepth(DEPTH.RIBBON_TEXT)
-    .setVisible(false);
+    const { demolishHint, placementHint } = createHints(this);
+    this.#demolishHint = demolishHint;
+    this.#placementHint = placementHint;
   }
 
   update(_time: number, delta: number) {
@@ -223,6 +217,11 @@ export class GameScene extends Phaser.Scene {
     if (this.#controls.isZKeyJustDown) {
       this.#demolishMode = !this.#demolishMode;
       this.data.set('demolishMode', this.#demolishMode);
+    }
+
+    // Ctrl+S → Save game
+    if (this.#controls.isCtrlSJustDown) {
+      SaveManager.save(this.#shop.points, this.#player.x, this.#player.y, this.#inventory.getSlotsData());
     }
 
     this.#debugPlacement.handleInput();
@@ -236,8 +235,6 @@ export class GameScene extends Phaser.Scene {
         m.update(delta);
       }
     }
-        // --- needs change ----
-
     //Player zone interaction
     this.physics.overlap(
       this.#player.getInteractZone(),
@@ -251,9 +248,9 @@ export class GameScene extends Phaser.Scene {
     );
 
     //Click Interactibles
-      const isDown = this.input.activePointer.isDown;
-      const justClicked = isDown && !this.#wasPointerDown;
-      this.#wasPointerDown = isDown;
+    const isDown = this.input.activePointer.isDown;
+    const justClicked = isDown && !this.#wasPointerDown;
+    this.#wasPointerDown = isDown;
 
     if (!this.#inventory.isOpen) {
       if (this.#controls.isXKeyJustDown){
@@ -269,7 +266,7 @@ export class GameScene extends Phaser.Scene {
         if (hovered && !hovered.isDead && this.#player.nearInteractibles.has(hovered)) {
           if (this.#demolishMode && hovered instanceof Machine && !(hovered instanceof Shop)) {
             Interactibles.setSelected(hovered);
-            this.#player.act('ACT_HAMMER', 25, 1);
+            this.#player.act('ACT_HAMMER', 1);
             return;
           } else if (hovered instanceof Machine && hovered.interfacable && !(hovered instanceof Shop)) {
             // Bind the interface to the selected furnace so its stacks
@@ -393,6 +390,7 @@ export class GameScene extends Phaser.Scene {
       this.#machineInterface.update();
     }
 
+
     if (this.#controls.isEKeyJustDown) {
       if (this.#machineInterface.isOpen || this.#shopInterface.isOpen) {
         this.#inventory.onSlotClick = null;
@@ -409,13 +407,13 @@ export class GameScene extends Phaser.Scene {
         this.#crafting.toggle();
 
         if (this.#inventory.isOpen) {
-        this.#inventory.onSlotClick = (itemKey) => {
+          this.#inventory.onSlotClick = (itemKey) => {
             if (this.#placement.startByItem(itemKey)) {
-                if (this.#inventory.isOpen) this.#inventory.toggle();
-                if (this.#crafting.isOpen)  this.#crafting.toggle();
-                this.#inventory.onSlotClick = null;
+              if (this.#inventory.isOpen) this.#inventory.toggle();
+              if (this.#crafting.isOpen)  this.#crafting.toggle();
+              this.#inventory.onSlotClick = null;
             }
-        };
+          };
         } else {
           this.#inventory.onSlotClick = null;
         }

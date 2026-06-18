@@ -19,6 +19,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     #stateMachine: StateMachine;
     #interactZone: Phaser.GameObjects.Zone;
     #nearInteractibles: Set<Interactibles> = new Set();
+    #damage: number;
     
     constructor(config: PlayerConfig) {
         const { scene, position, assetKey, frame } = config;
@@ -31,6 +32,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         this.setOrigin(0.5,0.6)
         this.setBodySize(30, 30);
         this.setOffset(82, 100);
+        this.#damage = 25;
 
         this.#controlsComponent = new ControlsComponent(this, config.controls);
         this.#stateMachine = new StateMachine(this);
@@ -51,9 +53,9 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
     clearNearInteractibles(): void { this.#nearInteractibles.clear(); }
 
-    act(animKey: string, damage: number, impactFrame: number): void {
+    act(animKey: string, impactFrame: number): void {
     this.#stateMachine.setState(
-        new ActState(this, this.#stateMachine, this.#controlsComponent, animKey, damage, impactFrame),
+        new ActState(this, this.#stateMachine, this.#controlsComponent, animKey, this.#damage, impactFrame),
     );
     }
 

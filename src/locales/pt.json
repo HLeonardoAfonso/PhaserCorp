@@ -1,5 +1,6 @@
 {
   "menu.startNewGame": "Iniciar Novo Jogo",
+  "menu.loadGame": "Continuar Jogo",
   "game.placement.cancelHint": "Pressione X para cancelar",
   "game.demolish.hint": "Modo demolição"
 

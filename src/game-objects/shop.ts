@@ -12,11 +12,6 @@ export class Shop extends Machine {
 
     get points(): number { return this.#points; }
 
-    addPoints(amount: number): void {
-        this.#points += amount;
-        this.scene.sound.play('COIN_SOUND');
-    }
-
     constructor(config: InteractiblesConfig) {
         super(config, 100, 'SHOP', true);
         this.playIdleAnimation();
@@ -40,10 +35,18 @@ export class Shop extends Machine {
         }
     }
 
+    setPoints(amount: number): void {
+        this.#points = amount;
+    }
+
+    addPoints(amount: number): void {
+        this.#points += amount;
+        this.scene.sound.play('COIN_SOUND');
+    }
+
     acceptItem(stack: StackData): boolean {
 
         const price = PRICES.get(stack.itemKey!);
-
         if (price) {
             this.addPoints(price * stack.amount);
             return true;

@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { KeyboardComponent } from '../input/keyboard-component';
 import { Slot } from './slot-component';
 import { DEPTH } from '../../common/depth';
+import type { StackData } from '../../common/types';
 
 export class Inventory {
 
@@ -53,6 +54,16 @@ export class Inventory {
 
   get isOpen(): boolean {
     return this.#banner.visible;
+  }
+
+  getSlotsData(): StackData[] {
+    return this.#slots.map(s => ({ itemKey: s.itemKey, amount: s.amount }));
+  }
+
+  setSlotsData(data: StackData[]): void {
+    for (let i = 0; i < data.length; i++) {
+      this.addItems(data[i].itemKey!, data[i].amount);
+    }
   }
 
   toggle(): void {
