@@ -41,6 +41,10 @@ export class PreloadScene extends Phaser.Scene {
       frameWidth: 192,
       frameHeight: 192,
     });
+    this.load.spritesheet('PLAYER_HAMMER', 'assets/pawn/Pawn_Interact Hammer.png', {
+    frameWidth: 192,
+    frameHeight: 192,
+    });
     this.load.spritesheet('PLAYER_AXE', 'assets/pawn/Pawn_Interact Axe.png', {
       frameWidth: 192,
       frameHeight: 192,

@@ -7,21 +7,28 @@ import { Tree } from "../../../game-objects/tree";
 import { Interactibles } from "../../../game-objects/interactibles";
 import { MoveState } from "./move-state";
 import { Ore } from "../../../game-objects/ore";
+import { Machine } from "../../../game-objects/machine";
 
 export class ActState extends State {
     declare protected gameObject: Phaser.Physics.Arcade.Sprite;
     #animKey: string;
     #controlsComponent: ControlsComponent;
+    #damage: number;
+    #impactFrame: number;
 
     constructor(
         gameObject: Phaser.Physics.Arcade.Sprite,
         stateMachine: StateMachine,
         controlsComponent: ControlsComponent,
         animKey: string,
+        damage: number = 25,
+        impactFrame: number = 3,
     ) {
         super(gameObject, stateMachine);
         this.#controlsComponent = controlsComponent;
         this.#animKey = animKey;
+        this.#damage = damage;
+        this.#impactFrame = impactFrame;
     }
 
     onEnter(_previousState: State | null): void {
@@ -30,21 +37,22 @@ export class ActState extends State {
         this.gameObject.setVelocity(0, 0);
         this.gameObject.play({ key: this.#animKey, repeat: -1 }, true);
 
-        if (selected && !selected.isDead){
+        if (selected && !selected.isDead) {
             const onFrame = (_anim: Phaser.Animations.Animation, frame: Phaser.Animations.AnimationFrame) => {
-                if (frame.index === 3) { // frame do impacto do machado
-                    selected.takeDamage(25);
-                    if(selected instanceof Tree){
-                        (selected as Tree).playInteractAnimation();
-                        this.gameObject.scene.sound.play('AXE_SOUND');
-                    }
-                    if(selected instanceof Ore){
-                        (selected as Ore).update();
-                        this.gameObject.scene.sound.play('PICKAXE_SOUND');
+                if (frame.index === this.#impactFrame) { // impact frame
+                    selected.takeDamage(this.#damage);
 
+                    if (selected instanceof Tree) {
+                        selected.playInteractAnimation();
+                        this.gameObject.scene.sound.play('AXE_SOUND');
+                    } else if (selected instanceof Ore) {
+                        selected.update();
+                        this.gameObject.scene.sound.play('PICKAXE_SOUND');
+                    } else if (selected instanceof Machine) {
+                        this.gameObject.scene.sound.play('PLACING_SOUND'); // swap for a hammer sound if you add one
                     }
                 }
-            }
+            };
             this.gameObject.on('animationupdate', onFrame);
         }
     }
@@ -53,6 +61,7 @@ export class ActState extends State {
         const controls = this.#controlsComponent.controls;
         const isMoving = controls.isLeftDown || controls.isRightDown || controls.isUpDown || controls.isDownDown;
         const selected = Interactibles.currentSelected;
+
         if (isMoving || !selected || selected.isDead) {
             this.gameObject.off('animationupdate');
             this.gameObject.scene.sound.stopAll();

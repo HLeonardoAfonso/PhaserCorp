@@ -22,6 +22,13 @@ export function createAnimations(scene: Phaser.Scene): void {
   });
 
   scene.anims.create({
+  key: 'ACT_HAMMER',
+  frames: scene.anims.generateFrameNumbers('PLAYER_HAMMER', { start: 0, end: 2 }),
+  frameRate: 8,
+  repeat: -1,
+  });
+
+  scene.anims.create({
     key: 'ACT_AXE',
     frames: scene.anims.generateFrameNumbers('PLAYER_AXE', { start: 0, end: 5 }),
     frameRate: 8,

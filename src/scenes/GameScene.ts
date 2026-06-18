@@ -41,6 +41,7 @@ export class GameScene extends Phaser.Scene {
   #placement!: PlacementSystem;
   #machines: Machine[] = [];
   #placementHint!: Phaser.GameObjects.Text;
+  #demolishMode = false;
 
   constructor() {
     super({ key: 'GAME_SCENE' });
@@ -191,11 +192,15 @@ export class GameScene extends Phaser.Scene {
   update(_time: number, delta: number) {
     this.#placementHint.setVisible(this.#placement.isActive);
 
-    // --- needs change ----
-    // Update all machines sorted top->bottom, left->right
+    if (this.#controls.isZKeyJustDown) {
+      this.#demolishMode = !this.#demolishMode;
+      this.data.set('demolishMode', this.#demolishMode);
+    }
+
     for (let i = this.#machines.length - 1; i >= 0; i--) {
       const m = this.#machines[i];
       if (m.isDead) {
+        m.cleanupIfDead();
         this.#machines.splice(i, 1);
       } else {
         m.update(delta);
@@ -232,7 +237,11 @@ export class GameScene extends Phaser.Scene {
       if (justClicked && !this.#placement.isActive) {
         const hovered = Interactibles.currentHovered;
         if (hovered && !hovered.isDead && this.#player.nearInteractibles.has(hovered)) {
-          if (hovered instanceof Machine && hovered.interfacable && !(hovered instanceof Shop)) {
+          if (this.#demolishMode && hovered instanceof Machine && !(hovered instanceof Shop)) {
+            Interactibles.setSelected(hovered);
+            this.#player.act('ACT_HAMMER', 25, 1);
+            return;
+          } else if (hovered instanceof Machine && hovered.interfacable && !(hovered instanceof Shop)) {
             // Bind the interface to the selected furnace so its stacks
             // are owned by the machine instance itself.
             this.#machineInterface.bind(hovered);

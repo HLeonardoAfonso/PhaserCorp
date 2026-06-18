@@ -8,6 +8,8 @@ import type { Player } from "../../../game-objects/player";
 import { Tree } from "../../../game-objects/tree";
 import { Interactibles } from "../../../game-objects/interactibles";
 import { Ore } from "../../../game-objects/ore";
+import { Machine } from "../../../game-objects/machine";
+import { Shop } from "../../../game-objects/shop";
 
 export class IdleState extends State {
     declare protected gameObject: Phaser.Physics.Arcade.Sprite;
@@ -53,6 +55,19 @@ export class IdleState extends State {
                 ),
             );
             return
+        }
+
+        if (selected instanceof Machine && !(selected instanceof Shop) && this.gameObject.scene.data.get('demolishMode') && (this.gameObject as Player).nearInteractibles.has(selected)) {
+            this.stateMachine.setState(
+            new ActState(
+                this.gameObject as Phaser.Physics.Arcade.Sprite,
+                this.stateMachine,
+                this.#controlsComponent,
+                "ACT_HAMMER",
+                10,
+            ),
+            );
+            return;
         }
 
         const isMoving = controls.isLeftDown || controls.isRightDown || controls.isUpDown || controls.isDownDown;

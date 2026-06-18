@@ -6,7 +6,8 @@ export abstract class Machine extends Interactibles {
 
     #Interfacable: boolean;
     #stacks: StackData[] = [];
-    
+    #cleanedUp = false;
+
     constructor(config: InteractiblesConfig, health: number, assetKey: string, interfacable: boolean) {
         super(config, health, assetKey);
         this.#Interfacable = interfacable;
@@ -97,17 +98,18 @@ export abstract class Machine extends Interactibles {
         return stack; // slot occupied with different item
     }
 
-    /**
-     * Check death state and clean up if dead. Call from subclass update() if needed.
-     */
+    cleanupIfDead(): void {
+    if (this.#cleanedUp || !this.isDead) return;
+    this.#cleanedUp = true;
+    Interactibles.clearSelected();
+    Interactibles.clearHovered();
+    Interactibles.onEntityDied?.(this.resourceKey, this.dropAmount);
+    this.removeInteractive();
+    this.destroy();
+    }
+
     protected checkDeath(): void {
-        if (this.isDead) {
-            Interactibles.clearSelected();
-            Interactibles.clearHovered();
-            Interactibles.onEntityDied?.(this.resourceKey, this.dropAmount);
-            this.removeInteractive();
-            this.destroy();
-        }
+        this.cleanupIfDead();
     }
 
     /**
