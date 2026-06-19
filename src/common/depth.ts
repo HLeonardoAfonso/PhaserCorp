@@ -12,4 +12,6 @@ export const DEPTH = {
   RIBBON_TEXT: 10005,
   RECIPE_FRAME: 11000,
   RECIPE_IMAGE: 11001,
+
+  MENU_PAPER: 10004,
 } as const;

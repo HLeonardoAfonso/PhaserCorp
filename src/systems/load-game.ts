@@ -7,12 +7,15 @@ import { Machine } from '../game-objects/machine';
 import { PlacementSystem } from './placement-system';
 import { Conveyer } from '../game-objects/machines/conveyer';
 
-export function loadGame(shop: Shop, player: Player, inventory: Inventory): void {
+export function loadGame(shop: Shop, player: Player): void {
     const data = SaveManager.load();
     if (!data) return;
     shop.setPoints(data.shopPoints);
     player.setPosition(data.player.x, player.y);
-    inventory.setSlotsData(data.inventory);
+}
+
+export function loadInventory(inventory: Inventory): void {
+    inventory.setSlotsData(SaveManager.getInventory());
 }
 
 export function restoreMachines(

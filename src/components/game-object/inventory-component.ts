@@ -61,8 +61,14 @@ export class Inventory {
   }
 
   setSlotsData(data: StackData[]): void {
-    for (let i = 0; i < data.length; i++) {
-      this.addItems(data[i].itemKey!, data[i].amount);
+    for (let i = 0; i < this.#slots.length; i++) {
+      this.#slots[i].sync(data[i]?.itemKey ?? null, data[i]?.amount ?? 0);
+    }
+  }
+
+  clearInventory(): void {
+    for (const slot of this.#slots) {
+      slot.clear();
     }
   }
 

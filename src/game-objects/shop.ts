@@ -41,7 +41,6 @@ export class Shop extends Machine {
 
     addPoints(amount: number): void {
         this.#points += amount;
-        this.scene.sound.play('COIN_SOUND');
     }
 
     acceptItem(stack: StackData): boolean {

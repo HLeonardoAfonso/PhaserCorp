@@ -15,6 +15,7 @@ export class SaveManager {
 
     private static entityStates: EntitySaveState[] = [];
     private static machines: MachineSaveState[] = [];
+    private static inventory: StackData[] = [];
 
     static save(points: number, playerX: number, playerY: number, inventory: StackData[], entityStates: EntitySaveState[], machines: MachineSaveState[]): void {
         const data: SaveData = {
@@ -35,6 +36,7 @@ export class SaveManager {
             const data = JSON.parse(loaded) as SaveData;
             SaveManager.entityStates = data.entityStates ?? [];
             SaveManager.machines = data.machines ?? [];
+            SaveManager.inventory = data.inventory;
             return data;
         } catch {
             return null;
@@ -64,5 +66,13 @@ export class SaveManager {
 
     static getSavedMachines(): MachineSaveState[] {
         return SaveManager.machines;
+    }
+
+    static setInventory(states: StackData[]): void {
+        SaveManager.inventory = states;
+    }
+
+    static getInventory(): StackData[] {
+        return SaveManager.inventory;
     }
 }

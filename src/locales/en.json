@@ -2,5 +2,6 @@
   "menu.startNewGame": "Start New Game",
   "menu.loadGame": "Load Game",
   "game.placement.cancelHint": "Press X to cancel",
-  "game.demolish.hint": "Demolish mode: on"
+  "game.demolish.hint": "Demolish mode: on",
+  "game.save.hint": "Game Saved!"
 }

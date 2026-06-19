@@ -2,6 +2,6 @@
   "menu.startNewGame": "Nouvelle Partie",
   "menu.loadGame": "Charger Partie",
   "game.placement.cancelHint": "Appuyez sur X pour annuler",
-  "game.demolish.hint": "Mode démolition"
-
+  "game.demolish.hint": "Mode démolition",
+  "game.save.hint": "Partie Sauvegardée!"
 }

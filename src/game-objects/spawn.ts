@@ -145,21 +145,16 @@ export function spawnInteractibles(
   }
 }
 
-/** After spawning all entities, apply saved health states. */
 export function restoreEntityStates(interactibles: Phaser.Physics.Arcade.StaticGroup): void {
   const states = SaveManager.getSavedStates();
-  if (states.length === 0) return;
 
   interactibles.getChildren().forEach(obj => {
     if (!(obj instanceof Interactibles) || obj.entityId === 0) return;
 
     for (let i = 0; i < states.length; i++) {
       if (states[i].id === obj.entityId) {
-        if (states[i].health <= 0) {
-          obj.takeDamage(obj.health);
-          obj.update();
-        }
-        return;
+        obj.takeDamage(obj.health - states[i].health);
+        obj.update();
       }
     }
   });

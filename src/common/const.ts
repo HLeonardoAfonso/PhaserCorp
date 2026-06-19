@@ -16,6 +16,8 @@ export const DIR_OFFSET: Record<Direction, Position> = {
   right: { x:  64, y:  0 },
 };
 
+export const BackGroundColor: string = '#47ABA9'
+
 export function turnLeft(d: Direction): Direction {
   return ({ up: 'left', left: 'down', down: 'right', right: 'up' } as const)[d];
 }
