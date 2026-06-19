@@ -35,10 +35,6 @@ export class Crate extends Machine {
         this.setInteractive(rect, Phaser.Geom.Rectangle.Contains);
     }
     
-    static get placementRect(): Phaser.Geom.Rectangle {
-        return new Phaser.Geom.Rectangle(-32, 64 + 5, 64, 54);
-    }
-
     acceptItem(stack: StackData): boolean {
         const leftover = this.routingStack(stack);
         // Accept only if all items were placed (no leftover)

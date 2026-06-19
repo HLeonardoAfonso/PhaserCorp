@@ -49,18 +49,14 @@ export class FurnaceInterface extends MachineInterface {
     this.#slots.forEach(s => s.setVisible(bool));
   }
 
-  /**
-   * Bind this interface to a specific Machine instance. The interface
-   * becomes a passive viewer of the machine's stacks — every update()
-   * call will mirror the machine's stack data onto the visual slots.
-   */
+  // Bind this interface to a specific Machine instance
   bind(machine: Machine): void {
     this.#machine = machine;
     this.open(machine.texture.key);
     this.update();
   }
 
-  /** Drop the current machine reference. */
+  // Drop the current machine reference
   unbind(): void {
     this.#machine = null;
   }

@@ -7,12 +7,13 @@ export class KeyboardComponent extends InputComponent {
     #aKey: Phaser.Input.Keyboard.Key;
     #sKey: Phaser.Input.Keyboard.Key;
     #dKey: Phaser.Input.Keyboard.Key;
+
     #eKey: Phaser.Input.Keyboard.Key;
     #rKey: Phaser.Input.Keyboard.Key;
+    #qKey: Phaser.Input.Keyboard.Key;
 
     #xKey: Phaser.Input.Keyboard.Key;
     #zKey: Phaser.Input.Keyboard.Key;
-    #ctrlKey: Phaser.Input.Keyboard.Key;
 
     constructor(keyboardPlugin: Phaser.Input.Keyboard.KeyboardPlugin) {
         super();
@@ -25,15 +26,13 @@ export class KeyboardComponent extends InputComponent {
 
         this.#eKey = keyboardPlugin.addKey(Phaser.Input.Keyboard.KeyCodes.E);
         this.#rKey = keyboardPlugin.addKey(Phaser.Input.Keyboard.KeyCodes.R);
+        this.#qKey = keyboardPlugin.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
 
         this.#xKey = keyboardPlugin.addKey(Phaser.Input.Keyboard.KeyCodes.X);
         this.#zKey = keyboardPlugin.addKey(Phaser.Input.Keyboard.KeyCodes.Z);
-        this.#ctrlKey = keyboardPlugin.addKey(Phaser.Input.Keyboard.KeyCodes.CTRL);
     }
 
-    get isCtrlSJustDown(): boolean {
-        return this.#ctrlKey.isDown && Phaser.Input.Keyboard.JustDown(this.#sKey);
-    }
+    get isQKeyJustDown(): boolean { return Phaser.Input.Keyboard.JustDown(this.#qKey); }
 
     get isUpDown(): boolean { return this.#cursorKeys.up.isDown || this.#wKey.isDown; }
     get isDownDown(): boolean { return this.#cursorKeys.down.isDown || this.#sKey.isDown;}

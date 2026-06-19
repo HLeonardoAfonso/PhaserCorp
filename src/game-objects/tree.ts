@@ -48,6 +48,7 @@ export class Tree extends Interactibles {
             this.setAlpha(1);
             // Se a arvore poder se regenerar, é melhor disable do que o remove
             //this.disableInteractive();
+            
         }
     }
 }

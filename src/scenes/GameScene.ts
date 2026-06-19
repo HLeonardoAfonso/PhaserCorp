@@ -6,11 +6,11 @@ import { Tree } from '../game-objects/tree';
 import { Cursors } from '../common/cursor';
 import { Inventory } from '../components/game-object/inventory-component';
 import { createAnimations } from '../construction/animations';
-import { createHints } from '../construction/hints';
+import { Hints } from '../construction/hints';
 import { createWorld, createRockLayer, createWaterEffects, createRockColliders } from '../construction/world-render';
 import { WORLD } from '../construction/world';
 import { Conveyer } from '../game-objects/machines/conveyer';
-import { spawnInteractibles } from '../game-objects/spawn';
+import { spawnInteractibles, restoreEntityStates } from '../game-objects/spawn';
 import { Shop } from '../game-objects/shop';
 import { Crafting } from '../components/game-object/crafting-component';
 import { FurnaceInterface } from '../components/game-object/furnace-interface-component';
@@ -24,8 +24,9 @@ import { PRICES } from '../game-objects/machines/processes';
 import type { Ribbon as RibbonType } from '../components/game-object/ribbon-component';
 import { TILES } from '../construction/tile-config';
 import { Ore } from '../game-objects/ore';
-import { loadGame } from '../systems/load-game';
+import { loadGame, restoreMachines, loadInventory } from '../systems/load-game';
 import { SaveManager } from '../systems/save-manager';
+import type { StackData, Direction } from '../common/types';
 
 const SHOP_POSITION = { x: (23 * 64) + 32, y: (23 * 64) + 32 };
 const PLAYER_POSITION = { x: (22*64), y: (27*64) };
@@ -50,11 +51,9 @@ export class GameScene extends Phaser.Scene {
   #wasPointerDown = false;
   #placement!: PlacementSystem;
   #machines: Machine[] = [];
-  #placementHint!: Phaser.GameObjects.Text;
-  #demolishHint!: Phaser.GameObjects.Text;
+  #hints!: Hints;
   #demolishMode = false;
   #debugPlacement!: DebugPlacement;
-
   constructor() {
     super({ key: 'GAME_SCENE' });
   }
@@ -202,26 +201,51 @@ export class GameScene extends Phaser.Scene {
 
     // Load saved game
     if ((this.scene.settings.data as { loadFromSave?: boolean })?.loadFromSave === true) {
-      loadGame(this.#shop, this.#player, this.#inventory);
+      loadGame(this.#shop, this.#player);
+      restoreMachines(this, this.#interactibles, this.#machines, this.#interactiblesMinusConveyors, SaveManager.getSavedMachines());
+      restoreEntityStates(this.#interactibles);
+      loadInventory(this.#inventory);
     }
 
-    const { demolishHint, placementHint } = createHints(this);
-    this.#demolishHint = demolishHint;
-    this.#placementHint = placementHint;
+    this.#hints = new Hints(this);
   }
 
   update(_time: number, delta: number) {
-    this.#placementHint.setVisible(this.#placement.isActive);
-    this.#demolishHint.setVisible(this.#demolishMode);
+    this.#hints.showPlacementHint(this.#placement.isActive);
+    this.#hints.showDemolishHint(this.#demolishMode);
 
     if (this.#controls.isZKeyJustDown) {
       this.#demolishMode = !this.#demolishMode;
       this.data.set('demolishMode', this.#demolishMode);
     }
 
-    // Ctrl+S → Save game
-    if (this.#controls.isCtrlSJustDown) {
-      SaveManager.save(this.#shop.points, this.#player.x, this.#player.y, this.#inventory.getSlotsData());
+    // Q > Save game
+    if (this.#controls.isQKeyJustDown) {
+      const entityStates: { id: number; health: number }[] = [];
+      this.#interactibles.getChildren().forEach(obj => {
+        if (obj instanceof Interactibles && obj.entityId > 0) {
+          entityStates.push({ id: obj.entityId, health: obj.health });
+        }
+      });
+      const machinesToSave = this.#machines.filter(m => !(m instanceof Shop));
+        
+      const machineStates = machinesToSave.map(m => {
+        const typeKey = (m.constructor as { craftKey?: string }).craftKey ?? 'UNKNOWN';
+        const facing = (m as { facing?: Direction }).facing ?? 'right';
+        const stacks = (m as { stacks?: StackData[] }).stacks ?? [];
+        
+        return {
+          typeKey: typeKey,
+          x: m.x,
+          y: m.y,
+          facing: facing,
+          health: m.health,
+          stacks: stacks,
+        };
+      });
+      SaveManager.save(this.#shop.points, this.#player.x, this.#player.y, this.#inventory.getSlotsData(), entityStates, machineStates);
+      this.#hints.showSaveHint(true);
+      this.time.delayedCall(2000, () => this.#hints.showSaveHint(false));
     }
 
     this.#debugPlacement.handleInput();
@@ -293,8 +317,8 @@ export class GameScene extends Phaser.Scene {
             }
             // Wire inventory clicks to transfer items into the bound machine's
             // input slot.
-            //   Normal click  → transfer 1 item.
-            //   Shift+click   → transfer as many as possible from that stack.
+            //   Normal click  > transfer 1 item.
+            //   Shift+click > transfer as many as possible from that stack.
             this.#inventory.onSlotClick = (itemKey, shiftKey) => {
               if (shiftKey) {
                 // Transfer as many as possible
@@ -319,23 +343,22 @@ export class GameScene extends Phaser.Scene {
               this.#inventory.toggle();
             }
             // Wire inventory clicks to consume 1 item and add the item's price to banner points.
-            //   Normal click  → sell 1 item.
-            //   Shift+click   → sell as many as possible of that item.
+            //   Normal click  > sell 1 item.
+            //   Shift+click > sell as many as possible of that item.
             this.#inventory.onSlotClick = (itemKey, shiftKey) => {
               const price = PRICES.get(itemKey);
               if (!price) return;
               if (shiftKey) {
                 const count = this.#inventory.countAllOf(itemKey);
-                if (count > 0) {
-                  this.#inventory.removeItems(itemKey, count);
-                  this.#shop.addPoints(price * count);
-                }
+                this.#inventory.removeItems(itemKey, count);
+                this.#shop.addPoints(price * count);
               } else {
                 if (this.#inventory.hasEnoughOf(itemKey, 1)) {
                   this.#inventory.removeItems(itemKey, 1);
                   this.#shop.addPoints(price);
                 }
               }
+              this.sound.play('COIN_SOUND');
             };
           }
           Interactibles.setSelected(hovered);

@@ -5,6 +5,8 @@ import { FUEL_ITEMS, SMELT_MAP } from "./processes";
 import { OPPOSITE, DIRECTIONS } from "../../common/const";
 import { registry } from "../../systems/machine-registry";
 
+const STACK_SIZE = 64;
+
 export class Furnace extends Machine {
     
     static readonly craftRecipe: Recipe = [
@@ -42,10 +44,6 @@ export class Furnace extends Machine {
         this.setInteractive(rect, Phaser.Geom.Rectangle.Contains);
     }
     
-    static get placementRect(): Phaser.Geom.Rectangle {
-        return new Phaser.Geom.Rectangle(-32, 64 + 5, 64, 54);
-    }
-
     acceptItem(stack: StackData): boolean {
         const leftover = this.routingStack(stack);
         // Accept only if all items were placed (no leftover)
@@ -127,7 +125,7 @@ export class Furnace extends Machine {
     }
 
     private outputCanRecive(): boolean {
-        return this.#outputSlot.amount < 64 
+        return this.#outputSlot.amount < STACK_SIZE 
             && this.#oreSlot.itemKey !== null    
             && this.#outputSlot.itemKey === SMELT_MAP.get(this.#oreSlot.itemKey);
     }

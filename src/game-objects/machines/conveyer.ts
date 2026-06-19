@@ -4,6 +4,9 @@ import type { Recipe, Direction, StackData } from "../../common/types";
 import { OPPOSITE } from "../../common/const";
 import { registry } from "../../systems/machine-registry";
 
+const CONV_SIZE = 64;
+const HEALTH = 100;
+
 export class Conveyer extends RotatableMachine {
 
     static readonly craftRecipe: Recipe = [
@@ -26,22 +29,22 @@ export class Conveyer extends RotatableMachine {
     #outputItem: Phaser.GameObjects.Image;
 
     constructor(config: RotatableConfig) {
-        super(config, 100, 'CONVEYOR', false);
+        super(config, HEALTH, 'CONVEYOR', false);
         registry.register(this);
         this.setStackCount(3);
         this.setAngle(this.facing === 'up' ? -90 :
                       this.facing === 'down' ? 90 :
                       this.facing === 'left' ? 180 : 0);
-        this.setBodySize(64, 64);
+        this.setBodySize(CONV_SIZE, CONV_SIZE);
         this.body?.setOffset(0, 0)
-        this.setDepth(config.position.y-32);
+        this.setDepth(config.position.y - CONV_SIZE/2);
 
         this.removeInteractive();
-        const rect = new Phaser.Geom.Rectangle(0, 0, 64, 64);
+        const rect = new Phaser.Geom.Rectangle(0, 0, CONV_SIZE, CONV_SIZE);
         this.hitRect = rect;
         this.setInteractive(rect, Phaser.Geom.Rectangle.Contains);
 
-        // Create item display images positioned based on facing direction (50% scale: 64→32)
+        // Create item display images positioned based on facing direction (50% scale: 64 to 32)
         const [inputOff, outputOff] = this.#slotOffsets();
         this.#inputItem = this.#createItemDisplay(inputOff[0], inputOff[1]);
         this.#innerItem = this.#createItemDisplay(0, 0);
@@ -75,13 +78,13 @@ export class Conveyer extends RotatableMachine {
         while (this.#tickAccumulator >= Conveyer.TICK_INTERVAL) {
             this.#tickAccumulator -= Conveyer.TICK_INTERVAL;
 
-            // 1: push OUTPUT → neighbor
+            // 1: push OUTPUT > neighbor
             this.#pushToNeighbor(this.facing);
 
-            // 2: push INNER → OUTPUT
+            // 2: push INNER > OUTPUT
             this.#moveStack(Conveyer.INNER, Conveyer.OUTPUT);
 
-            // 3: push INPUT → INNER
+            // 3: push INPUT > INNER
             this.#moveStack(Conveyer.INPUT, Conveyer.INNER);
         }
 
@@ -152,7 +155,4 @@ export class Conveyer extends RotatableMachine {
         super.destroy();
     }
 
-    static get placementRect(): Phaser.Geom.Rectangle {
-        return new Phaser.Geom.Rectangle(-32, 64 + 5, 64, 54);
-    }
 }

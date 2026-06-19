@@ -1,8 +1,14 @@
 import Phaser from 'phaser';
 import { i18n } from '../locales/i18n';
 import { SaveManager } from '../systems/save-manager';
+import { BackGroundColor } from '../common/const'
+import { DEPTH } from '../common/depth'
 
-const TILE = 48; // same spacing as RecipeOverlay uses for paper columns
+const TILE = 48;
+const LANG_ICON_VERTICAL = 20;
+const LANG_ICON_HORIZONTAL = 80;
+const NEW_GAME_BTN = -90;
+const LOAD_GAME_BTN = 50;
 
 type FlagLayout = {
   startX: number;
@@ -25,31 +31,34 @@ export class MenuScene extends Phaser.Scene {
     super({ key: 'MENU_SCENE' });
   }
 
-  #addButton(y: number, key: string): Phaser.GameObjects.Image {
+  #addButton(y: number, key: string): [Phaser.GameObjects.Image, Phaser.GameObjects.Text] {
     const btn = this.add.image(this.cameras.main.width / 2, y, 'MENU_BUTTON');
     btn.setOrigin(0.5);
     btn.setInteractive({ useHandCursor: true });
-    this.add.text(this.cameras.main.width / 2, y, i18n.t(key), {
+    const text = this.add.text(this.cameras.main.width / 2, y, i18n.t(key), {
       fontSize: '28px',
       color: '#ffffff',
       stroke: '#000000',
       strokeThickness: 3,
     }).setOrigin(0.5);
-    return btn;
+    return [btn, text];
   }
 
   public create(): void {
-    this.cameras.main.setBackgroundColor('#47ABA9');
+    this.cameras.main.setBackgroundColor(BackGroundColor);
 
     const { width, height } = this.cameras.main;
     const banner = this.add.image(width / 2, height / 2, 'MENU_BANNER');
     banner.setOrigin(0.5);
 
-    const startButton = this.#addButton(height / 2, 'menu.startNewGame');
-    const loadButton = this.#addButton(height / 2 + 90, 'menu.loadGame');
+    const btnNewGame = this.#addButton(height / 2 + NEW_GAME_BTN, 'menu.startNewGame');
+    const btnLoadGame = this.#addButton(height / 2 + LOAD_GAME_BTN, 'menu.loadGame');
 
-    this.#startText = this.children.list[this.children.list.length - 1] as Phaser.GameObjects.Text;
-    this.#loadText = this.children.list[this.children.list.length - 1] as Phaser.GameObjects.Text;
+    const startButton = btnNewGame[0];
+    const loadButton = btnLoadGame[0];
+
+    this.#startText = btnNewGame[1];
+    this.#loadText = btnLoadGame[1];
 
     startButton.on('pointerdown', () => { this.scene.start('GAME_SCENE') }); 
     loadButton.on('pointerdown', () => {
@@ -59,8 +68,8 @@ export class MenuScene extends Phaser.Scene {
     });
 
     // --- World icon (lower-left of banner) ---
-    const iconX = banner.x - banner.displayWidth / 2 + 80;
-    const iconY = banner.y + banner.displayHeight / 2 + 20;
+    const iconX = banner.x - banner.displayWidth / 2 + LANG_ICON_HORIZONTAL;
+    const iconY = banner.y + banner.displayHeight / 2 + LANG_ICON_VERTICAL;
     const worldIcon = this.add.image(iconX, iconY, 'MENU_WORLD_ICON')
       .setOrigin(0.5)
       .setInteractive({ useHandCursor: true });
@@ -164,7 +173,7 @@ export class MenuScene extends Phaser.Scene {
           frame,
         )
           .setOrigin(0.5)
-          .setDepth(10004); // paper behind flags
+          .setDepth(DEPTH.MENU_PAPER);
         this.#flagUnderlay.push(sprite);
       }
     });

@@ -24,6 +24,7 @@ export abstract class Interactibles extends Phaser.Physics.Arcade.Sprite {
     #health: number;
     #hovered = false;
     #hitRect!: Phaser.Geom.Rectangle;
+    entityId: number = 0;
 
     abstract get resourceKey(): string;
     get dropAmount(): number { return 1; }
