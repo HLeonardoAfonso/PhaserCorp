@@ -10,7 +10,7 @@ export class Inventory {
   #controls: KeyboardComponent;
   #slots: Slot[] = [];
 
-  /** Callback invoked when a player clicks on an inventory slot. */
+  // Callback invoked when a player clicks on an inventory slot
   onSlotClick: ((itemKey: string, shiftKey: boolean) => void) | null = null;
 
   constructor(scene: Phaser.Scene, controls: KeyboardComponent, debug: boolean) {
@@ -119,7 +119,7 @@ export class Inventory {
     return false;
   }
 
-  /** Return the total quantity of the given item across all inventory slots. */
+  // Return the total quantity of the given item across all inventory slots
   countAllOf(itemKey: string): number {
     let total = 0;
     for (const slot of this.#slots) {
