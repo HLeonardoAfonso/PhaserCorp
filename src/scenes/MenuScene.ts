@@ -9,6 +9,7 @@ const LANG_ICON_VERTICAL = 20;
 const LANG_ICON_HORIZONTAL = 80;
 const NEW_GAME_BTN = -90;
 const LOAD_GAME_BTN = 50;
+const TEXT_HIGHT = 280;
 
 type FlagLayout = {
   startX: number;
@@ -50,6 +51,13 @@ export class MenuScene extends Phaser.Scene {
     const { width, height } = this.cameras.main;
     const banner = this.add.image(width / 2, height / 2, 'MENU_BANNER');
     banner.setOrigin(0.5);
+
+    this.add.text(width / 2, height / 2 - TEXT_HIGHT, 'PhaserCorp', {
+      fontSize: '100px',
+      color: '#ffffff',
+      stroke: '#000000',
+      strokeThickness: 3,
+    }).setOrigin(0.5);
 
     const btnNewGame = this.#addButton(height / 2 + NEW_GAME_BTN, 'menu.startNewGame');
     const btnLoadGame = this.#addButton(height / 2 + LOAD_GAME_BTN, 'menu.loadGame');
