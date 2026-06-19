@@ -136,7 +136,7 @@ export function createWaterEffects(
       }
       // water collider
       if (mapData[row][col] === 4) {
-        const waterZone = scene.add.zone(col * 64 + 32, row * 64 + 32, 64, 64);
+        const waterZone = scene.add.zone(col * 64 + 32, row * 64 + 32, TILE_SIZE, TILE_SIZE);
         colliders.add(waterZone);
       }
     }
@@ -164,7 +164,7 @@ export function createRockColliders(
 
       // Full 64x64 collider for wall tiles
       if (rockWallSet.has(tile)) {
-        const rockZone = scene.add.zone(col * 64 + 32, row * 64 + 32, 64, 64);
+        const rockZone = scene.add.zone(col * 64 + 32, row * 64 + 32, TILE_SIZE, TILE_SIZE);
         colliders.add(rockZone);
       }
 

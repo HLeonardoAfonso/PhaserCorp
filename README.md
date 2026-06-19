@@ -1,6 +1,8 @@
 * npm install
 * npm run dev
 
+play in the link
+
 Visual Assets from free "Tiny Swords" asset pack
 https://pixelfrog-assets.itch.io/tiny-swords
 
@@ -9,9 +11,7 @@ were created using generative neural networks with editing by the authors
 
 Audio Assets from pixabay.com
 
-
-
-
+PLay keys
 
 Ressources
 
