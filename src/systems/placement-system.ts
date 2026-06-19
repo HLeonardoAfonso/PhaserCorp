@@ -67,7 +67,7 @@ export class PlacementSystem {
 
     get isActive(): boolean { return this.#active; }
 
-    /** Begin placing an inventory item; returns false if it isn't placeable. */
+    //Iniciar o placement de máquinas
     startByItem(itemKey: string): boolean {
         const def = PlacementSystem.placeableFor(itemKey);
         if (!def) return false;
@@ -76,7 +76,7 @@ export class PlacementSystem {
         return true;
     }
 
-    /** Begin placement with an explicit factory + ghost asset. */
+    //Parte visual do placement, ghost sprite
     start(factory: PlaceableConstructor, assetKey: string): void {
         if (this.#active) this.cancel();
 
@@ -93,7 +93,7 @@ export class PlacementSystem {
         this.#updateGhostRotation();
     }
 
-    /** Abort placement and clear the ghost. */
+    // Cancelar o placement
     cancel(): void {
         this.#ghost?.destroy();
         this.#ghost = null;
@@ -102,6 +102,7 @@ export class PlacementSystem {
         this.#itemKey = null;
     }
 
+    // Fazer o rotate do sprite
     rotate(): void {
         if (!this.#active || !this.#hasRotation) return;
         const steps = this.#factory.rotationSteps ?? 4;
@@ -109,12 +110,13 @@ export class PlacementSystem {
         this.#updateGhostRotation();
     }
 
+    // Atualizar a posição do ghost sprite
     update(justClicked: boolean): void {
         if (!this.#active || !this.#ghost) return;
 
-        // Arm only after the starting click is released, so that click can't
-        // immediately place a machine.
-        if (!this.#scene.input.activePointer.isDown) this.#armed = true;
+        if (!this.#scene.input.activePointer.isDown){
+            this.#armed = true;
+        }
 
         const { x, y } = this.#snappedPointer();
         this.#ghost.setPosition(x, y);
@@ -125,6 +127,7 @@ export class PlacementSystem {
         if (justClicked && canPlace && this.#armed) this.#place(x, y);
     }
 
+    // Fazer a rotação do ghost sprite
     #updateGhostRotation(): void {
         if (!this.#ghost) return;
         const steps = this.#factory.rotationSteps ?? 4;
@@ -136,7 +139,7 @@ export class PlacementSystem {
         this.#ghost.setAngle(facing === 'up' ? -90 : facing === 'down' ? 90 : facing === 'left' ? 180 : 0);
     }
 
-    /** World-space pointer position snapped to the tile-grid centre. */
+    // Metodo privado para ajudar no snap de cada tile
     #snappedPointer(): { x: number; y: number } {
         const wp = this.#scene.cameras.main.getWorldPoint(
             this.#scene.input.activePointer.x,
@@ -148,7 +151,7 @@ export class PlacementSystem {
         };
     }
 
-    /** Verificação do placement da máquina */
+    // Verificação do placement da máquina
     #canPlaceAt(x: number, y: number): boolean {
         const tileX = Math.floor(x / TILE);
         const tileY = Math.floor(y / TILE);
@@ -170,7 +173,7 @@ export class PlacementSystem {
         return !Phaser.Geom.Rectangle.Overlaps(tileRect, playerRect);
     }
 
-    /** Build the object, register it, play sfx, then consume one from stock. */
+    // Placement da máquina selecionada, play do som e remover item do inventario
     #place(x: number, y: number): void {
         const facing = this.#hasRotation ? DIRECTIONS[this.#currentRotation] : undefined;
         const config: InteractiblesConfig & { facing?: Direction } = {
