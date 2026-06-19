@@ -8,6 +8,8 @@ type NeighborEdges = {
   right?: number[];  // left column of chunk right  (16 values)
 }
 
+const CHUNK_SIZE = 16;
+const TILE_SIZE = 64;
 
 function getNeighborEdges(world: world, chunkRow: number, chunkCol: number): NeighborEdges {
   return {
@@ -19,10 +21,10 @@ function getNeighborEdges(world: world, chunkRow: number, chunkCol: number): Nei
 }
 
 function convertChunk(chunk: chunk, edges?: NeighborEdges): chunk {
-  const converted: chunk = Array.from({ length: 16 }, () => new Array(16).fill(0));
+  const converted: chunk = Array.from({ length: CHUNK_SIZE }, () => new Array(CHUNK_SIZE).fill(0));
 
-  for (let i = 0; i < 16; i++) {
-    for (let f = 0; f < 16; f++) {
+  for (let i = 0; i < CHUNK_SIZE; i++) {
+    for (let f = 0; f < CHUNK_SIZE; f++) {
       if (chunk[i][f] === 0) {
         converted[i][f] = TILES.WATER;  // water
       } else {
@@ -43,10 +45,10 @@ function convertChunk(chunk: chunk, edges?: NeighborEdges): chunk {
 }
 
 function convertRockChunk(chunk: chunk, edges?: NeighborEdges): chunk {
-  const converted: chunk = Array.from({ length: 16 }, () => new Array(16).fill(-1));
+  const converted: chunk = Array.from({ length: CHUNK_SIZE }, () => new Array(CHUNK_SIZE).fill(-1));
 
-  for (let i = 0; i < 16; i++) {
-    for (let f = 0; f < 16; f++) {
+  for (let i = 0; i < CHUNK_SIZE; i++) {
+    for (let f = 0; f < CHUNK_SIZE; f++) {
       if (chunk[i][f] === 2) {
         let code = 0;
         // Up — not rock above (inside chunk or from neighbor above)
@@ -74,8 +76,8 @@ function convertRockChunk(chunk: chunk, edges?: NeighborEdges): chunk {
 export function createWorld(world: world): number[][] {
   const chunkRows = world.length;
   const chunkCols = world[0].length;
-  const mapHeight = chunkRows * 16;
-  const mapWidth  = chunkCols * 16;
+  const mapHeight = chunkRows * CHUNK_SIZE;
+  const mapWidth  = chunkCols * CHUNK_SIZE;
 
   const result: number[][] = Array.from({ length: mapHeight }, () => new Array(mapWidth).fill(0));
 
@@ -83,9 +85,9 @@ export function createWorld(world: world): number[][] {
     for (let chunkCol = 0; chunkCol < chunkCols; chunkCol++) {
       const edges = getNeighborEdges(world, chunkRow, chunkCol);
       const chunk = convertChunk(world[chunkRow][chunkCol], edges);
-      for (let r = 0; r < 16; r++) {
-        for (let c = 0; c < 16; c++) {
-          result[chunkRow * 16 + r][chunkCol * 16 + c] = chunk[r][c];
+      for (let r = 0; r < CHUNK_SIZE; r++) {
+        for (let c = 0; c < CHUNK_SIZE; c++) {
+          result[chunkRow * CHUNK_SIZE + r][chunkCol * CHUNK_SIZE + c] = chunk[r][c];
         }
       }
     }
@@ -97,8 +99,8 @@ export function createWorld(world: world): number[][] {
 export function createRockLayer(world: world): number[][] {
   const chunkRows = world.length;
   const chunkCols = world[0].length;
-  const mapHeight = chunkRows * 16;
-  const mapWidth  = chunkCols * 16;
+  const mapHeight = chunkRows * CHUNK_SIZE;
+  const mapWidth  = chunkCols * CHUNK_SIZE;
 
   const result: number[][] = Array.from({ length: mapHeight }, () => new Array(mapWidth).fill(-1));
 
@@ -106,9 +108,9 @@ export function createRockLayer(world: world): number[][] {
     for (let chunkCol = 0; chunkCol < chunkCols; chunkCol++) {
       const edges = getNeighborEdges(world, chunkRow, chunkCol);
       const chunk = convertRockChunk(world[chunkRow][chunkCol], edges);
-      for (let r = 0; r < 16; r++) {
-        for (let c = 0; c < 16; c++) {
-          result[chunkRow * 16 + r][chunkCol * 16 + c] = chunk[r][c];
+      for (let r = 0; r < CHUNK_SIZE; r++) {
+        for (let c = 0; c < CHUNK_SIZE; c++) {
+          result[chunkRow * CHUNK_SIZE + r][chunkCol * CHUNK_SIZE + c] = chunk[r][c];
         }
       }
     }

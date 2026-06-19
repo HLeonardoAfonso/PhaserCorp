@@ -22,6 +22,11 @@ type CraftableEntry = {
   craftKey: string;
 };
 
+const offset = 64;
+const slotSize = 110;
+const gridCols = 3;
+const gridRows = 3;
+
 const CRAFTABLE_MACHINES = [Furnace, Conveyer, Drill, Crate, Crafter] as const;
 
 const CRAFTABLE_ITEMS: CraftableEntry[] = [
@@ -124,16 +129,11 @@ export class Crafting {
   #initSlotData(scene: Phaser.Scene, debug: boolean): void {
     const topLeftX = this.#table.x - this.#table.displayWidth / 2;
     const topLeftY = this.#table.y - this.#table.displayHeight / 2;
-    const offsetX = 64;
-    const offsetY = 64;
-    const slotSize = 128;
-    const gridCols = 3;
-    const gridRows = 2;
 
     for (let row = 0; row < gridRows; row++) {
       for (let col = 0; col < gridCols; col++) {
-        const cx = topLeftX + offsetX + col * slotSize + slotSize / 2;
-        const cy = topLeftY + offsetY + row * slotSize + slotSize / 2;
+        const cx = topLeftX + offset + col * slotSize + slotSize / 2;
+        const cy = topLeftY + offset + row * slotSize + slotSize / 2;
 
         this.#slots.push({
           x: cx,

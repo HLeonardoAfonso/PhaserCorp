@@ -5,9 +5,12 @@ Visual Assets from free "Tiny Swords" asset pack
 https://pixelfrog-assets.itch.io/tiny-swords
 
 Assets not included in the asset pack mentioned before
-were created using generative neural networks with aditing by the authors
+were created using generative neural networks with editing by the authors
 
-Audio Assets ...
+Audio Assets from pixabay.com
+
+
+
 
 
 Ressources

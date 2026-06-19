@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { PreloadScene } from './scenes/PreloadScene';
 import { GameScene } from './scenes/GameScene';
 import { MenuScene } from './scenes/MenuScene';
+import { BackGroundColor } from './common/const'
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -12,7 +13,7 @@ const config: Phaser.Types.Core.GameConfig = {
     mode: Phaser.Scale.RESIZE,
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
-  backgroundColor: '#47ABA9',
+  backgroundColor: BackGroundColor,
   scene: [PreloadScene, MenuScene, GameScene],
   physics: {
     default: 'arcade',
