@@ -11,7 +11,7 @@ export function loadGame(shop: Shop, player: Player): void {
     const data = SaveManager.load();
     if (!data) return;
     shop.setPoints(data.shopPoints);
-    player.setPosition(data.player.x, player.y);
+    player.setPosition(data.player.x, data.player.y);
 }
 
 export function loadInventory(inventory: Inventory): void {

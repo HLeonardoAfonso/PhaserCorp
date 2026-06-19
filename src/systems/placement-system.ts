@@ -8,6 +8,7 @@ import { Furnace } from '../game-objects/machines/furnace';
 import { Conveyer } from '../game-objects/machines/conveyer';
 import { Drill } from '../game-objects/machines/drill';
 import { Crafter } from '../game-objects/machines/crafter';
+import { Crate } from '../game-objects/machines/crate';
 
 const TILE = 64;
 const GHOST_ALPHA = 0.5;
@@ -15,8 +16,6 @@ const GHOST_DEPTH = 999;
 const VALID_TINT = 0x00ff00;
 const INVALID_TINT = 0xff0000;
 
-/** Constructor for a placeable object plus the optional static metadata
- *  the placement system reads off the class. */
 type PlaceableConstructor = (new (config: InteractiblesConfig) => Interactibles) & {
     displayOrigin?: { x: number; y: number };
     rotationSteps?: number;
@@ -27,9 +26,8 @@ export interface PlaceableDef {
     assetKey: string;
 }
 
-/** inventory itemKey (craftItemKey) -> how to place it */
 const PLACEABLES: ReadonlyMap<string, PlaceableDef> = new Map(
-    [Furnace, Conveyer, Drill, Crafter].map(cls => [
+    [Furnace, Conveyer, Drill, Crafter, Crate].map(cls => [
         cls.craftKey,
         { factory: cls as unknown as PlaceableConstructor, assetKey: cls.craftKey },
     ])

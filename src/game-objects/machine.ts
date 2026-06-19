@@ -17,7 +17,10 @@ export abstract class Machine extends Interactibles {
         return this.#Interfacable;
     }
 
-    /** Per-instance slot data. Mutated by the interface / process logic. */
+    static get placementRect(): Phaser.Geom.Rectangle {
+        return new Phaser.Geom.Rectangle(-32, 64 + 5, 64, 54);
+    }
+
     get stacks(): StackData[] {
         return this.#stacks;
     }
@@ -38,43 +41,12 @@ export abstract class Machine extends Interactibles {
 
     playIdleAnimation(): void {}
 
-    // autonomous machine item trasnfer system 
-
-    //Accept an item from a neighbor. Returns true if accepted, false if rejected.
-    // Exemplo
-    // Conveyor calls neighbor.acceptItem({ itemKey: 'IRON_ORE', amount: 1 }).
-    // The furnace accepts it into its smeltable slot and returns true.
     abstract acceptItem(stack: StackData): boolean;
 
-    /**
-     * Whether this machine can receive items from a given direction.
-     * 
-     * Example:
-     *   conveyor.canReceiveFrom('left') returns true if its facing is not 'left'
-     *   and its input slot is empty.
-     */
     abstract canReceiveFrom(dir: Direction): boolean;
 
-    /**
-     * Called every game tick with delta in ms.
-     * 
-     * Example:
-     *   A furnace accumulates delta in smeltingProgress.
-     *   When smeltingProgress >= smeltingTime (100ms), it consumes fuel + ore
-     *   and produces an output.
-     */
     abstract update(delta: number): void;
 
-    /**
-     * Attempt to insert a stack into a specific slot.
-     * Returns the leftover stack that didn't fit.
-     * 
-     * Example:
-     *   insertIntoSlot(0, { itemKey: 'COAL', amount: 5 })
-     *   If slot 0 is empty, it accepts 5 coal (or up to 64) and returns leftover.
-     *   If slot 0 already has COAL with amount 62, it accepts 2 and returns { itemKey: 'COAL', amount: 3 }.
-     *   If slot 0 has IRON_ORE, it rejects all and returns the original stack.
-     */
     protected insertIntoSlot(slotIndex: number, stack: StackData): StackData {
         const slot = this.#stacks[slotIndex];
 
@@ -121,13 +93,6 @@ export abstract class Machine extends Interactibles {
         this.cleanupIfDead();
     }
 
-    /**
-     * Override destroy to unregister from the MachineRegistry.
-     * 
-     * Example:
-     *   When a conveyor is mined, destroy() is called → it removes itself
-     *   from the registry so getNeighbor() no longer finds it.
-     */
     destroy(): void {
         registry.unregister(this);
         super.destroy();

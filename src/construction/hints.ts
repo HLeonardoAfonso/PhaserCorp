@@ -1,6 +1,10 @@
 import { i18n } from '../locales/i18n';
 import { DEPTH } from '../common/depth';
 
+const HINT_X = 20;
+const HINT_Y_BOTTOM = 20;
+const HINT_Y_TOP = 60;
+
 export class Hints {
   private demolishHint: Phaser.GameObjects.Text;
   private placementHint: Phaser.GameObjects.Text;
@@ -17,8 +21,8 @@ export class Hints {
 
   private createDemolishHint(): Phaser.GameObjects.Text {
     return this.scene.add.text(
-      20,
-      this.scene.cameras.main.height - 60,
+      HINT_X,
+      this.scene.cameras.main.height - HINT_Y_TOP,
       i18n.t('game.demolish.hint'),
       { fontSize: '25px', color: '#ff8800', stroke: '#000000', strokeThickness: 2 },
     )
@@ -30,8 +34,8 @@ export class Hints {
 
   private createPlacementHint(): Phaser.GameObjects.Text {
     return this.scene.add.text(
-      20,
-      this.scene.cameras.main.height - 20,
+      HINT_X,
+      this.scene.cameras.main.height - HINT_Y_BOTTOM,
       i18n.t('game.placement.cancelHint'),
       { fontSize: '25px', color: '#ff0000', stroke: '#000000', strokeThickness: 2 },
     )

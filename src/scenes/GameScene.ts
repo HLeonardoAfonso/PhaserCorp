@@ -219,7 +219,7 @@ export class GameScene extends Phaser.Scene {
       this.data.set('demolishMode', this.#demolishMode);
     }
 
-    // Q → Save game
+    // Q > Save game
     if (this.#controls.isQKeyJustDown) {
       const entityStates: { id: number; health: number }[] = [];
       this.#interactibles.getChildren().forEach(obj => {
@@ -317,8 +317,8 @@ export class GameScene extends Phaser.Scene {
             }
             // Wire inventory clicks to transfer items into the bound machine's
             // input slot.
-            //   Normal click  → transfer 1 item.
-            //   Shift+click   → transfer as many as possible from that stack.
+            //   Normal click  > transfer 1 item.
+            //   Shift+click > transfer as many as possible from that stack.
             this.#inventory.onSlotClick = (itemKey, shiftKey) => {
               if (shiftKey) {
                 // Transfer as many as possible
@@ -343,8 +343,8 @@ export class GameScene extends Phaser.Scene {
               this.#inventory.toggle();
             }
             // Wire inventory clicks to consume 1 item and add the item's price to banner points.
-            //   Normal click  → sell 1 item.
-            //   Shift+click   → sell as many as possible of that item.
+            //   Normal click  > sell 1 item.
+            //   Shift+click > sell as many as possible of that item.
             this.#inventory.onSlotClick = (itemKey, shiftKey) => {
               const price = PRICES.get(itemKey);
               if (!price) return;
