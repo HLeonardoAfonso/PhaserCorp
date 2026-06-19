@@ -105,6 +105,11 @@ diagram below shows the classes and how they relate to one another.
 
 ![Model class diagram](public/README/ModelDiagram.png)
 
+## Authors
+
+Henrique Afonso - 15799\
+Henrique Fernandes - 33393
+
 ## Credits
 
 - Visual assets from the free "Tiny Swords" asset pack:
